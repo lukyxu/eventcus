@@ -3,7 +3,14 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
 require('dotenv').config()
+
+const uri = process.env.DB_CONNECTION;
+mongoose.connect(uri, 
+  {  useNewUrlParser: true,  useUnifiedTopology: true})
+  .then(() => {  console.log('MongoDB Connected')})
+  .catch(err => console.log(err))
 
 var indexRouter = require('./routes/index');
 var organizerRouter = require('./routes/organizer');
