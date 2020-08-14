@@ -4,18 +4,18 @@ import PostForm from './../services/post-form.js';
 
 export default function EventForm() {
 
-    const [name, setName] = useState('');
-    const [date, setDate] = useState('');
-    const [details, setDetails] = useState('');
-    const [release, setRelease] = useState('');
-    const [payment, setPayment] = useState('');
+    const [eventName, setName] = useState('');
+    const [eventDate, setDate] = useState('');
+    const [eventDetails, setDetails] = useState('');
+    const [ticketRelease, setRelease] = useState('');
+    const [paymentInfo, setPayment] = useState('');
 
     const [defaultFieldsChecked, setDefaults] = useState({
-        'Full Name': true,
-        'Shortcode': true,
-        'Email': true,
-        'Contact Number': true,
-        'Food Allergy': false,
+        fullName: true,
+        shortcode: true,
+        email: true,
+        contactNumber: true,
+        foodAllergies: true,
     });
 
     const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergy'];
@@ -39,113 +39,118 @@ export default function EventForm() {
 
     const validateForm = () => {
         return (
-			name.length > 0 &&
-			date.length > 0 &&
-			details.length > 0 &&
-			release.length > 0 &&
-			payment.length > 0 &&
+			eventName.length > 0 &&
+			eventDate.length > 0 &&
+			eventDetails.length > 0 &&
+			ticketRelease.length > 0 &&
+			paymentInfo.length > 0 &&
 			ticketTypes[0]['type'].length > 0 &&
 			ticketTypes[0]['quantity'] > 0
 		);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (event) => {
         const reqBody = {
-            name,
-            date,
-            details,
-            release,
-            payment,
+            eventName,
+            eventDate,
+            eventDetails,
+            ticketRelease,
+            paymentInfo,
             ticketTypes,
             defaultFields
         }
+        console.log("here")
         PostForm(reqBody);
+        event.preventDefault();
     };
     
     const renderTicketType = (ticket) => {
-        if (ticket.type === '') {
+        // if (ticket.type === '') {
             return (
-                <Form.Group as={Row}>
+                <Form.Group controlId="ticket" as={Row}>
                     <Col>
                         <Form.Control placeholder="Ticket Type" onChange={(e) => {
                             ticket['type'] = (e.target.value)
-                            validateForm()}} />
+                            setTicketTypes([...ticketTypes])
+                            }} />
                     </Col>
                     <Col>
                         <Form.Control placeholder="Price" onChange={(e) => {ticket['price'] = (e.target.value) 
-                        validateForm()}} />
+                            setTicketTypes([...ticketTypes])
+                        }} />
                     </Col>
                     <Col>
                         <Form.Control placeholder="Quantity" onChange={(e) => {ticket['quantity'] = (e.target.value) 
-                        validateForm()}} />
+                            setTicketTypes([...ticketTypes])
+                        }} />
                     </Col>
                     <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
                 </Form.Group>
             )
-        } else {
-            return (
-                <Form.Group as={Row}>
-                    <Col>
-                        <Form.Control value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
-                    </Col>
-                    <Col>
-                        <Form.Control value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
-                    </Col>
-                    <Col>
-                        <Form.Control value={ticket.quantity} onChange={(e) => ticket['quantity'] = (e.target.value)} />
-                    </Col>
+        // } else {
+        //     return (
+        //         <Form.Group controlId="ticketFilled" as={Row}>
+        //             <Col>
+        //                 <Form.Control value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
+        //             </Col>
+        //             <Col>
+        //                 <Form.Control value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
+        //             </Col>
+        //             <Col>
+        //                 <Form.Control value={ticket.quantity} onChange={(e) => ticket['quantity'] = (e.target.value)} />
+        //             </Col>
 
-                    <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
-                </Form.Group>
-            )
-        }
+        //             <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
+        //         </Form.Group>
+        //     )
+        // }
     };
 
     return (
         <div className='eventFormMain'>
-            <Form on submit={handleSubmit}>
+            <Form onSubmit={handleSubmit}>
                 <h1>Event Information</h1>
                 <div className='eventFormSection'>
                     <Row>
                         <Col>
-                            <Form.Group as={Row}>
+                            <Form.Group controlId="eventName" as={Row}>
                                 <Col>
                                     <Form.Label>Event Name</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Enter an event name" value={name} onChange={(e) => setName(e.target.value)} />
+                                    <Form.Control placeholder="Enter an event name" value={eventName} onChange={(e) => setName(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
                         <Col>
-                            <Form.Group as={Row}>
+                            <Form.Group controlId="eventDate" as={Row}>
                                 <Col>
                                     <Form.Label>Event Date</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" value={date} type ='date' onChange={(e) => setDate(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" value={eventDate} type ='date' onChange={(e) => setDate(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
                     </Row>
                     <Row>
                         <Col>
-                            <Form.Group as={Row}>
+                            <Form.Group controlId="eventDetails" as={Row}>
                                 <Col>
                                     <Form.Label>Event Details</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control as="textarea" placeholder="Enter some details" value={details} rows='3' onChange={(e) => setDetails(e.target.value)} />
+                                    <Form.Control as="textarea" placeholder="Enter some eventDetails" value={eventDetails} rows='3' onChange={(e) => setDetails(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
                         <Col>
-                            <Form.Group as={Row}>
+                            <Form.Group controlId="ticketRelease"as={Row}>
                                 <Col>
                                     <Form.Label>Ticket Release</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" type ='date' value={release} onChange={(e) => setRelease(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" type ='date' value={ticketRelease} onChange={(e) => setRelease(e.target.value)} />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row}>
@@ -153,7 +158,7 @@ export default function EventForm() {
                                     <Form.Label>Payment Info</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Payment information" value={payment} onChange={(e) => setPayment(e.target.value)} />
+                                    <Form.Control placeholder="Payment information" value={paymentInfo} onChange={(e) => setPayment(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
