@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Header from './../components/header.js'
+import { Form, Col, Row } from 'react-bootstrap';
+
 
 export default function Create() {
-        return (
-            <div>
-                <h2>Create Event</h2>
-                <p>this is the create event page</p>
-                <Link to={'/'} className="nav-link"> Dashboard </Link>
-            </div>
-        );
-    }
+
+    const [name, setName] = useState('');
+    const [date, setDate] = useState('');
+    const [details, setDetails] = useState('');
+    const [release, setRelease] = useState('');
+
+    const handleSubmit = (event) => { };
+
+    return (
+        <div>
+            <Header title='Create Event' />
+            <Link to={'/'} className="nav-link"> Dashboard </Link>
+            
+        </div>
+    );
+}

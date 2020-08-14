@@ -1,15 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './styles.css';
-import {Navbar} from 'react-bootstrap';
+import Header from './../components/header.js'
 
 export default function Dashboard() {
     return (
 
         <div>
-            <Navbar fixed='top' variant='dark'>
-                Dashboard
-            </Navbar>
+            <Header title='Dashboard'/>
             <div>
                 <h2>Dashboard</h2>
                 <p>this is the dashboard page</p>
