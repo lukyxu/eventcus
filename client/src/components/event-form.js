@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Col, Row, Button } from 'react-bootstrap';
+import PostForm from './../services/post-form.js';
 
 export default function EventForm() {
 
@@ -48,10 +49,19 @@ export default function EventForm() {
 		);
     };
 
-    const refresh = () => {
-
+    const handleSubmit = () => {
+        const reqBody = {
+            name,
+            date,
+            details,
+            release,
+            payment,
+            ticketTypes,
+            defaultFields
+        }
+        PostForm(reqBody);
     };
-
+    
     const renderTicketType = (ticket) => {
         if (ticket.type === '') {
             return (
@@ -91,8 +101,6 @@ export default function EventForm() {
         }
     };
 
-    const handleSubmit = (event) => { };
-
     return (
         <div className='eventFormMain'>
             <Form on submit={handleSubmit}>
@@ -115,7 +123,7 @@ export default function EventForm() {
                                     <Form.Label>Event Date</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" value={date} onChange={(e) => setDate(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" value={date} type ='date' onChange={(e) => setDate(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -137,7 +145,7 @@ export default function EventForm() {
                                     <Form.Label>Ticket Release</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" value={release} onChange={(e) => setRelease(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" type ='date' value={release} onChange={(e) => setRelease(e.target.value)} />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row}>

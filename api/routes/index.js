@@ -51,39 +51,41 @@ router.post('/authenticate', passport.authenticate('jwt',{session : false}), fun
 });
 
 router.post('/createForm', function(req, res, next) {
-  req = {
-    eventName: "Boat Party",
-    eventDetails: "A fun time",
-    fullName: true,
-    shortCode: true,
-    email: true,
-    contactNumber: true,
-    foodAllergies: true
-  }
+  // req = {
+  //   eventName: "Boat Party",
+  //   eventDetails: "A fun time",
+  //   fullName: true,
+  //   shortCode: true,
+  //   email: true,
+  //   contactNumber: true,
+  //   foodAllergies: true
+  // }
   let form = new Form(req.eventName)
   form.setTitle(req.eventName + " Ticket Reservation");
   form.setDescription(req.eventDetails)
-  if (req.fullName) {
-    form.addTextItem().setTitle("Full Name").setRequired();
-  }
-  if (req.shortCode) {
-    form.addTextItem().setTitle("Imperial Shortcode");
-  }
-  if (req.email) {
-    form.addTextItem().setTitle("Email Address").setRequired();
-  }
-  if (req.contactNumber) {
-    form.addTextItem().setTitle("Contact Number").setRequired();
-  }
-  if (req.foodAllergies) {
-    form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
-    form.addTextItem().setTitle("If yes, please specify")
-  }
+  // if (req.fullName) {
+  //   form.addTextItem().setTitle("Full Name").setRequired();
+  // }
+  // if (req.shortCode) {
+  //   form.addTextItem().setTitle("Imperial Shortcode");
+  // }
+  // if (req.email) {
+  //   form.addTextItem().setTitle("Email Address").setRequired();
+  // }
+  // if (req.contactNumber) {
+  //   form.addTextItem().setTitle("Contact Number").setRequired();
+  // }
+  // if (req.foodAllergies) {
+  //   form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
+  //   form.addTextItem().setTitle("If yes, please specify")
+  // }
 
   form.linkWithSheets()
 
   googleAppLinker.createForm(form.toFunctionString())
   console.log(form.toFunctionString())
+  
+  res.json({success : true})
 });
 
 module.exports = router;
