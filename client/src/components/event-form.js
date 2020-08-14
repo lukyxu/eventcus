@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Col, Row, Container, FormCheck, Button } from 'react-bootstrap';
+import { Form, Col, Row, Button } from 'react-bootstrap';
 
 export default function EventForm() {
 
@@ -19,7 +19,7 @@ export default function EventForm() {
 
     const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergy'];
 
-    const [ticketTypes, setTicketTypes] = useState([{ type: '', price: 0 }]);
+    const [ticketTypes, setTicketTypes] = useState([{ type: '', price: 0, quantity: 0 }]);
 
     const addTicketType = () => {
         var list = [...ticketTypes];
@@ -36,17 +36,39 @@ export default function EventForm() {
 
     };
 
+    const validateForm = () => {
+        return (
+			name.length > 0 &&
+			date.length > 0 &&
+			details.length > 0 &&
+			release.length > 0 &&
+			payment.length > 0 &&
+			ticketTypes[0]['type'].length > 0 &&
+			ticketTypes[0]['quantity'] > 0
+		);
+    };
+
+    const refresh = () => {
+
+    };
+
     const renderTicketType = (ticket) => {
         if (ticket.type === '') {
             return (
                 <Form.Group as={Row}>
                     <Col>
-                        <Form.Control placeholder="Ticket Type" onChange={(e) => ticket['type'] = (e.target.value)} />
+                        <Form.Control placeholder="Ticket Type" onChange={(e) => {
+                            ticket['type'] = (e.target.value)
+                            validateForm()}} />
                     </Col>
                     <Col>
-                        <Form.Control placeholder="Price" onChange={(e) => ticket['price'] = (e.target.value)} />
+                        <Form.Control placeholder="Price" onChange={(e) => {ticket['price'] = (e.target.value) 
+                        validateForm()}} />
                     </Col>
-
+                    <Col>
+                        <Form.Control placeholder="Quantity" onChange={(e) => {ticket['quantity'] = (e.target.value) 
+                        validateForm()}} />
+                    </Col>
                     <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
                 </Form.Group>
             )
@@ -54,10 +76,13 @@ export default function EventForm() {
             return (
                 <Form.Group as={Row}>
                     <Col>
-                        <Form.Control placeholder={ticket.type} value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
+                        <Form.Control value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
                     </Col>
                     <Col>
-                        <Form.Control placeholder="Price" value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
+                        <Form.Control value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
+                    </Col>
+                    <Col>
+                        <Form.Control value={ticket.quantity} onChange={(e) => ticket['quantity'] = (e.target.value)} />
                     </Col>
 
                     <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
@@ -90,7 +115,7 @@ export default function EventForm() {
                                     <Form.Label>Event Date</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" value={name} onChange={(e) => setDate(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" value={date} onChange={(e) => setDate(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -102,7 +127,7 @@ export default function EventForm() {
                                     <Form.Label>Event Details</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control as="textarea" placeholder="Enter some details" value={name} rows='3' onChange={(e) => setDetails(e.target.value)} />
+                                    <Form.Control as="textarea" placeholder="Enter some details" value={details} rows='3' onChange={(e) => setDetails(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -112,7 +137,7 @@ export default function EventForm() {
                                     <Form.Label>Ticket Release</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" value={name} onChange={(e) => setRelease(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" value={release} onChange={(e) => setRelease(e.target.value)} />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row}>
@@ -120,7 +145,7 @@ export default function EventForm() {
                                     <Form.Label>Payment Info</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Payment information" value={name} onChange={(e) => setPayment(e.target.value)} />
+                                    <Form.Control placeholder="Payment information" value={payment} onChange={(e) => setPayment(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -136,7 +161,7 @@ export default function EventForm() {
                                 Add ticket types
                             </Form.Label>
                             {ticketTypes.map((ticket, i) => (
-                                    renderTicketType(ticket)
+                                renderTicketType(ticket)
                             ))}
                             <Button onClick={addTicketType} >Add another ticket</Button>
                         </Form.Group>
@@ -162,6 +187,10 @@ export default function EventForm() {
                         </Form.Group>
                     </Row>
                 </div>
+                <br />
+                <Button type="submit" id="submitEditBtn" disabled={!validateForm()}>
+                    Create
+				</Button>
             </Form>
         </div>
 
