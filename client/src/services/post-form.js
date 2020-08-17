@@ -1,6 +1,5 @@
 export default function PostForm(formData) {
-
-    console.log(formData)
+  console.log(formData)
     return fetch('/createForm',{
         method : "post",
         body : JSON.stringify(formData),

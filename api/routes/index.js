@@ -24,7 +24,7 @@ router.post('/logout', function(req, res, next) {
 });
 
 router.post('/register', function(req, res, next) {
-  const {firstName, lastName, email, password} = req.body
+  const {name, email, password} = req.body
 
   Organizer.findOne({email}, (err, user) => {
     if (err) {
@@ -33,12 +33,12 @@ router.post('/register', function(req, res, next) {
     if (user) {
       res.status(400).json({error: "Email is already registered"})
     } else {
-      const newUser = new Organizer({firstName, lastName, email, password});
+      const newUser = new Organizer({name, email, password});
       newUser.save(err => {
         if (err) {
           res.status(500).json({error: err}) 
         } else {
-          Authenticator.setToken(newUser._id ,res)
+          authenticator.setToken(newUser._id ,res)
           res.status(200).json({message: "Account successfully created"}) 
         }
       })
