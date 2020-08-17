@@ -10,7 +10,7 @@ export default function EventForm() {
     const [ticketRelease, setTicketRelease] = useState('');
     const [paymentInfo, setPaymentInfo] = useState('');
 
-    const [defaultFieldsChecked, setDefaultFieldsChecked] = useState({
+    const [fieldsChecked, setFieldsChecked] = useState({
         fullName: true,
         shortcode: true,
         email: true,
@@ -18,17 +18,22 @@ export default function EventForm() {
         foodAllergies: true,
     });
 
-    const defaultFieldsDict = {
-        'Full Name' : 'fullName',
-        'Shortcode' : 'shortcode',
-        'Email' : 'email',
-        'Contact Number' : 'contactNumber',
-        'Food Allergies' : 'foodAllergies',
-    };
+    // const defaultFieldsDict = {
+    //     'Full Name' : 'fullName',
+    //     'Shortcode' : 'shortcode',
+    //     'Email' : 'email',
+    //     'Contact Number' : 'contactNumber',
+    //     'Food Allergies' : 'foodAllergies',
+    // };
 
-    const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergies'];
+    // const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergies'];
 
     const [ticketTypes, setTicketTypes] = useState([{ type: '', price: -1, quantity: 0 }]);
+
+    const camelToTitle = (text) => {
+      var result = text.replace( /([A-Z])/g, " $1" );
+      return result.charAt(0).toUpperCase() + result.slice(1);
+    }
 
     const addTicketType = () => {
         var list = [...ticketTypes];
@@ -65,7 +70,7 @@ export default function EventForm() {
             ticketRelease,
             paymentInfo,
             ticketTypes,
-            defaultFieldsChecked
+            fieldsChecked
         }
         PostForm(reqBody);
 
@@ -75,8 +80,7 @@ export default function EventForm() {
         setTicketRelease('');
         setPaymentInfo('');
         setTicketTypes([{ type: '', price: 0, quantity: 0 }]);
-        setTicketTypes([]);
-        setDefaultFieldsChecked({
+        setFieldsChecked({
             fullName: true,
             shortcode: true,
             email: true,
@@ -128,24 +132,6 @@ export default function EventForm() {
                     }
                 </Form.Group>
             )
-        // } else {
-        //     console.log(ticket.type)
-        //     return (
-        //         <Form.Group controlId="ticketFilled" key={i} as={Row}>
-        //             <Col>
-        //                 <Form.Control value={ticket.type} onChange={(e) => {ticket['type'] = (e.target.value); setTicketTypes([...ticketTypes])}} />
-        //             </Col>
-        //             <Col>
-        //                 <Form.Control value={ticket.price} onChange={(e) => {ticket['price'] = (e.target.value); setTicketTypes([...ticketTypes])}} />
-        //             </Col>
-        //             <Col>
-        //                 <Form.Control value={ticket.quantity} onChange={(e) => {ticket['quantity'] = (e.target.value); setTicketTypes([...ticketTypes])}} />
-        //             </Col>
-
-        //             <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
-        //         </Form.Group>
-        //     )
-        // }
     };
 
     return (
@@ -232,11 +218,11 @@ export default function EventForm() {
                             <Form.Label>
                                 Select default fields to add to sign up form
                             </Form.Label>
-                            {defaultFields.map(t => (
-                                <Form.Check key={t} checked={defaultFieldsChecked[defaultFieldsDict[t]]} type="checkbox" label={t} id={"checkbox_" + t}
+                            {Object.keys(fieldsChecked).map(t => (
+                                <Form.Check key={t} checked={fieldsChecked[t]} type="checkbox" label={camelToTitle(t)} id={"checkbox_" + t}
                                     onChange={() => {
-                                        defaultFieldsChecked[defaultFieldsDict[t]] = !defaultFieldsChecked[defaultFieldsDict[t]]
-                                        setDefaultFieldsChecked({ ...defaultFieldsChecked })
+                                      fieldsChecked[t] = !fieldsChecked[t]
+                                        setFieldsChecked({ ...fieldsChecked })
                                     }} />
                             ))}
                         </Form.Group>

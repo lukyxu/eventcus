@@ -9,7 +9,6 @@ export default function PostForm(formData) {
         },
         credentials: "include"
     }).then(res => {
-        console.log("here2")
         if(res.status !== 201) {
             return res.json().then(data => data);;
         }

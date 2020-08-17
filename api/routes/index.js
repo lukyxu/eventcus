@@ -65,19 +65,20 @@ router.post('/createForm', function(req, res, next) {
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation");
   form.setDescription(body.eventDetails)
-  if (body.defaultFieldsChecked.fullName) {
+  if (body.fieldsChecked.fullName) {
     form.addTextItem().setTitle("Full Name").setRequired();
   }
-  if (body.defaultFieldsChecked.shortcode) {
+  if (body.fieldsChecked.shortcode) {
     form.addTextItem().setTitle("Imperial Shortcode");
   }
-  if (body.defaultFieldsChecked.email) {
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
+  if (body.fieldsChecked.email) {
     form.addTextItem().setTitle("Email Address").setRequired();
   }
-  if (body.defaultFieldsChecked.contactNumber) {
+  if (body.fieldsChecked.contactNumber) {
     form.addTextItem().setTitle("Contact Number").setRequired();
   }
-  if (body.defaultFieldsChecked.foodAllergies) {
+  if (body.fieldsChecked.foodAllergies) {
     form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
     form.addTextItem().setTitle("If yes, please specify")
   }
