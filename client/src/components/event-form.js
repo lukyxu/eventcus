@@ -28,11 +28,11 @@ export default function EventForm() {
 
     const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergies'];
 
-    const [ticketTypes, setTicketTypes] = useState([{ type: '', price: 0, quantity: 0 }]);
+    const [ticketTypes, setTicketTypes] = useState([{ type: '', price: -1, quantity: 0 }]);
 
     const addTicketType = () => {
         var list = [...ticketTypes];
-        list.push({ type: '', price: 0 });
+        list.push({ type: '', price: -1, quantity: 0});
         setTicketTypes(list);
     };
 
@@ -85,54 +85,73 @@ export default function EventForm() {
         });
         event.preventDefault();
     };
-    
-    const renderTicketType = (ticket) => {
-        if (ticket.type === '' || ticket.price === -1 || ticket.quantity === 0) {
+    // const renderRemoveTicket = (ticket) => (ticketTypes.length > 1) ? <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button> : <div></div>
+  const renderRemoveTicket = (ticket) => {
+    console.log("ok")
+    console.log(ticket)
+    if (ticketTypes.length > 1) {
+        return <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
+      } else {
+        return null
+      }
+    }
+
+  const isNumeric = (value) => /^-{0,1}\d+$/.test(value)
+
+    const renderTicketType = (ticket, i) => {
             return (
-                <Form.Group controlId="ticket" as={Row}>
+                <Form.Group controlId="ticket" key={i} as={Row}>
                     <Col>
-                        <Form.Control placeholder="Ticket Type" onChange={(e) => {
+                        <Form.Control value={ticket.type} placeholder="Ticket Type" onChange={(e) => {
                             ticket['type'] = (e.target.value)
-                            // setTicketTypes([...ticketTypes])
+                            setTicketTypes([...ticketTypes])
                             }} />
                     </Col>
                     <Col>
-                        <Form.Control placeholder="Price" onChange={(e) => {ticket['price'] = (e.target.value) 
-                            // setTicketTypes([...ticketTypes])
-                        }} />
+                        <Form.Control value={ticket.price < 0 ? '' : ticket.price} placeholder="Price" onChange={(e) => {
+                            if (isNumeric(e.target.value) || e.target.value.length === 0) {
+                              ticket['price'] = (e.target.value) 
+                              setTicketTypes([...ticketTypes])
+                            }
+                          }} />
                     </Col>
                     <Col>
-                        <Form.Control placeholder="Quantity" onChange={(e) => {ticket['quantity'] = (e.target.value) 
-                            // setTicketTypes([...ticketTypes])
+                        <Form.Control value={ticket.quantity <= 0 ? '' : ticket.quantity} placeholder="Quantity" onChange={(e) => {
+                          if (isNumeric(e.target.value) || e.target.value.length === 0) {
+                            ticket['quantity'] = (e.target.value)
+                            setTicketTypes([...ticketTypes])
+                          }
                         }} />
                     </Col>
-                    <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
+                    {
+                      renderRemoveTicket(ticket)
+                    }
                 </Form.Group>
             )
-        } else {
-            return (
-                <Form.Group controlId="ticketFilled" as={Row}>
-                    <Col>
-                        <Form.Control value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
-                    </Col>
-                    <Col>
-                        <Form.Control value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
-                    </Col>
-                    <Col>
-                        <Form.Control value={ticket.quantity} onChange={(e) => ticket['quantity'] = (e.target.value)} />
-                    </Col>
+        // } else {
+        //     console.log(ticket.type)
+        //     return (
+        //         <Form.Group controlId="ticketFilled" key={i} as={Row}>
+        //             <Col>
+        //                 <Form.Control value={ticket.type} onChange={(e) => {ticket['type'] = (e.target.value); setTicketTypes([...ticketTypes])}} />
+        //             </Col>
+        //             <Col>
+        //                 <Form.Control value={ticket.price} onChange={(e) => {ticket['price'] = (e.target.value); setTicketTypes([...ticketTypes])}} />
+        //             </Col>
+        //             <Col>
+        //                 <Form.Control value={ticket.quantity} onChange={(e) => {ticket['quantity'] = (e.target.value); setTicketTypes([...ticketTypes])}} />
+        //             </Col>
 
-                    <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
-                </Form.Group>
-            )
-        }
+        //             <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
+        //         </Form.Group>
+        //     )
+        // }
     };
 
     return (
         <div className='eventFormMain'>
             <Form onSubmit={handleSubmit}>
                 <h1>Event Information</h1>
-                {console.log(ticketTypes)}
                 <div className='eventFormSection'>
                     <Row>
                         <Col>
@@ -197,7 +216,7 @@ export default function EventForm() {
                                 Add ticket types
                             </Form.Label>
                             {ticketTypes.map((ticket, i) => (
-                                renderTicketType(ticket)
+                                renderTicketType(ticket, i)
                             ))}
                             <Button onClick={addTicketType} >Add another ticket</Button>
                         </Form.Group>
