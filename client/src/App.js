@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import Create from './pages/create-event';
+import Login from './pages/login';
 
 class App extends Component {
   render() {
@@ -19,6 +20,7 @@ class App extends Component {
           <Switch>
               <Route exact path='/' component={Dashboard} />
               <Route path='/create-event' component={Create} />
+              <Route path='/login' component={Login} />
           </Switch>
         </div>
       </Router>
