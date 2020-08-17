@@ -6,6 +6,15 @@ var Organizer = require('../models/Organizer');
 var googleAppLinker = require('../helpers/googleAppLinker')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
 
+/* Read sa-credentials. */
+const fs = require('fs');
+const readline = require('readline');
+var serviceAccountEmail ='';
+fs.readFile('sa-credentials.json', (err, content) => {
+  if (err) return console.log('Error loading sa-credentials file:', err);
+  serviceAccountEmail  = JSON.parse(content).client_email;
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -52,7 +61,7 @@ router.post('/authenticate', passport.authenticate('jwt',{session : false}), fun
 
 router.post('/createForm', function(req, res, next) {
   const body = req.body;
-  console.log(req)
+  // console.log(req)
   // req = {
   //   eventName: "Boat Party",
   //   eventDetails: "A fun time",
@@ -64,7 +73,8 @@ router.post('/createForm', function(req, res, next) {
   // }
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation");
-  form.setDescription(body.eventDetails)
+  form.setDescription(body.eventDetails);
+  form.setServiceAccount(serviceAccountEmail);
   if (body.fieldsChecked.fullName) {
     form.addTextItem().setTitle("Full Name").setRequired();
   }
