@@ -51,6 +51,8 @@ router.post('/authenticate', passport.authenticate('jwt',{session : false}), fun
 });
 
 router.post('/createForm', function(req, res, next) {
+  const body = req.body;
+  console.log(req)
   // req = {
   //   eventName: "Boat Party",
   //   eventDetails: "A fun time",
@@ -60,25 +62,25 @@ router.post('/createForm', function(req, res, next) {
   //   contactNumber: true,
   //   foodAllergies: true
   // }
-  let form = new Form(req.eventName)
-  form.setTitle(req.eventName + " Ticket Reservation");
-  form.setDescription(req.eventDetails)
-  // if (req.fullName) {
-  //   form.addTextItem().setTitle("Full Name").setRequired();
-  // }
-  // if (req.shortCode) {
-  //   form.addTextItem().setTitle("Imperial Shortcode");
-  // }
-  // if (req.email) {
-  //   form.addTextItem().setTitle("Email Address").setRequired();
-  // }
-  // if (req.contactNumber) {
-  //   form.addTextItem().setTitle("Contact Number").setRequired();
-  // }
-  // if (req.foodAllergies) {
-  //   form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
-  //   form.addTextItem().setTitle("If yes, please specify")
-  // }
+  let form = new Form(body.eventName)
+  form.setTitle(body.eventName + " Ticket Reservation");
+  form.setDescription(body.eventDetails)
+  if (body.defaultFieldsChecked.fullName) {
+    form.addTextItem().setTitle("Full Name").setRequired();
+  }
+  if (body.defaultFieldsChecked.shortcode) {
+    form.addTextItem().setTitle("Imperial Shortcode");
+  }
+  if (body.defaultFieldsChecked.email) {
+    form.addTextItem().setTitle("Email Address").setRequired();
+  }
+  if (body.defaultFieldsChecked.contactNumber) {
+    form.addTextItem().setTitle("Contact Number").setRequired();
+  }
+  if (body.defaultFieldsChecked.foodAllergies) {
+    form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
+    form.addTextItem().setTitle("If yes, please specify")
+  }
 
   form.linkWithSheets()
 

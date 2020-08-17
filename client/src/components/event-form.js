@@ -4,13 +4,13 @@ import PostForm from './../services/post-form.js';
 
 export default function EventForm() {
 
-    const [eventName, setName] = useState('');
-    const [eventDate, setDate] = useState('');
-    const [eventDetails, setDetails] = useState('');
-    const [ticketRelease, setRelease] = useState('');
-    const [paymentInfo, setPayment] = useState('');
+    const [eventName, setEventName] = useState('');
+    const [eventDate, setEventDate] = useState('');
+    const [eventDetails, setEventDetails] = useState('');
+    const [ticketRelease, setTicketRelease] = useState('');
+    const [paymentInfo, setPaymentInfo] = useState('');
 
-    const [defaultFieldsChecked, setDefaults] = useState({
+    const [defaultFieldsChecked, setDefaultFieldsChecked] = useState({
         fullName: true,
         shortcode: true,
         email: true,
@@ -18,7 +18,15 @@ export default function EventForm() {
         foodAllergies: true,
     });
 
-    const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergy'];
+    const defaultFieldsDict = {
+        'Full Name' : 'fullName',
+        'Shortcode' : 'shortcode',
+        'Email' : 'email',
+        'Contact Number' : 'contactNumber',
+        'Food Allergies' : 'foodAllergies',
+    };
+
+    const defaultFields = ['Full Name', 'Shortcode', 'Email', 'Contact Number', 'Food Allergies'];
 
     const [ticketTypes, setTicketTypes] = useState([{ type: '', price: 0, quantity: 0 }]);
 
@@ -57,59 +65,74 @@ export default function EventForm() {
             ticketRelease,
             paymentInfo,
             ticketTypes,
-            defaultFields
+            defaultFieldsChecked
         }
-        console.log("here")
         PostForm(reqBody);
+
+        setEventName('');
+        setEventDate('');
+        setEventDetails('');
+        setTicketRelease('');
+        setPaymentInfo('');
+        setTicketTypes([{ type: '', price: 0, quantity: 0 }]);
+        setTicketTypes([]);
+        setDefaultFieldsChecked({
+            fullName: true,
+            shortcode: true,
+            email: true,
+            contactNumber: true,
+            foodAllergies: true
+        });
         event.preventDefault();
     };
     
     const renderTicketType = (ticket) => {
-        // if (ticket.type === '') {
+        if (ticket.type === '' || ticket.price === -1 || ticket.quantity === 0) {
             return (
                 <Form.Group controlId="ticket" as={Row}>
                     <Col>
                         <Form.Control placeholder="Ticket Type" onChange={(e) => {
                             ticket['type'] = (e.target.value)
-                            setTicketTypes([...ticketTypes])
+                            // setTicketTypes([...ticketTypes])
                             }} />
                     </Col>
                     <Col>
                         <Form.Control placeholder="Price" onChange={(e) => {ticket['price'] = (e.target.value) 
-                            setTicketTypes([...ticketTypes])
+                            // setTicketTypes([...ticketTypes])
                         }} />
                     </Col>
                     <Col>
                         <Form.Control placeholder="Quantity" onChange={(e) => {ticket['quantity'] = (e.target.value) 
-                            setTicketTypes([...ticketTypes])
+                            // setTicketTypes([...ticketTypes])
                         }} />
                     </Col>
                     <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
                 </Form.Group>
             )
-        // } else {
-        //     return (
-        //         <Form.Group controlId="ticketFilled" as={Row}>
-        //             <Col>
-        //                 <Form.Control value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
-        //             </Col>
-        //             <Col>
-        //                 <Form.Control value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
-        //             </Col>
-        //             <Col>
-        //                 <Form.Control value={ticket.quantity} onChange={(e) => ticket['quantity'] = (e.target.value)} />
-        //             </Col>
+        } else {
+            return (
+                <Form.Group controlId="ticketFilled" as={Row}>
+                    <Col>
+                        <Form.Control value={ticket.type} onChange={(e) => ticket['type'] = (e.target.value)} />
+                    </Col>
+                    <Col>
+                        <Form.Control value={ticket.price} onChange={(e) => ticket['price'] = (e.target.value)} />
+                    </Col>
+                    <Col>
+                        <Form.Control value={ticket.quantity} onChange={(e) => ticket['quantity'] = (e.target.value)} />
+                    </Col>
 
-        //             <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
-        //         </Form.Group>
-        //     )
-        // }
+                    <Button id="removeCourseBtn" onClick={() => removeTicketType(ticket)}>X</Button>
+                </Form.Group>
+            )
+        }
     };
 
     return (
         <div className='eventFormMain'>
             <Form onSubmit={handleSubmit}>
                 <h1>Event Information</h1>
+                {console.log(ticketTypes)}
                 <div className='eventFormSection'>
                     <Row>
                         <Col>
@@ -118,7 +141,7 @@ export default function EventForm() {
                                     <Form.Label>Event Name</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Enter an event name" value={eventName} onChange={(e) => setName(e.target.value)} />
+                                    <Form.Control placeholder="Enter an event name" value={eventName} onChange={(e) => setEventName(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -128,7 +151,7 @@ export default function EventForm() {
                                     <Form.Label>Event Date</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" value={eventDate} type ='date' onChange={(e) => setDate(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" value={eventDate} type ='date' onChange={(e) => setEventDate(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -140,7 +163,7 @@ export default function EventForm() {
                                     <Form.Label>Event Details</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control as="textarea" placeholder="Enter some eventDetails" value={eventDetails} rows='3' onChange={(e) => setDetails(e.target.value)} />
+                                    <Form.Control as="textarea" placeholder="Enter some eventDetails" value={eventDetails} rows='3' onChange={(e) => setEventDetails(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -150,7 +173,7 @@ export default function EventForm() {
                                     <Form.Label>Ticket Release</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Choose date and time" type ='date' value={ticketRelease} onChange={(e) => setRelease(e.target.value)} />
+                                    <Form.Control placeholder="Choose date and time" type ='date' value={ticketRelease} onChange={(e) => setTicketRelease(e.target.value)} />
                                 </Col>
                             </Form.Group>
                             <Form.Group as={Row}>
@@ -158,7 +181,7 @@ export default function EventForm() {
                                     <Form.Label>Payment Info</Form.Label>
                                 </Col>
                                 <Col>
-                                    <Form.Control placeholder="Payment information" value={paymentInfo} onChange={(e) => setPayment(e.target.value)} />
+                                    <Form.Control placeholder="Payment information" value={paymentInfo} onChange={(e) => setPaymentInfo(e.target.value)} />
                                 </Col>
                             </Form.Group>
                         </Col>
@@ -191,10 +214,10 @@ export default function EventForm() {
                                 Select default fields to add to sign up form
                             </Form.Label>
                             {defaultFields.map(t => (
-                                <Form.Check key={t} checked={defaultFieldsChecked[t]} type="checkbox" label={t} id={"checkbox_" + t}
+                                <Form.Check key={t} checked={defaultFieldsChecked[defaultFieldsDict[t]]} type="checkbox" label={t} id={"checkbox_" + t}
                                     onChange={() => {
-                                        defaultFieldsChecked[t] = !defaultFieldsChecked[t]
-                                        setDefaults({ ...defaultFieldsChecked })
+                                        defaultFieldsChecked[defaultFieldsDict[t]] = !defaultFieldsChecked[defaultFieldsDict[t]]
+                                        setDefaultFieldsChecked({ ...defaultFieldsChecked })
                                     }} />
                             ))}
                         </Form.Group>
