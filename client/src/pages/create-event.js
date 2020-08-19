@@ -9,7 +9,6 @@ export default function Create() {
             <Header title='Create Event' />
             <Link to={'/'} className="nav-link"> Dashboard </Link>
             <EventForm/>
-
         </div>
     );
 }

@@ -12,6 +12,7 @@ export default function Dashboard({setUser}) {
                 <p>this is the dashboard page</p>
                 <Link to={'/create-event'} className="nav-link">Create Event</Link>
                 <Link to={'/login'} onClick={() => {logout(() => {setUser(null)})}} className="nav-link">Logout</Link>
+                <p className='createNewEventButton'>Create a new event</p>
             </div>
         </div>
     );

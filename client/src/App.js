@@ -6,6 +6,7 @@ import Create from './pages/create-event';
 import Login from './pages/login';
 import {isAuthenticated} from './services/authService'
 import ReactLoading from 'react-loading';
+import './styles.css';
 
 function App() {
   useEffect(() => {
