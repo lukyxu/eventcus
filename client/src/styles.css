@@ -26,12 +26,77 @@
 }
 
 .createNewEventButton {
-  position: absolute;
-width: 237px;
-height: 204px;
-left: 1008px;
-top: 107px;
+    position: absolute;
+    width: 237px;
+    height: 204px;
+    left: 1008px;
+    top: 107px;
 
-background: #5E99F1;
-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    background: #5E99F1;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.eventFormErrorMessage {
+    color: #bf1650;
+}
+
+.eventFormErrorMessage::before {
+    display: inline;
+    content: "⚠ ";
+}
+
+.fieldInput {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid white;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+.checkboxInput {
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid white;
+    padding: 10px 15px;
+    margin-right: 10px;
+}
+
+button[type="submit"],
+input[type="submit"] {
+  background: #ec5990;
+  color: white;
+  text-transform: uppercase;
+  border: none;
+  margin-top: 40px;
+  padding: 20px;
+  /* font-size: 16px; */
+  /* font-weight: 100; */
+  letter-spacing: 10px;
+}
+
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+  background: #bf1650;
+}
+
+button[type="submit"]:active,
+input[type="button"]:active,
+input[type="submit"]:active {
+  transition: 0.3s all;
+  transform: translateY(3px);
+  border: 1px solid transparent;
+  opacity: 0.8;
+}
+
+button[type="button"] {
+    display: block;
+    appearance: none;
+    background: #1d7bff;
+    color: white;
+    border: none;
+    /* text-transform: uppercase; */
+    padding: 10px 20px;
+    border-radius: 4px;
 }
