@@ -4,10 +4,11 @@ let MultipleChoiceItem = require("./GoogleFormMultipleChoiceItem")
 let TextItem = require("./GoogleFormTextItem")
 
 class GoogleFormBuilder {
-  constructor(formName, title, description) {
+  constructor(formName, title, description, serviceAccount) {
     this.formName = formName;
     this.title = title || "";
     this.description = description || "";
+    this.serviceAccount = serviceAccount || "";
     this.linked = false;
     this.items = [];
   }
@@ -28,7 +29,7 @@ class GoogleFormBuilder {
       content += this.items[i].toString()
     }
     if(this.linked) {
-      content += `var sheet = SpreadsheetApp.create("Responses", 50, 5);form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());Logger.log('Published URL: ' + form.getPublishedUrl());Logger.log('Editor URL: ' + form.getEditUrl());   var res = {'formResLink' : form.getPublishedUrl(), 'formEditLink' : form .getEditUrl(), 'sheetId' : sheet.getId() };return res;`
+      content += `var sheet = SpreadsheetApp.create("Responses", 50, 5);form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());sheet.addEditor("${this.serviceAccount}");Logger.log('Published URL: ' + form.getPublishedUrl());Logger.log('Editor URL: ' + form.getEditUrl());   var res = {'formResLink' : form.getPublishedUrl(), 'formEditLink' : form .getEditUrl(), 'sheetId' : sheet.getId() };return res;`
     }
     return content.replace(/;/g, ';\n')
   }
@@ -39,6 +40,10 @@ class GoogleFormBuilder {
 
   setTitle(title) {
     this.title = title;
+  }
+
+  setServiceAccount(serviceAccount) {
+    this.serviceAccount = serviceAccount;
   }
 
   setDescription(description) {
