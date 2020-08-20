@@ -81,7 +81,7 @@ router.post('/createForm', function(req, res, next) {
   if (body.fieldsChecked.shortcode) {
     form.addTextItem().setTitle("Imperial Shortcode");
   }
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type + " - " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"))).setRequired()
   if (body.fieldsChecked.email) {
     form.addTextItem().setTitle("Email Address").setRequired();
   }
