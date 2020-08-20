@@ -18,6 +18,7 @@ export default function EventForm() {
         foodAllergies: true,
     });
 
+
     // const defaultFieldsDict = {
     //     'Full Name' : 'fullName',
     //     'Shortcode' : 'shortcode',
@@ -72,7 +73,10 @@ export default function EventForm() {
             ticketTypes,
             fieldsChecked
         }
-        PostForm(reqBody);
+
+        const res = PostForm(reqBody);
+        console.log('helllooooo');
+        console.log(res.body.sheetId);
 
         setEventName('');
         setEventDate('');

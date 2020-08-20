@@ -66,7 +66,7 @@ class GoogleAppLinker {
     });
   }
 
-  createForm(code) {
+  createForm(code, callback) {
     // For testing purposes
     code = code || 'function myFunction() {\n var form = FormApp.create(\'New Form\');\n var item = form.addTextItem();\n item.setTitle(\'Shortcode\');\n  var sheet = SpreadsheetApp.create("Responses", 50, 5); \n sheet.addEditor("sa-eventmanager@event-manager-cl-1597328691488.iam.gserviceaccount.com");\n form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId()); \n Logger.log(\'Published URL: \' + form.getPublishedUrl());\n Logger.log(\'Editor URL: \' + form.getEditUrl());\n   var res = {\'formResLink\' : form.getPublishedUrl(), \'formEditLink\' : form .getEditUrl(), \'sheetId\' : sheet.getId() }; \n return res;\n }';
     this.authorize((auth) => {
@@ -157,6 +157,8 @@ class GoogleAppLinker {
             console.log(res.data.response.result);
             // saveItemInFolder(res.data.response.result.SHEET_ID)
             console.log('success');
+            callback(res.data.response.result)
+            // return res.data.response.result
           });
         });
       });
