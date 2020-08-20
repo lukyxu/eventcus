@@ -100,9 +100,8 @@ router.post('/createForm', function(req, res, next) {
     const sheetId = formRes.sheetId;
     console.log(sheetId);
     res.json({success : true});
-
-    
-    // reader.init();
+    let reader = new GoogleSheetsReader(sheetId);
+    reader.init(() => reader.configSheet(body.ticketTypes));
   });
 
 

@@ -19,9 +19,17 @@ class GoogleSheetsReader {
       // OR use API key -- only for read-only access to public sheets
       // doc.useApiKey('YOUR-API-KEY');
       await this.doc.loadInfo();
-      this.sheet = this.doc.sheetsByIndex[0]; // or use doc.sheetsById[id]
-      console.log(this.sheet.title);
-      // const rows = await this.sheet.getRows();
+      this.responseSheet = this.doc.sheetsByIndex[0]; // or use doc.sheetsById[id]
+      this.ticketSheet = this.doc.sheetsByIndex[1];
+      console.log(this.responseSheet.title);
+      // await this.sheet.getRows()
+
+      // console.log("col " + this.sheet.columnCount)
+      // console.log("cell stats " + this.sheet.cellStats)
+      // console.log("loaded " + this.sheet.cellStats.loaded)
+      // console.log("nonempty " + this.sheet.cellStats.nonEmpty)
+      // console.log("headers " + this.sheet.headerValues)
+      
       // console.log(rows[0]);
       callback(this);
     } catch(err) {
@@ -29,18 +37,29 @@ class GoogleSheetsReader {
     }
   }
 
+  async configSheet(ticketTypes) {
+    // Add payment and reservation status headers 
+    await this.responseSheet.loadHeaderRow();
+    await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Payment status", "Reservation status"]));
+    
+    // Create Ticket Type sheet
+    await this.ticketSheet.updateProperties({title: "Ticket Types"})
+    await this.ticketSheet.setHeaderRow(["type", "price", "quantity", "allocated"])
+    await this.ticketSheet.addRows(ticketTypes)
+  }
+
   async getHeaders() {
-    const rows = await this.sheet.getRows();
+    const rows = await this.responseSheet.getRows();
     console.log(rows[0]);
   }
 
   async read() {
     // read cells
-    await this.sheet.loadCells('A1:B4');
+    await this.responseSheet.loadCells('A1:B4');
 
     // read/write cell values
-    const a1 = sheet.getCell(0, 0); // access cells using a zero-based index
-    const b2 = sheet.getCellByA1('B2'); // or A1 style notation
+    const a1 = responseSheet.getCell(0, 0); // access cells using a zero-based index
+    const b2 = responseSheet.getCellByA1('B2'); // or A1 style notation
     // access everything about the cell
     console.log(a1.value);
     console.log(a1.formula);

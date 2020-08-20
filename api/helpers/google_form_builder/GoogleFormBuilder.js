@@ -29,7 +29,7 @@ class GoogleFormBuilder {
       content += this.items[i].toString()
     }
     if(this.linked) {
-      content += `var sheet = SpreadsheetApp.create("Responses", 50, 5);form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());sheet.addEditor("${this.serviceAccount}");Logger.log('Published URL: ' + form.getPublishedUrl());Logger.log('Editor URL: ' + form.getEditUrl());   var res = {'formResLink' : form.getPublishedUrl(), 'formEditLink' : form .getEditUrl(), 'sheetId' : sheet.getId() };return res;`
+      content += `var sheet = SpreadsheetApp.create("Responses", 50, 20);form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());sheet.addEditor("${this.serviceAccount}");Logger.log('Published URL: ' + form.getPublishedUrl());Logger.log('Editor URL: ' + form.getEditUrl());   var res = {'formResLink' : form.getPublishedUrl(), 'formEditLink' : form .getEditUrl(), 'sheetId' : sheet.getId() };return res;`
     }
     return content.replace(/;/g, ';\n')
   }
