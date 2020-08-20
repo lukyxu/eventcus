@@ -116,7 +116,7 @@ export default function EventForm() {
                             }} />
                     </Col>
                     <Col>
-                        <Form.Control value={ticket.price < 0 ? '' : ticket.price} placeholder="Price" onChange={(e) => {
+                        <Form.Control value={ticket.price <= 0 ? '' : ticket.price} placeholder="Price" onChange={(e) => {
                             if (isNumeric(e.target.value) || e.target.value.length === 0) {
                               ticket['price'] = (e.target.value) 
                               setTicketTypes([...ticketTypes])

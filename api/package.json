@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "concurrently \"npm run server\" \"cd ../client && npm start\"",
-    "server": "if [$NODE_ENV == 'production']; then node ./bin/www; else nodemon ./bin/www; fi"
+    "server": "if [ \"$NODE_ENV\" = 'production' ]; then node ./bin/www; else nodemon ./bin/www; fi"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

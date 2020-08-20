@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,13 +12,16 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import {login} from '../services/authService'
+import { useHistory } from "react-router-dom";
+
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        ABACUS
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -46,8 +49,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+
+export default function SignIn({setUser}) {
+  const history = useHistory()
   const classes = useStyles();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  function handleLogin(e) {
+    e.preventDefault()
+    login({email, password}, (data) => {
+      if (data.error) {
+        console.log(data.error)
+      } else if (!data.isAuthenticated) {
+        console.log("Not authenticated")
+      } else {
+        setUser(data.user)
+        history.push('/')
+      }
+      
+      
+    })
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -68,6 +90,8 @@ export default function SignIn() {
             id="email"
             label="Email Address"
             name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
             autoFocus
           />
@@ -77,6 +101,8 @@ export default function SignIn() {
             required
             fullWidth
             name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             label="Password"
             type="password"
             id="password"
@@ -92,6 +118,7 @@ export default function SignIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={handleLogin}
           >
             Sign In
           </Button>
