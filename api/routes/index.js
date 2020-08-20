@@ -4,6 +4,7 @@ var authenticator = require('../helpers/authenticator')
 var passport = require('passport')
 var Organizer = require('../models/Organizer');
 var googleAppLinker = require('../helpers/googleAppLinker')
+var GoogleSheetsReader = require('../helpers/googleSheets')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
 
 /* Read sa-credentials. */
@@ -95,10 +96,30 @@ router.post('/createForm', function(req, res, next) {
 
   form.linkWithSheets()
 
-  googleAppLinker.createForm(form.toFunctionString())
-  console.log(form.toFunctionString())
+  googleAppLinker.createForm(form.toFunctionString(), formRes => {
+    const sheetId = formRes.sheetId;
+    console.log(sheetId);
+    res.json({success : true});
+
+    
+    // reader.init();
+  });
+
+
+  // console.log('here')
+
+  // console.log(googleAppLinker.createForm(form.toFunctionString()))
+  // console.log(form.toFunctionString())
   
-  res.json({success : true})
+
+
+
 });
+
+router.post('/readRows', function(req, res, next) {
+  const sheetId = req.body.sheetId;
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init((r) => reader.getHeaders(r));
+})
 
 module.exports = router;
