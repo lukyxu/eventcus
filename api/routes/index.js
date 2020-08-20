@@ -82,7 +82,8 @@ router.post('/createForm', function(req, res, next) {
   if (body.fieldsChecked.shortcode) {
     form.addTextItem().setTitle("Imperial Shortcode");
   }
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type + " - " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"))).setRequired()
+  // form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type + " - " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"))).setRequired()
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
   if (body.fieldsChecked.email) {
     form.addTextItem().setTitle("Email Address").setRequired();
   }
@@ -115,10 +116,11 @@ router.post('/createForm', function(req, res, next) {
 
 });
 
-router.post('/readRows', function(req, res, next) {
+router.post('/allocate', function(req, res, next) {
   const sheetId = req.body.sheetId;
+  console.log(sheetId);
   let reader = new GoogleSheetsReader(sheetId);
-  reader.init((r) => reader.getHeaders(r));
-})
+  reader.init(() => reader.allocate());
+});
 
 module.exports = router;
