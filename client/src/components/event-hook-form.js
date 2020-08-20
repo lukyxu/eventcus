@@ -1,13 +1,12 @@
 import React from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Col, Row } from "react-bootstrap";
 import { ErrorMessage } from "@hookform/error-message";
 import PostForm from './../services/post-form.js';
-
-let renderCount = 0;
+import CurrencyInput from 'react-currency-input-field';
 
 export default function EventHookForm() {
-  const { register, handleSubmit, errors, control } = useForm({
+  const { register, handleSubmit, getValues, errors, control } = useForm({
     criteriaMode: "all",
     defaultValues: {
       ticketTypes: [{ type: "", price: 0, quantity: 0 }]
@@ -19,7 +18,13 @@ export default function EventHookForm() {
     name: "ticketTypes"
   });
 
-  const fieldsOptions = ["Full Name", "Shortcode", "Email", "Contact Number", "Food Allergies"];
+  const fieldsOptions = {
+    "Full Name": true,
+    "Shortcode": true,
+    "Email": true,
+    "Contact Number": true,
+    "Food Allergies": false
+  };
 
   const camelize = (text) => {
     text = text.replace(/[-_\s.]+(.)?/g, (_, c) => c ? c.toUpperCase() : '');
@@ -44,11 +49,8 @@ export default function EventHookForm() {
 
   // console.log(watch("eventName")); // you can watch individual input by pass the name of the input
 
-  renderCount++;
-
   return (
     <div className="eventFormMain">
-      <span className="counter">Render Count: {renderCount}</span>
       <form onSubmit={handleSubmit(onSubmit)}>
         <h1>Event Information</h1>
         <div className="eventFormSection">
@@ -69,7 +71,11 @@ export default function EventHookForm() {
                 className="fieldInput"
                 name="eventDate"
                 placeholder="Choose date and time"
-                type="date"
+                type="datetime-local"
+                // onChange={async () => {
+                //   await trigger("ticketRelease")
+                //   }
+                // }
                 ref={register({ required: true })}
               />
               {errors.eventDate && <p className="eventFormErrorMessage">This field is required</p>}              
@@ -82,7 +88,7 @@ export default function EventHookForm() {
                 className="fieldInput"
                 name="eventDetails"
                 placeholder="Enter some event details"
-                rows="3"
+                rows="5"
                 ref={register({ required: true })}
               />
               {errors.eventDetails && <p className="eventFormErrorMessage">This field is required</p>}              
@@ -94,17 +100,24 @@ export default function EventHookForm() {
                   className="fieldInput"
                   name="ticketRelease"
                   placeholder="Choose date and time"
-                  type="date"
-                  ref={register({ required: true })}
-                  // ref={register({
-                  //   required: <p className="eventFormErrorMessage">This field is required</p>,
-                  //   validate: value => value.isBefore(eventDate)|| <p className="eventFormErrorMessage">Ticket release date should be before actual event date</p>
-                  // })}
+                  type="datetime-local"
+                  // ref={register({ required: true })}
+                  ref={register({
+                    required: <p className="eventFormErrorMessage">This field is required</p>,
+                    validate: {
+                      beforeEvent: value => {
+                        return new Date(value).getTime() <= new Date(getValues("eventDate")).getTime() || <p className="eventFormErrorMessage">Ticket release date should be before actual event date</p>
+                      }
+                    }
+                  })}
                 />
-                {errors.ticketRelease && <p className="eventFormErrorMessage">This field is required</p>}  
+                <ErrorMessage
+                  errors={errors}
+                  name="ticketRelease"
+                />
               </div> 
               <div>
-                <label>Paymen Information</label>
+                <label>Payment Information</label>
                 <input
                   className="fieldInput"
                   name="paymentInfo"
@@ -136,18 +149,24 @@ export default function EventHookForm() {
                     <ErrorMessage errors={errors} name={`ticketTypes[${index}].type`} />
                   </Col>
                   <Col>
-                    <input
-                      className="fieldInput"
+                    <Controller
+                      as={<CurrencyInput allowDecimals={true} decimalsLimit={2} prefix="£" className="fieldInput" />}
                       name={`ticketTypes[${index}].price`}
-                      placeholder="Ticket Price"
-                      // defaultValue={`${ticket.type}`} // make sure to set up defaultValue
-                      ref={register({
+                      control={control}
+                      placeholder="Price"
+                      defaultValue={ticket.price}
+                      rules={{
                         required: <p className="eventFormErrorMessage">This field is required</p>,
                         pattern: {
                           value: /^-{0,1}\d+$/,
                           message: <p className="eventFormErrorMessage">This field is number only</p>
-                        }
-                      })}
+                        },
+                        min: {
+                          value: 0,
+                          message: <p className="eventFormErrorMessage">Price should not be negative</p>
+                        },
+                        validate: value => value !== 0 || <p className="eventFormErrorMessage">This field is required</p>
+                      }}
                     />
                     <ErrorMessage
                       errors={errors}
@@ -184,13 +203,6 @@ export default function EventHookForm() {
                       )}
                   </Col>
                 </Row>
-                {/* <Controller
-                  as={<input />}
-                  name={`ticketTypes[${index}].price`}
-                  control={control}
-                  placeholder="Price"
-                  defaultValue={ticket.price} // make sure to set up defaultValue
-                /> */}
               </div>
             );
           })}
@@ -210,7 +222,7 @@ export default function EventHookForm() {
         <div className="eventFormSection">
           <h5>Select default fields to add to sign up form</h5>
           <div>
-            {fieldsOptions.map((option) => (
+            {Object.keys(fieldsOptions).map((option) => (
               <div key={option}>
                 <input
                   className="checkboxInput"
@@ -218,7 +230,7 @@ export default function EventHookForm() {
                   value={option}
                   name="fieldsChecked"
                   ref={register}
-                  defaultChecked={true}
+                  defaultChecked={fieldsOptions[option]}
                 />
                 <label>{option}</label>
               </div>

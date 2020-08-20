@@ -53,6 +53,7 @@
     border: 1px solid white;
     padding: 10px 15px;
     margin-bottom: 10px;
+    resize: none;
 }
 
 .checkboxInput {
@@ -65,20 +66,21 @@
 
 button[type="submit"],
 input[type="submit"] {
-  background: #ec5990;
+  background: #1d7bff;
   color: white;
   text-transform: uppercase;
   border: none;
   margin-top: 40px;
-  padding: 20px;
+  padding: 15px 25px;
+  border-radius: 4px;
   /* font-size: 16px; */
   /* font-weight: 100; */
-  letter-spacing: 10px;
+  /* letter-spacing: 10px; */
 }
 
 button[type="submit"]:hover,
 input[type="submit"]:hover {
-  background: #bf1650;
+  background: #0b67e8;
 }
 
 button[type="submit"]:active,
@@ -99,4 +101,9 @@ button[type="button"] {
     /* text-transform: uppercase; */
     padding: 10px 20px;
     border-radius: 4px;
+}
+
+button[type="button"]:hover,
+input[type="button"]:hover {
+  background: #0b67e8;
 }
