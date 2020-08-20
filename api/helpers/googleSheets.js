@@ -45,7 +45,11 @@ class GoogleSheetsReader {
     // Create Ticket Type sheet
     await this.ticketSheet.updateProperties({title: "Ticket Types"})
     await this.ticketSheet.setHeaderRow(["type", "price", "quantity", "allocated"])
-    await this.ticketSheet.addRows(ticketTypes)
+    const rows = await this.ticketSheet.addRows(ticketTypes)
+    rows.map((row) => {
+      row.allocated = 0
+      row.save()
+    })
   }
 
   async getHeaders() {
