@@ -123,4 +123,17 @@ router.post('/allocate', function(req, res, next) {
   reader.init(() => reader.allocate());
 });
 
+router.post('/ticketReservationInfo', function(req, res, next) {
+  const sheetId = req.body.sheetId;
+  console.log(sheetId);
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init(() => {
+    reader.ticketReservationInfo((data) => {
+      console.log(data);
+      res.json(data);
+    });
+  });
+
+});
+
 module.exports = router;

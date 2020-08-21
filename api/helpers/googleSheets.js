@@ -98,7 +98,18 @@ class GoogleSheetsReader {
     })
 
     console.log('allocated');
+  }
 
+  async ticketReservationInfo(callback) {
+    const ticketTypeRows = await this.ticketTypeSheet.getRows();
+    const data = []
+    ticketTypeRows.forEach( (row) => {
+      // Todo change to include paid, unreserved = total - paid - reserved
+      const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
+      data.push({"type" : row.type, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity})
+    })
+
+    callback(data);
 
   }
 
