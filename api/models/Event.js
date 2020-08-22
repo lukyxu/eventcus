@@ -14,7 +14,6 @@ const EventSchema = mongoose.Schema({
     required: true
   },
   dropTime: Date,
-
   hosts: {
     type: [mongoose.Schema.Types.ObjectId],
     default: []
