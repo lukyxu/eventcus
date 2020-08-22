@@ -97,6 +97,8 @@ router.post('/createForm', function(req, res, next) {
 
   form.linkWithSheets()
 
+  form.setFormOpenTime(new Date(body.ticketRelease))
+  console.log(form.toFunctionString())
   googleAppLinker.createForm(form.toFunctionString(), formRes => {
     const sheetId = formRes.sheetId;
     console.log(sheetId);

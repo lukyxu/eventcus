@@ -43,7 +43,7 @@ export default function EventHookForm() {
       temp[camelize(option)] = true;
     })
     data.fieldsChecked = temp;
-    console.log(data);
+    console.log(typeof data.ticketRelease);
     PostForm(data);
   }; // your form submit function which will invoke after successful validation
 
