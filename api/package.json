@@ -7,6 +7,7 @@
     "server": "if [ \"$NODE_ENV\" = 'production' ]; then node ./bin/www; else nodemon ./bin/www; fi"
   },
   "dependencies": {
+    "agenda": "^3.1.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
