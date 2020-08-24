@@ -77,9 +77,9 @@ class GoogleFormBuilder {
     this.description = description;
   }
 
-  // setFormOpenTime(openTime) {
+  setFormOpenTime(openTime) {
   //   this.openTime = openTime;
-  // }
+  }
 
   addMultipleChoiceItem() {
     let item = new MultipleChoiceItem();
