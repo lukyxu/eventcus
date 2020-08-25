@@ -26,14 +26,12 @@
 }
 
 .createNewEventButton {
-    position: absolute;
-    width: 237px;
-    height: 204px;
-    left: 1008px;
-    top: 107px;
-
     background: #5E99F1;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 1.5em;
+    height: 50px;
+    width: 100%;
+    color: #ffffff;
 }
 
 .eventFormErrorMessage {
@@ -64,8 +62,7 @@
     margin-right: 10px;
 }
 
-button[type="submit"],
-input[type="submit"] {
+button[type="submit"].blueButton, input[type="submit"].blueButton {
   background: #1d7bff;
   color: white;
   text-transform: uppercase;
@@ -78,21 +75,18 @@ input[type="submit"] {
   /* letter-spacing: 10px; */
 }
 
-button[type="submit"]:hover,
-input[type="submit"]:hover {
+button[type="submit"]:hover.blueButton, input[type="submit"]:hover.blueButton {
   background: #0b67e8;
 }
 
-button[type="submit"]:active,
-input[type="button"]:active,
-input[type="submit"]:active {
+button[type="submit"]:active.blueButton, input[type="button"]:active.blueButton, input[type="submit"]:active.blueButton {
   transition: 0.3s all;
   transform: translateY(3px);
   border: 1px solid transparent;
   opacity: 0.8;
 }
 
-button[type="button"] {
+button[type="button"].blueButton {
     display: block;
     appearance: none;
     background: #1d7bff;
@@ -103,7 +97,16 @@ button[type="button"] {
     border-radius: 4px;
 }
 
-button[type="button"]:hover,
-input[type="button"]:hover {
+button[type="button"]:hover.blueButton,
+input[type="button"]:hover.blueButton {
   background: #0b67e8;
+}
+
+.circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-bottom: -3px;
+  background: #4AE575;
+  display: inline-block;
 }
