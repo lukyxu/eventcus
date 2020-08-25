@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { Form, Col, Row, Button } from 'react-bootstrap';
+import React from 'react';
+import { Col, Row } from 'react-bootstrap';
 import dayjs from 'dayjs'
 
 const dateFormat = 'DD/MM/YYYY'
 export default function EventTable({title, events}) {
-  console.log(events)
   return <div className="eventTable">
     <Row>
       <Col xs={12}>
@@ -25,7 +24,7 @@ export default function EventTable({title, events}) {
         </Col>
       </Row>
       {events.map(event => 
-        <Row>
+        <Row key={event.name}>
           <Col xs={3}>
           <span>{dayjs(event.eventDate).format(dateFormat)}</span>
           </Col>

@@ -105,7 +105,12 @@ input[type="button"]:hover.blueButton {
 
 .centralDashboardContainer {
   margin: auto;
-  max-width: 80vw;
+}
+
+@media (min-width: 768px) {
+  .centralDashboardContainer {
+    max-width: 80vw;
+  }
 }
 
 @media (min-width: 1600px) {

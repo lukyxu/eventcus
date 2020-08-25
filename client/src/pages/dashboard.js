@@ -13,12 +13,6 @@ import { useHistory } from "react-router-dom";
 export default function Dashboard({ setUser }) {
   const history = useHistory();
     const [searchValue, setSearchValue] = useState('');
-    const pressAllocate = () => {
-        const reqBody = {
-            sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
-        }
-        const res = AllocateTickets(reqBody);
-    }
 
     const events = [
       {
@@ -49,6 +43,14 @@ export default function Dashboard({ setUser }) {
         }
       },
     ]
+
+    const pressAllocate = () => {
+      const reqBody = {
+          sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
+      }
+      const res = AllocateTickets(reqBody);
+      console.log(res)
+  }
 
     const pressTicketResInfo = () => {
       const reqBody = {
@@ -105,14 +107,15 @@ export default function Dashboard({ setUser }) {
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col xs={12}>
-                <EventTable title="Upcoming Events" events={events.filter(e => e.eventDate.getTime() > new Date().getTime())}></EventTable>
+                <EventTable title="Upcoming Events" events={events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()) && e.eventDate.getTime() > new Date().getTime())}></EventTable>
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col xs={12}>
-                <EventTable title="Past Events" events={events.filter(e => e.eventDate.getTime() <= new Date().getTime())}></EventTable>
+                <EventTable title="Past Events" events={events.filter(e => e.name.startsWith(searchValue) && e.eventDate.getTime() <= new Date().getTime())}></EventTable>
               </Col>
             </Row>
+            <br></br>
             <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
             <br></br>
             <Button className="blueButton" onClick={pressTicketResInfo}> Ticket Reservation Info </Button>
