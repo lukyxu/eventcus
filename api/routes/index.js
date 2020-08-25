@@ -140,4 +140,11 @@ router.post('/ticketReservationInfo', function(req, res, next) {
 
 });
 
+router.post('/changePaymentStatus', function(req, res, next) {
+  const sheetId = req.body.sheetId;
+  console.log(sheetId);
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init(() => reader.changePaymentStatus(req.body.timestamp, req.body.fullName));
+});
+
 module.exports = router;

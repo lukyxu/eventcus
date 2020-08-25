@@ -86,12 +86,14 @@ class GoogleSheetsReader {
   }
 
   async findPerson(timestamp, fullName) {
-    const responseRows = await this.ticketTypeSheet.getRows();
-    responseRows.map((row) => {
-      if (row.timestamp == timestamp && row.fullName == fullName) {
-        return row
+    const responseRows = await this.responseSheet.getRows();
+    var res;
+    await responseRows.forEach((row) => {
+      if (row.Timestamp == timestamp && row.FullName == fullName) {
+        res = row
       }
     });
+    return res;
 
   }
 
@@ -99,6 +101,7 @@ class GoogleSheetsReader {
     const person = await this.findPerson(timestamp, fullName);
 
     person.PaymentStatus = (person.PaymentStatus == "paid" ? "" : "paid");
+    await person.save();
   }
 
   async changeReservationStatus(timestamp, fullName) {
