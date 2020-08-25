@@ -44,6 +44,10 @@ export default function Dashboard({ setUser }) {
       },
     ]
 
+    const filteredEvents = () => {
+      return events.sort((e1, e2) => e2.eventDate.getTime() - e1.eventDate.getTime()).filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
+    }
+
     const pressAllocate = () => {
       const reqBody = {
           sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
@@ -107,12 +111,12 @@ export default function Dashboard({ setUser }) {
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col sm={12}>
-                <EventTable title="Upcoming Events" events={events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()) && e.eventDate.getTime() > new Date().getTime())}></EventTable>
+                <EventTable title="Upcoming Events" events={filteredEvents().filter(e => e.eventDate.getTime() > new Date().getTime())}></EventTable>
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col sm={12}>
-                <EventTable title="Past Events" events={events.filter(e => e.name.startsWith(searchValue) && e.eventDate.getTime() <= new Date().getTime())}></EventTable>
+                <EventTable title="Past Events" events={filteredEvents().filter(e => e.eventDate.getTime() <= new Date().getTime())}></EventTable>
               </Col>
             </Row>
             <br></br>
