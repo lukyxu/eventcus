@@ -87,6 +87,7 @@ button[type="submit"]:active.blueButton, input[type="button"]:active.blueButton,
 }
 
 button[type="button"].blueButton {
+    width: 100%;
     display: block;
     appearance: none;
     background: #1d7bff;
@@ -109,4 +110,22 @@ input[type="button"]:hover.blueButton {
   margin-bottom: -3px;
   background: #4AE575;
   display: inline-block;
+}
+
+.eventTableHeader {
+  background-color: #1d7bff;
+  color:#ffffff;
+  font-weight: bold;
+  padding: 10px 20px;
+  width: 100%;
+  display: inherit;
+}
+
+.eventTable b, .eventTable span{
+  padding: 10px 20px;
+  display: inherit;
+}
+.eventTableColouredText span {
+  display: inline;
+  padding: 0px;
 }

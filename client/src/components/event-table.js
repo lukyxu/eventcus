@@ -1,26 +1,50 @@
 import React, { useState } from 'react';
 import { Form, Col, Row, Button } from 'react-bootstrap';
+import dayjs from 'dayjs'
 
-export default function EventTable({title}) {
-  return <div>
+const dateFormat = 'DD/MM/YYYY'
+export default function EventTable({title, events}) {
+  console.log(events)
+  return <div className="eventTable">
     <Row>
       <Col xs={12}>
-        <b style={{backgroundColor: "#1d7bff", color:"#ffffff", padding: "10px 20px", width: "100%", display: "inherit"}}>{title}</b>
+        {/* <Button className="blueButton">{title}</Button> */}
+        <div className="eventTableHeader">{title}</div>
       </Col>
     </Row>
-    <Row>
-      <Col xs={3}>
-        <b style={{backgroundColor: "#f0f0f0", color:"#504e4e", padding: "10px 20px", width: "100%", display: "inherit"}}>{"Date"}</b>
-      </Col>
-      <Col xs={5}>
-        <b style={{backgroundColor: "#f0f0f0", color:"#504e4e", padding: "10px 20px", width: "100%", display: "inherit"}}>{"Name"}</b>
-      </Col>
-      <Col xs={4}>
-        <b style={{backgroundColor: "#f0f0f0", color:"#504e4e", padding: "10px 20px", width: "100%", display: "inherit"}}>{"Tickets Reserved"}</b>
-      </Col>
-    </Row>
-    {/* <Row style={{backgroundColor: "#f0f0f0", width:"100%", color:"#6766666", padding: "10px 20px"}}>
-        {"Hello"}
-     </Row> */}
+    <div style={{backgroundColor: "#f0f0f0", color:"#504e4e", width: "100%"}}>
+      <Row>
+        <Col xs={3}>
+          <b>{"Date"}</b>
+        </Col>
+        <Col xs={4}>
+          <b>{"Name"}</b>
+        </Col>
+        <Col xs={5}>
+          <b>{"Tickets Reserved"}</b>
+        </Col>
+      </Row>
+      {events.map(event => 
+        <Row>
+          <Col xs={3}>
+          <span>{dayjs(event.eventDate).format(dateFormat)}</span>
+          </Col>
+          <Col xs={4}>
+            <span>{event.name}</span>
+          </Col>
+          <Col xs={5}>
+              <span className="eventTableColouredText">
+                <span style={{color:"#4ae575"}}>{event.tickets.paid}</span>
+                <span style={{color:"#363636"}}>{"/"}</span>
+                <span style={{color:"#ffb800"}}>{event.tickets.reserved}</span>
+                <span style={{color:"#363636"}}>{"/"}</span>
+                <span style={{color:"#de5959"}}>{event.tickets.unreserved}</span>
+                <span style={{color:"#363636"}}>{"/"}</span>
+                <span style={{color:"#363636"}}>{event.tickets.paid + event.tickets.reserved + event.tickets.unreserved}</span>
+              </span>
+          </Col>
+        </Row>
+      )}
+    </div>
   </div>
 }
