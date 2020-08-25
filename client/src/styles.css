@@ -105,10 +105,17 @@ input[type="button"]:hover.blueButton {
 
 .centralDashboardContainer {
   margin: auto;
+  margin-top: 1rem;
 }
 
-@media (min-width: 768px) {
+.colouredKeys {
+  align-items: center;
+  height: 100%;
+}
+
+@media (min-width: 568px) {
   .centralDashboardContainer {
+    margin-top:3rem;
     max-width: 80vw;
   }
 }
@@ -116,6 +123,13 @@ input[type="button"]:hover.blueButton {
 @media (min-width: 1600px) {
   .centralDashboardContainer {
     max-width: 1280px;
+  }
+}
+
+@media (max-width: 568px) {
+  .colouredKeys {
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 }
 

@@ -73,23 +73,23 @@ export default function Dashboard({ setUser }) {
     return (
       <div>
         <Header title='Dashboard' />
-        <div className='mt-5 centralDashboardContainer'>
+        <div className='centralDashboardContainer'>
           <Container fluid style={{minHeight:"100vh"}}>
             <Row>
-              <Col xs={12}>
+              <Col xs sm={12}>
                 <Button onClick= {() => history.push("/create-event")} className='blueButton' style={{width: "100%"}}>
                   CREATE A NEW EVENT
                 </Button>
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
-              <Col xs={5}><SearchBar
+              <Col xs={12} sm={5}><SearchBar
                 value={searchValue}
                 onChange={(newValue) => setSearchValue(newValue)}
                 onRequestSearch={() => null}/>
               </Col>
-              <Col xs={7}>
-                <Row style={{alignItems: "center", height: "100%"}}>
+              <Col xs={12} sm={7}>
+                <Row className="colouredKeys">
                   <Col>
                   <span className = "circle" style={{backgroundColor:"#4ae575"}}> </span> Paid
                   </Col>
@@ -106,12 +106,12 @@ export default function Dashboard({ setUser }) {
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
-              <Col xs={12}>
+              <Col sm={12}>
                 <EventTable title="Upcoming Events" events={events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()) && e.eventDate.getTime() > new Date().getTime())}></EventTable>
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
-              <Col xs={12}>
+              <Col sm={12}>
                 <EventTable title="Past Events" events={events.filter(e => e.name.startsWith(searchValue) && e.eventDate.getTime() <= new Date().getTime())}></EventTable>
               </Col>
             </Row>
@@ -123,6 +123,7 @@ export default function Dashboard({ setUser }) {
             <Button className="blueButton" onClick={pressChangePaymentStatus}> Change Payment Status </Button>
             <br></br>
             <Button className="blueButton" onClick={() => { logout(() => { setUser(null); history.push('/login') })}}> Logout </Button>
+            <br></br>
           </Container>
         </div>
       </div>
