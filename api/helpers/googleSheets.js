@@ -149,7 +149,7 @@ class GoogleSheetsReader {
     const data = []; 
 
     responseRows.forEach((row) => {
-      data.push({email : row.EmailAddress, ticketType : row.TicketType});
+      data.push({email : row.EmailAddress, ticketType : row.TicketType, reservationStatus : row.ReservationStatus});
     })
 
     callback(data)
