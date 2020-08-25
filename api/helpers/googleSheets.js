@@ -108,6 +108,7 @@ class GoogleSheetsReader {
     const person = await this.findPerson(timestamp, fullName);
 
     person.ReservationStatus = (person.ReservationStatus == "reserved" ? "waitlist" : "reserved");
+    await person.save();
   }
 
   async allocate() {
