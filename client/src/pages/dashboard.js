@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import { Link } from 'react-router-dom';
 import {Container, Row, Col} from 'react-bootstrap'
 import Header from '../components/header.js'
 import { logout } from '../services/authService'
@@ -7,12 +6,9 @@ import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
 import ChangePaymentStatus from './../services/changePaymentStatus.js';
 import Button from '@material-ui/core/Button';
-import { ButtonBase } from '@material-ui/core';
 import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
 import { useHistory } from "react-router-dom";
-
-
 
 export default function Dashboard({ setUser }) {
   const history = useHistory();
@@ -22,13 +18,6 @@ export default function Dashboard({ setUser }) {
             sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
         }
         const res = AllocateTickets(reqBody);
-    }
-
-    const pressTicketResInfo = () => {
-        const reqBody = {
-            sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
-        }
-        const res = TicketReservationInfo(reqBody);
     }
 
     const events = [
@@ -60,6 +49,15 @@ export default function Dashboard({ setUser }) {
         }
       },
     ]
+
+    const pressTicketResInfo = () => {
+      const reqBody = {
+          sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
+      }
+      const res = TicketReservationInfo(reqBody);
+      console.log(res)
+    }
+
     const pressChangePaymentStatus = () => {
         const reqBody = {
             sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358',
@@ -67,6 +65,7 @@ export default function Dashboard({ setUser }) {
             fullName: 'Alex Liu',
         }
         const res = ChangePaymentStatus(reqBody);
+        console.log(res)
     }
 
     return (
@@ -114,14 +113,13 @@ export default function Dashboard({ setUser }) {
                 <EventTable title="Past Events" events={events.filter(e => e.eventDate.getTime() <= new Date().getTime())}></EventTable>
               </Col>
             </Row>
-            <Link to={'/create-event'} className="nav-link">Create Event</Link>
-            <Link to={'/login'} onClick={() => { logout(() => { setUser(null) }) }} className="nav-link">Logout</Link>
-
             <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
             <br></br>
             <Button className="blueButton" onClick={pressTicketResInfo}> Ticket Reservation Info </Button>
             <br></br>
-            <Button className="blueButton" onClick={pressChangePaymentStatus}> ChangePaymentStatus </Button>
+            <Button className="blueButton" onClick={pressChangePaymentStatus}> Change Payment Status </Button>
+            <br></br>
+            <Button className="blueButton" onClick={() => { logout(() => { setUser(null); history.push('/login') })}}> Logout </Button>
           </Container>
         </div>
       </div>

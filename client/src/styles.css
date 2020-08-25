@@ -103,6 +103,17 @@ input[type="button"]:hover.blueButton {
   background: #1d7bff;
 }
 
+.centralDashboardContainer {
+  margin: auto;
+  max-width: 80vw;
+}
+
+@media (min-width: 1600px) {
+  .centralDashboardContainer {
+    max-width: 1280px;
+  }
+}
+
 .circle {
   width: 18px;
   height: 18px;
@@ -121,6 +132,10 @@ input[type="button"]:hover.blueButton {
   display: inherit;
 }
 
+.eventTable {
+  filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.25));
+}
+
 .eventTable b, .eventTable span{
   padding: 10px 20px;
   display: inherit;
@@ -130,13 +145,3 @@ input[type="button"]:hover.blueButton {
   padding: 0px;
 }
 
-.centralDashboardContainer {
-  margin: auto;
-  max-width: 80vw;
-}
-
-@media (min-width: 1600px) {
-  .centralDashboardContainer {
-    max-width: 1280px;
-  }
-}
