@@ -61,9 +61,9 @@
     padding: 10px 15px;
     margin-right: 10px;
 }
-
+/* #1d7bff */
 button[type="submit"].blueButton, input[type="submit"].blueButton {
-  background: #1d7bff;
+  background: #5E99F1;
   color: white;
   text-transform: uppercase;
   border: none;
@@ -76,7 +76,7 @@ button[type="submit"].blueButton, input[type="submit"].blueButton {
 }
 
 button[type="submit"]:hover.blueButton, input[type="submit"]:hover.blueButton {
-  background: #0b67e8;
+  background: #1d7bff;
 }
 
 button[type="submit"]:active.blueButton, input[type="button"]:active.blueButton, input[type="submit"]:active.blueButton {
@@ -90,7 +90,7 @@ button[type="button"].blueButton {
     width: 100%;
     display: block;
     appearance: none;
-    background: #1d7bff;
+    background: #5E99F1;
     color: white;
     border: none;
     /* text-transform: uppercase; */
@@ -100,7 +100,7 @@ button[type="button"].blueButton {
 
 button[type="button"]:hover.blueButton,
 input[type="button"]:hover.blueButton {
-  background: #0b67e8;
+  background: #1d7bff;
 }
 
 .circle {
@@ -113,7 +113,7 @@ input[type="button"]:hover.blueButton {
 }
 
 .eventTableHeader {
-  background-color: #1d7bff;
+  background-color: #5E99F1;
   color:#ffffff;
   font-weight: bold;
   padding: 10px 20px;
@@ -128,4 +128,15 @@ input[type="button"]:hover.blueButton {
 .eventTableColouredText span {
   display: inline;
   padding: 0px;
+}
+
+.centralDashboardContainer {
+  margin: auto;
+  max-width: 80vw;
+}
+
+@media (min-width: 1600px) {
+  .centralDashboardContainer {
+    max-width: 1280px;
+  }
 }

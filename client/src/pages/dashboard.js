@@ -72,7 +72,7 @@ export default function Dashboard({ setUser }) {
     return (
       <div>
         <Header title='Dashboard' />
-        <div className='mt-5' style={{margin: "auto", maxWidth: "80vw", minWidth: "400px"}}>
+        <div className='mt-5 centralDashboardContainer'>
           <Container fluid style={{minHeight:"100vh"}}>
             <Row>
               <Col xs={12}>
