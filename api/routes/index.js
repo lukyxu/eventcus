@@ -83,7 +83,7 @@ router.post('/createForm', function(req, res, next) {
     form.addTextItem().setTitle("Imperial Shortcode");
   }
   // form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type + " - " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"))).setRequired()
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
+ 
   if (body.fieldsChecked.email) {
     form.addTextItem().setTitle("Email Address").setRequired();
   }
@@ -94,6 +94,8 @@ router.post('/createForm', function(req, res, next) {
     form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
     form.addTextItem().setTitle("If yes, please specify")
   }
+
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
 
   form.linkWithSheets()
 

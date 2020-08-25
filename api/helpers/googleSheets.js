@@ -50,15 +50,25 @@ class GoogleSheetsReader {
     this.responseSheet.headerValues.map((header) => {
       newHeaders.push(this.toCamelCase(header));
     })
-    console.log(this.responseSheet.headerValues)
-    await this.responseSheet.setHeaderRow(newHeaders.concat(["PaymentStatus", "ReservationStatus"]));
+    console.log(this.responseSheet.headerValues);
+
+
+    const ticketTypeColumnAddress = String.fromCharCode(64 + newHeaders.length);
+    const reservationStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 1);
+    const paymentStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 2);
+    console.log(ticketTypeColumnAddress);
+
+
+    await this.responseSheet.setHeaderRow(newHeaders.concat(["ReservationStatus", "PaymentStatus"]));
 
     // Create Ticket Type sheet
     await this.ticketTypeSheet.updateProperties({ title: "Ticket Types" })
     await this.ticketTypeSheet.setHeaderRow(["type", "price", "quantity", "allocated", "paid"])
     const rows = await this.ticketTypeSheet.addRows(ticketTypes)
     rows.map(async (row) => {
-      row.allocated = 0;
+      row.allocated = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
+      row.paid = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
+    
       await row.save();
     })
   }
@@ -75,8 +85,26 @@ class GoogleSheetsReader {
     return res;
   }
 
-  async setPaid(timestamp, fullName) {
-    
+  async findPerson(timestamp, fullName) {
+    const responseRows = await this.ticketTypeSheet.getRows();
+    responseRows.map((row) => {
+      if (row.timestamp == timestamp && row.fullName == fullName) {
+        return row
+      }
+    });
+
+  }
+
+  async changePaymentStatus(timestamp, fullName) {
+    const person = await this.findPerson(timestamp, fullName);
+
+    person.PaymentStatus = (person.PaymentStatus == "paid" ? "" : "paid");
+  }
+
+  async changeReservationStatus(timestamp, fullName) {
+    const person = await this.findPerson(timestamp, fullName);
+
+    person.ReservationStatus = (person.ReservationStatus == "reserved" ? "waitlist" : "reserved");
   }
 
   async allocate() {
@@ -97,9 +125,6 @@ class GoogleSheetsReader {
       }
     });
 
-    await ticketTypeRows.forEach(async (row) => {
-      await row.save();
-    })
 
     console.log('allocated');
   }

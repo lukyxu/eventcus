@@ -8,7 +8,8 @@ const SCOPES = ['https://www.googleapis.com/auth/script.projects',
   'https://www.googleapis.com/auth/spreadsheets.currentonly',
   'https://www.googleapis.com/auth/spreadsheets',
   'https://www.googleapis.com/auth/forms',
-  'https://www.googleapis.com/auth/forms.currentonly'];
+  'https://www.googleapis.com/auth/forms.currentonly',
+  'https://www.googleapis.com/auth/script.scriptapp'];
   
 class GoogleAppLinker {
   constructor(token_path, credentials_path) {
