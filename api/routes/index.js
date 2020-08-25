@@ -98,7 +98,7 @@ router.post('/createForm', passport.authenticate('jwt',{session : false}), funct
     form.addTextItem().setTitle("Imperial Shortcode");
   }
   // form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type + " - " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"))).setRequired()
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
+ 
   if (body.fieldsChecked.email) {
     form.addTextItem().setTitle("Email Address").setRequired();
   }
@@ -109,6 +109,8 @@ router.post('/createForm', passport.authenticate('jwt',{session : false}), funct
     form.addMultipleChoiceItem().setTitle("Do you have any allergies or dietery requirements?").setChoices(["Yes", "No"]).setRequired();
     form.addTextItem().setTitle("If yes, please specify")
   }
+
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
 
   form.linkWithSheets()
 
@@ -161,6 +163,20 @@ router.post('/ticketReservationInfo', function(req, res, next) {
     });
   });
 
+});
+
+router.post('/changePaymentStatus', function(req, res, next) {
+  const sheetId = req.body.sheetId;
+  console.log(sheetId);
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init(() => reader.changePaymentStatus(req.body.timestamp, req.body.fullName));
+});
+
+router.post('/changeReservationStatus', function(req, res, next) {
+  const sheetId = req.body.sheetId;
+  console.log(sheetId);
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init(() => reader.changePaymentStatus(req.body.timestamp, req.body.fullName));
 });
 
 module.exports = router;

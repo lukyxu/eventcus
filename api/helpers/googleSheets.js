@@ -50,15 +50,25 @@ class GoogleSheetsReader {
     this.responseSheet.headerValues.map((header) => {
       newHeaders.push(this.toCamelCase(header));
     })
-    console.log(this.responseSheet.headerValues)
-    await this.responseSheet.setHeaderRow(newHeaders.concat(["PaymentStatus", "ReservationStatus"]));
+    console.log(this.responseSheet.headerValues);
+
+
+    const ticketTypeColumnAddress = String.fromCharCode(64 + newHeaders.length);
+    const reservationStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 1);
+    const paymentStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 2);
+    console.log(ticketTypeColumnAddress);
+
+
+    await this.responseSheet.setHeaderRow(newHeaders.concat(["ReservationStatus", "PaymentStatus"]));
 
     // Create Ticket Type sheet
     await this.ticketTypeSheet.updateProperties({ title: "Ticket Types" })
-    await this.ticketTypeSheet.setHeaderRow(["type", "price", "quantity", "allocated"])
+    await this.ticketTypeSheet.setHeaderRow(["type", "price", "quantity", "allocated", "paid"])
     const rows = await this.ticketTypeSheet.addRows(ticketTypes)
     rows.map(async (row) => {
-      row.allocated = 0;
+      row.allocated = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
+      row.paid = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
+    
       await row.save();
     })
   }
@@ -73,6 +83,32 @@ class GoogleSheetsReader {
       }
     })
     return res;
+  }
+
+  async findPerson(timestamp, fullName) {
+    const responseRows = await this.responseSheet.getRows();
+    var res;
+    await responseRows.forEach((row) => {
+      if (row.Timestamp == timestamp && row.FullName == fullName) {
+        res = row
+      }
+    });
+    return res;
+
+  }
+
+  async changePaymentStatus(timestamp, fullName) {
+    const person = await this.findPerson(timestamp, fullName);
+
+    person.PaymentStatus = (person.PaymentStatus == "paid" ? "" : "paid");
+    await person.save();
+  }
+
+  async changeReservationStatus(timestamp, fullName) {
+    const person = await this.findPerson(timestamp, fullName);
+
+    person.ReservationStatus = (person.ReservationStatus == "reserved" ? "waitlist" : "reserved");
+    await person.save();
   }
 
   async allocate() {
@@ -93,9 +129,6 @@ class GoogleSheetsReader {
       }
     });
 
-    await ticketTypeRows.forEach(async (row) => {
-      await row.save();
-    })
 
     console.log('allocated');
   }
@@ -104,35 +137,24 @@ class GoogleSheetsReader {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const data = []
     ticketTypeRows.forEach( (row) => {
-      // Todo change to include paid, unreserved = total - paid - reserved
       const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
-      data.push({"type" : row.type, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity})
+      data.push({"type" : row.type, "paid": row.paid, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity})
     })
 
     callback(data);
-
   }
 
-  async getHeaders() {
-    const rows = await this.responseSheet.getRows();
-    console.log(rows[0]);
+  async getEmailsAndTicketType(callback) {
+    const responseRows = await this.responseSheet.getRows();
+    const data = []; 
+
+    responseRows.forEach((row) => {
+      data.push({email : row.EmailAddress, ticketType : row.TicketType, reservationStatus : row.ReservationStatus});
+    })
+
+    callback(data)
   }
 
-  async read() {
-    // read cells
-    await this.responseSheet.loadCells('A1:B4');
-
-    // read/write cell values
-    const a1 = responseSheet.getCell(0, 0); // access cells using a zero-based index
-    const b2 = responseSheet.getCellByA1('B2'); // or A1 style notation
-    // access everything about the cell
-    console.log(a1.value);
-    console.log(a1.formula);
-    console.log(a1.formattedValue);
-    console.log(b2.value)
-
-
-  }
 
 }
 
