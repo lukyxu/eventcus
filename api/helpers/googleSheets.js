@@ -137,35 +137,24 @@ class GoogleSheetsReader {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const data = []
     ticketTypeRows.forEach( (row) => {
-      // Todo change to include paid, unreserved = total - paid - reserved
       const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
-      data.push({"type" : row.type, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity})
+      data.push({"type" : row.type, "paid": row.paid, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity})
     })
 
     callback(data);
-
   }
 
-  async getHeaders() {
-    const rows = await this.responseSheet.getRows();
-    console.log(rows[0]);
+  async getEmailsAndTicketType(callback) {
+    const responseRows = await this.responseSheet.getRows();
+    const data = []; 
+
+    responseRows.forEach((row) => {
+      data.push({email : row.EmailAddress, ticketType : row.TicketType});
+    })
+
+    callback(data)
   }
 
-  async read() {
-    // read cells
-    await this.responseSheet.loadCells('A1:B4');
-
-    // read/write cell values
-    const a1 = responseSheet.getCell(0, 0); // access cells using a zero-based index
-    const b2 = responseSheet.getCellByA1('B2'); // or A1 style notation
-    // access everything about the cell
-    console.log(a1.value);
-    console.log(a1.formula);
-    console.log(a1.formattedValue);
-    console.log(b2.value)
-
-
-  }
 
 }
 
