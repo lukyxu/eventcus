@@ -213,6 +213,7 @@ export default function EventHookForm() {
                 </div>
               );
             })}
+            <hr></hr>
             <button
               type="button"
               className="blueButton"
@@ -406,7 +407,15 @@ export default function EventHookForm() {
             ))}
           </div>
         </div> */}
-        <button className="blueButton" type="submit">Create</button>
+        <Row>
+          <Col xs={0} sm={0} xl={4}></Col>
+          <Col xs={12} sm={12} xl={4} className="formSection">
+            <hr></hr>
+            <button className="blueButton" type="submit">Create Event</button>
+          </Col> 
+          <Col xs={0} sm={0} xl={4}></Col>
+          <Col></Col>      
+        </Row>   
       </form>
     </Container>
   );

@@ -67,7 +67,8 @@ button[type="submit"].blueButton, input[type="submit"].blueButton {
   color: white;
   text-transform: uppercase;
   border: none;
-  margin-top: 40px;
+  width: 100%;
+  margin-bottom: 10px;
   padding: 15px 25px;
   border-radius: 4px;
   /* font-size: 16px; */
