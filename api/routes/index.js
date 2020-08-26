@@ -3,9 +3,12 @@ var router = express.Router();
 var authenticator = require('../helpers/authenticator')
 var passport = require('passport')
 var Organizer = require('../models/Organizer');
+var Event = require('../models/Event');
 var googleAppLinker = require('../helpers/googleAppLinker')
 var GoogleSheetsReader = require('../helpers/googleSheets')
+var GoogleFormOpener = require('../helpers/google_form_builder/GoogleFormOpener')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
+var Agenda = require('agenda')
 
 /* Read sa-credentials. */
 const fs = require('fs');
@@ -60,18 +63,30 @@ router.post('/authenticate', passport.authenticate('jwt',{session : false}), fun
   res.status(200).json({isAuthenticated : true, user : req.user});
 });
 
-router.post('/createForm', function(req, res, next) {
+const agenda = new Agenda({
+  db: {address: process.env.DB_CONNECTION, collection: 'scheduler'},
+  processEvery: '30 seconds',
+  maxConcurrency: 1
+});
+
+agenda.start()
+// (async () => {
+//   await agenda.start()
+//   agenda.now('openForm', {formId: '1C5eu37hlr_CVt2trEWpVoShnieMypgx4HUloHjuwTPo'})
+//   console.log("OK")
+// })();
+
+agenda.define('openForm', {concurrency: 1}, (job, done) => {
+  console.log(job.attrs)
+  console.log((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString())
+  googleAppLinker.createForm((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
+    console.log(formRes)
+    done()
+  })
+})
+
+router.post('/createForm', passport.authenticate('jwt',{session : false}), function(req, res, next) {
   const body = req.body;
-  // console.log(req)
-  // req = {
-  //   eventName: "Boat Party",
-  //   eventDetails: "A fun time",
-  //   fullName: true,
-  //   shortCode: true,
-  //   email: true,
-  //   contactNumber: true,
-  //   foodAllergies: true
-  // }
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation");
   form.setDescription(body.eventDetails);
@@ -101,8 +116,18 @@ router.post('/createForm', function(req, res, next) {
 
   form.setFormOpenTime(new Date(body.ticketRelease))
   console.log(form.toFunctionString())
+  if (form.formClosed()) {
+    console.log("CLOSED")
+  }
   googleAppLinker.createForm(form.toFunctionString(), formRes => {
-    const sheetId = formRes.sheetId;
+    const {sheetId, formId} = formRes;
+    const newEvent = new Event({name: body.eventName, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId})
+    newEvent.save(err => {
+      console.error(err)
+    })
+
+    agenda.schedule(new Date(body.ticketRelease), 'openForm', {formId})
+
     console.log(sheetId);
     res.json({success : true});
     let reader = new GoogleSheetsReader(sheetId);

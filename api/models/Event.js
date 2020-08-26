@@ -9,6 +9,14 @@ const EventSchema = mongoose.Schema({
   hosts: {
     type: [mongoose.Schema.Types.ObjectId],
     default: []
+  },
+  sheetId: {
+    type: String,
+    required: true
+  },
+  formId: {
+    type: String,
+    required: true
   }
 });
 
