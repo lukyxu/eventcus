@@ -13,22 +13,22 @@ export default function EventTable({title, events}) {
     </Row>
     <div style={{backgroundColor: "#f0f0f0", color:"#504e4e", width: "100%"}}>
       <Row>
-        <Col xs={4} sm={3}>
+        <Col xs={3} sm={3}>
           <b>{"Date"}</b>
         </Col>
-        <Col xs={3} sm={4}>
+        <Col xs={4} sm={4}>
           <b>{"Name"}</b>
         </Col>
         <Col xs={5} sm={5}>
-          <b>{"Tickets Reserved"}</b>
+          <b style={{textAlign:"end"}}>{"Tickets Reserved"}</b>
         </Col>
       </Row>
       {events.map(event => 
         <Row key={event.name}>
-          <Col xs={4} sm={3}>
+          <Col xs={3} sm={3}>
           <span>{dayjs(event.eventDate).format(dateFormat)}</span>
           </Col>
-          <Col xs={3} sm={4}>
+          <Col xs={4} sm={4}>
             <span>{event.name}</span>
           </Col>
           <Col xs={5} sm={5}>

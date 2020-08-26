@@ -159,6 +159,11 @@ input[type="button"]:hover.blueButton {
   padding: 10px 20px;
   display: inherit;
 }
+
+.eventTableColouredText  {
+  text-align: end;
+}
+
 .eventTableColouredText span {
   display: inline;
   padding: 0px;

@@ -195,7 +195,7 @@ export default function EventHookForm() {
                   </Col>
                   <Col>
                       {fields.length > 1 ? (
-                      <button type="button" onClick={() => remove(index)}>
+                      <button type="button" className="blueButton" onClick={() => remove(index)}>
                         X
                       </button>
                       ) : (
@@ -208,6 +208,7 @@ export default function EventHookForm() {
           })}
           <button
             type="button"
+            className="blueButton"
             onClick={() => {
               append();
             }}
@@ -237,7 +238,7 @@ export default function EventHookForm() {
             ))}
           </div>
         </div>
-        <button type="submit">Create</button>
+        <button className="blueButton" type="submit">Create</button>
       </form>
     </div>
   );
