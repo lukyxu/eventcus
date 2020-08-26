@@ -38,8 +38,8 @@ class GoogleSheetsReader {
   }
 
   toCamelCase(string) {
-    return string.replace(/\s+(.)/g, function (match, group) { 
-      return group.toUpperCase()  
+    return string.replace(/\s+(.)/g, function (match, group) {
+      return group.toUpperCase()
     })
   }
 
@@ -56,7 +56,6 @@ class GoogleSheetsReader {
     const ticketTypeColumnAddress = String.fromCharCode(64 + newHeaders.length);
     const reservationStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 1);
     const paymentStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 2);
-    console.log(ticketTypeColumnAddress);
 
 
     await this.responseSheet.setHeaderRow(newHeaders.concat(["ReservationStatus", "PaymentStatus"]));
@@ -68,19 +67,28 @@ class GoogleSheetsReader {
     rows.map(async (row) => {
       row.allocated = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
       row.paid = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
-    
+
       await row.save();
     })
+    const totalRow = await this.ticketTypeSheet.addRow({ type: "total" })
+    totalRow.quantity = `=SUM(C2:C${ticketTypes.length + 1})`
+    totalRow.allocated = `=SUM(D2:D${ticketTypes.length + 1})`
+    totalRow.paid = `=SUM(E2:E${ticketTypes.length + 1})`
+    await totalRow.save();
   }
 
   async isTicketAvaliable(ticketType, ticketTypeRows) {
     var res = false;
     await ticketTypeRows.forEach(async (row) => {
-      if (row.type === ticketType && row.allocated < row.quantity) {
-        row.allocated = parseInt(row.allocated) + 1;
-        // console.log(row.type);
-        res = true;
+
+      if (row.type != "total") {
+        if (row.type === ticketType && row.allocated < row.quantity) {
+          row.allocated = parseInt(row.allocated) + 1;
+          // console.log(row.type);
+          res = true;
+        }
       }
+
     })
     return res;
   }
@@ -118,7 +126,7 @@ class GoogleSheetsReader {
     await responseRows.map(async (row) => {
       // console.log(row.Timestamp);
       if (row.ReservationStatus == null) {
-        const bool  = await this.isTicketAvaliable(row.TicketType, ticketTypeRows);
+        const bool = await this.isTicketAvaliable(row.TicketType, ticketTypeRows);
         // console.log(bool)
         if (bool) {
           row.ReservationStatus = 'reserved';
@@ -136,9 +144,9 @@ class GoogleSheetsReader {
   async ticketReservationInfo(callback) {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const data = []
-    ticketTypeRows.forEach( (row) => {
+    ticketTypeRows.forEach((row) => {
       const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
-      data.push({"type" : row.type, "paid": row.paid, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity});
+      data.push({ "type": row.type, "paid": row.paid, "reserved": row.allocated, "unreserved": unreserved, "quantity": row.quantity });
     })
 
     callback(data);
@@ -148,7 +156,7 @@ class GoogleSheetsReader {
     const emails = [];
     responseRows.forEach((row) => {
       console.log(row.FullName, reservationStatus)
-      if (row.TicketType  == ticketType && row.ReservationStatus == reservationStatus) {
+      if (row.TicketType == ticketType && row.ReservationStatus == reservationStatus) {
         emails.push(row.EmailAddress);
       }
     });
@@ -162,16 +170,20 @@ class GoogleSheetsReader {
     const data = [];
 
     ticketTypeRows.forEach((ticket) => {
-      console.log(ticket.type)
-      const waitlistEmails =  this.getEmails(ticket.type, "waitlist", responseRows);
-      if (waitlistEmails.length != 0) {
-        data.push({ticketType : ticket.type, reservationStatus : "waitlist", emails : waitlistEmails});
+
+      if (ticket.type != "total") {
+        console.log(ticket.type)
+        const waitlistEmails = this.getEmails(ticket.type, "waitlist", responseRows);
+        if (waitlistEmails.length != 0) {
+          data.push({ ticketType: ticket.type, reservationStatus: "waitlist", emails: waitlistEmails });
+        }
+
+        const reservedEmails = this.getEmails(ticket.type, "reserved", responseRows);
+        if (reservedEmails.length != 0) {
+          data.push({ ticketType: ticket.type, reservationStatus: "reserved", emails: reservedEmails });
+        }
       }
 
-      const reservedEmails =  this.getEmails(ticket.type, "reserved", responseRows);
-      if (reservedEmails.length != 0) {
-        data.push({ticketType : ticket.type, reservationStatus : "reserved", emails : reservedEmails});
-      }
     });
     callback(data);
   }

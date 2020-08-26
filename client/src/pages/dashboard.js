@@ -10,42 +10,69 @@ import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
 import { useHistory } from "react-router-dom";
 
-export default function Dashboard({ setUser }) {
+export default function Dashboard({ setUser, events}) {
   const history = useHistory();
     const [searchValue, setSearchValue] = useState('');
 
-    const events = [
-      {
-        eventDate: new Date(2020, 9, 10),
-        name: "Ten 10",
-        tickets: {
-          paid: 15,
-          reserved: 14,
-          unreserved: 40
-        }
-      },
-      {
-        eventDate: new Date(2020, 9, 17),
-        name: "Fresher's Dinner",
-        tickets: {
-          paid: 0,
-          reserved: 0,
-          unreserved: 40
-        }
-      },
-      {
-        eventDate: new Date(2020, 9, 1),
-        name: "Ice Breaker",
-        tickets: {
-          paid: 40,
-          reserved: 0,
-          unreserved: 0
-        }
-      },
-    ]
+    // let resEvent = await fetch("http://localhost:9000/events")
+    console.log(events)
+
+ 
+    // events = [
+    //   {
+    //     eventDate: new Date(2020, 9, 10),
+    //     name: "Ten 10",
+    //     total: {
+    //       type: total,
+    //       paid: 15,
+    //       reserved: 14,
+    //       unreserved: 40,
+    //       quantity: 69,
+    //     },
+    //     tickets: [
+    //         {
+    //             type: normal,
+    //             paid: 5,
+    //             reserved: 4,
+    //             unreserved: 6,
+    //             quantity: 15,
+    //         },
+    //         {
+    //             type: vip,
+    //             paid: 5,
+    //             reserved: 4,
+    //             unreserved: 6,
+    //             quantity: 15,
+    //         }
+    //     ]
+    //   },
+
+    //   {
+    //     eventDate: new Date(2020, 9, 17),
+    //     name: "Fresher's Dinner",
+    //     tickets: {
+    //       paid: 0,
+    //       reserved: 0,
+    //       unreserved: 40
+    //     }
+    //   },
+    //   {
+    //     eventDate: new Date(2020, 9, 1),
+    //     name: "Ice Breaker",
+    //     tickets: {
+    //       paid: 40,
+    //       reserved: 0,
+    //       unreserved: 0
+    //     }
+    //   },
+    // ]
 
     const filteredEvents = () => {
-      return events.sort((e1, e2) => e2.eventDate.getTime() - e1.eventDate.getTime()).filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
+      console.log(events)
+
+      let e = events.sort((e1, e2) => new Date(e2.eventDate).getTime() - new Date(e1.eventDate).getTime()) //.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
+        console.log(e)
+        return events
     }
 
     const pressAllocate = () => {
@@ -111,12 +138,14 @@ export default function Dashboard({ setUser }) {
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col sm={12}>
-                <EventTable title="Upcoming Events" events={filteredEvents().filter(e => e.eventDate.getTime() > new Date().getTime())}></EventTable>
+                <EventTable title="Upcoming Events" events={filteredEvents()}></EventTable> 
+                {/* .filter(e => new Date(e.eventDate).getTime() > new Date().getTime())}> */}
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col sm={12}>
-                <EventTable title="Past Events" events={filteredEvents().filter(e => e.eventDate.getTime() <= new Date().getTime())}></EventTable>
+                <EventTable title="Past Events" events={filteredEvents()}></EventTable>
+                    {/* // .filter(e => new Date(e.eventDate).getTime() <= new Date().getTime())} */}
               </Col>
             </Row>
             <br></br>
