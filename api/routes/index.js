@@ -165,6 +165,19 @@ router.post('/ticketReservationInfo', function(req, res, next) {
 
 });
 
+router.post('/getEmailsAndTicketTypes', function(req, res, next) {
+  const sheetId = req.body.sheetId;
+  console.log(sheetId);
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init(() => {
+    reader.getEmailsAndTicketTypes((data) => {
+      console.log(data);
+      res.json(data);
+    });
+  });
+
+});
+
 router.post('/changePaymentStatus', function(req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);

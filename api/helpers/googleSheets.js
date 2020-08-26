@@ -138,21 +138,42 @@ class GoogleSheetsReader {
     const data = []
     ticketTypeRows.forEach( (row) => {
       const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
-      data.push({"type" : row.type, "paid": row.paid, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity})
+      data.push({"type" : row.type, "paid": row.paid, "reserved" : row.allocated, "unreserved" : unreserved, "quantity" : row.quantity});
     })
 
     callback(data);
   }
 
-  async getEmailsAndTicketType(callback) {
-    const responseRows = await this.responseSheet.getRows();
-    const data = []; 
-
+  getEmails(ticketType, reservationStatus, responseRows) {
+    const emails = [];
     responseRows.forEach((row) => {
-      data.push({email : row.EmailAddress, ticketType : row.TicketType, reservationStatus : row.ReservationStatus});
-    })
+      console.log(row.FullName, reservationStatus)
+      if (row.TicketType  == ticketType && row.ReservationStatus == reservationStatus) {
+        emails.push(row.EmailAddress);
+      }
+    });
+    return emails;
+  }
 
-    callback(data)
+  async getEmailsAndTicketType(callback) {
+    const ticketTypeRows = await this.ticketTypeSheet.getRows();
+    const responseRows = await this.responseSheet.getRows();
+
+    const data = [];
+
+    ticketTypeRows.forEach((ticket) => {
+      console.log(ticket.type)
+      const waitlistEmails =  this.getEmails(ticket.type, "waitlist", responseRows);
+      if (waitlistEmails.length != 0) {
+        data.push({ticketType : ticket.type, reservationStatus : "waitlist", emails : waitlistEmails});
+      }
+
+      const reservedEmails =  this.getEmails(ticket.type, "reserved", responseRows);
+      if (reservedEmails.length != 0) {
+        data.push({ticketType : ticket.type, reservationStatus : "reserved", emails : reservedEmails});
+      }
+    });
+    callback(data);
   }
 
 
