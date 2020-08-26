@@ -6,6 +6,10 @@ const EventSchema = mongoose.Schema({
     required: true
   },
   dropTime: Date,
+  eventDate: {
+    type: Date,
+    required: true
+  },
   hosts: {
     type: [mongoose.Schema.Types.ObjectId],
     default: []
