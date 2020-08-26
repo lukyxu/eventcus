@@ -133,16 +133,16 @@ router.post('/createForm', passport.authenticate('jwt',{session : false}), funct
     let reader = new GoogleSheetsReader(sheetId);
     reader.init(() => reader.configSheet(body.ticketTypes));
   });
+});
 
-
-  // console.log('here')
-
-  // console.log(googleAppLinker.createForm(form.toFunctionString()))
-  // console.log(form.toFunctionString())
-  
-
-
-
+router.get('/events', passport.authenticate('jwt',{session : false}), function(req, res, next) {
+  Event.find({hosts: req.user._id}, (err, events)=> {
+    if (err) {
+      console.log(err)
+      res.status(500).json({error: err})
+    }
+    res.status(200).json(events)
+  })
 });
 
 router.post('/allocate', function(req, res, next) {
@@ -162,7 +162,6 @@ router.post('/ticketReservationInfo', function(req, res, next) {
       res.json(data);
     });
   });
-
 });
 
 router.post('/getEmailsAndTicketTypes', function(req, res, next) {
