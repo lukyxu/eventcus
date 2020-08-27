@@ -4,13 +4,13 @@ import Header from './../components/header.js'
 // import EventForm from './../components/event-form';
 import EventHookForm from '../components/event-hook-form.js';
 
-export default function Create() {
+export default function Create({fetchEvents}) {
     return (
         <div>
             <Header title='Create Event' />
             <Link to={'/'} className="nav-link"> Dashboard </Link>
             {/* <EventForm/> */}
-            <EventHookForm/>
+            <EventHookForm fetchEvents={fetchEvents}/>
 
         </div>
     );

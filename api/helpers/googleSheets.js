@@ -21,6 +21,7 @@ class GoogleSheetsReader {
       await this.doc.loadInfo();
       this.responseSheet = this.doc.sheetsByIndex[0]; // or use doc.sheetsById[id]
       this.ticketTypeSheet = this.doc.sheetsByIndex[1];
+      console.log("Initiating");
       console.log(this.responseSheet.title);
       // await this.sheet.getRows()
 
@@ -51,12 +52,9 @@ class GoogleSheetsReader {
       newHeaders.push(this.toCamelCase(header));
     })
     console.log(this.responseSheet.headerValues);
-
-
     const ticketTypeColumnAddress = String.fromCharCode(64 + newHeaders.length);
     const reservationStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 1);
     const paymentStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 2);
-
 
     await this.responseSheet.setHeaderRow(newHeaders.concat(["ReservationStatus", "PaymentStatus"]));
 

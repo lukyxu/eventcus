@@ -29,38 +29,38 @@ function App() {
     })
   }, [])
 
-  useEffect(() => {
-    async function fetchEvents() {
-      let res = await fetch("/events", {credentials: "include"})
-      let e = await res.json()
-      let r = []
+  async function fetchEvents() {
+    let res = await fetch("/events", {credentials: "include"})
+    let e = await res.json()
+    let r = []
 
-      await Promise.all(e.map(async (event) => {
-        console.log(event)
-        const reqBody = {
-          sheetId: event.sheetId
+    await Promise.all(e.map(async (event) => {
+      console.log(event)
+      const reqBody = {
+        sheetId: event.sheetId
+      }
+
+      let tickets = await TicketReservationInfo(reqBody)
+      let total;
+
+      tickets.forEach((ticket, index, object) => {
+        if (ticket.type === "total") {
+          total = ticket;
+          object.splice(index, 1)
         }
+      })
+      r.push({eventDate : event.eventDate, name : event.name, total : total, tickets : tickets})
+    }))
 
-        let tickets = await TicketReservationInfo(reqBody)
-        let total;
+    console.log(r)
+    // console.log(typeof r)
+    r.sort((e1,e2) => new Date(e2.eventDate).getTime() - new Date(e1.eventDate).getTime())
+    setEvents(r)
+    setLoaded(true)
+  }
 
-        tickets.forEach((ticket, index, object) => {
-          if (ticket.type === "total") {
-            total = ticket;
-            object.splice(index, 1)
-          }
-        })
-        r.push({eventDate : event.eventDate, name : event.name, total : total, tickets : tickets})
-      }))
-
-      console.log(r)
-      // console.log(typeof r)
-      r.sort((e1,e2) => new Date(e2.eventDate).getTime() - new Date(e1.eventDate).getTime())
-      setEvents(r)
-      setLoaded(true)
-    }
+  useEffect(() => {
     fetchEvents()
-
   }, [user])
 
   if (!loaded) {
@@ -79,7 +79,7 @@ function App() {
         <hr /> */}
         <Switch>
             <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events}/>} />
-            <PrivateRoute exact user={user} path='/create-event' component={Create} />
+            <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
             <Route exact path='/login' render={(props) => <Login setUser={setUser}/>}/>
         </Switch>
       </div>
