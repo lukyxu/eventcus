@@ -9,6 +9,7 @@ import {isAuthenticated} from './services/authService'
 import ReactLoading from 'react-loading';
 import './styles.css';
 import TicketReservationInfo from './services/ticketReservationInfo.js';
+import Send from './pages/send-email';
 
 function App() {
 
@@ -86,6 +87,7 @@ function App() {
             <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events} fetchEvents={fetchEvents} renderEvents={renderEvents}/>} />
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
             <PrivateRoute exact user={user} path='/event' render={(props) => <Event></Event>} />
+            <PrivateRoute exact user={user} path='/send-email' render={(props) => <Send></Send>} />
             <Route exact path='/login' render={(props) => <Login setUser={setUser} setLoaded={setLoaded}/>}/>
         </Switch>
       </div>
