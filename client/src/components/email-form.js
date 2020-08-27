@@ -163,28 +163,32 @@ export default function EmailForm() {
   });
 
   const onSubmit = async (data) => {
-    // setLoadingSend(true)
-    const normal = info[info.findIndex(x => x.type === 'normal' && x.reservationstatus === 'reserved')]
-    console.log(data.messageNormal);
-    var accessToken = await getAccessToken(config.scopes);
-    const message = {
-      "subject": "Test email",
-      "body": {
-        "contentType": "Text",
-        "content": data.messageNormal
-      },
-      "bccRecipients": normal.emails.map(email => {
-        return ({
-          "emailAddress": {
-            "address": email
-          }
+    if (!isAuthenticated) {
+      login();
+    } else {
+      // setLoadingSend(true)
+      const normal = info[info.findIndex(x => x.type === 'normal' && x.reservationstatus === 'reserved')]
+      console.log(data.messageNormal);
+      var accessToken = await getAccessToken(config.scopes);
+      const message = {
+        "subject": "Test email",
+        "body": {
+          "contentType": "Text",
+          "content": data.messageNormal
+        },
+        "bccRecipients": normal.emails.map(email => {
+          return ({
+            "emailAddress": {
+              "address": email
+            }
+          })
         })
-      })
+      }
+      sendNewEmail(accessToken, message);
+      // let res = await PostForm(data);
+      // console.log(res)
+      // history.push('/')
     }
-    sendNewEmail(accessToken, message);
-    // let res = await PostForm(data);
-    // console.log(res)
-    // history.push('/')
   }; // your form submit function which will invoke after successful validation
 
   // const renderSendButton = () => {
@@ -245,12 +249,7 @@ export default function EmailForm() {
         <Row className="formSection">
           <hr></hr>
           {/* {renderSendButton()} */}
-          <Button
-            className="blueButton"
-            type={isAuthenticated ? "submit" : "button"}
-            onClick={() => isAuthenticated ? null : login()}>
-              Send
-          </Button>
+          <Button className="blueButton" type="submit">Send</Button>
         </Row>
       </form>
     </Container>
