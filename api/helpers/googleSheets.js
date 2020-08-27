@@ -162,7 +162,7 @@ class GoogleSheetsReader {
     return emails;
   }
 
-  async getEmailsAndTicketType(callback) {
+  async getEmailsAndTicketTypes(callback) {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const responseRows = await this.responseSheet.getRows();
 
