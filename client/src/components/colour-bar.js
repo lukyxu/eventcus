@@ -12,9 +12,20 @@ export default function ColourBar({data}) {
   let totalValue = data.map(d => d.value).reduce((a,b) => a+b)
   console.log(totalValue)
 
+  const render = () => {
+    let first = true
+    return data.map((d, i) => {
+      let bl = "none"
+      if (d.value != 0 && first) {
+        first = false
+      } else if (d.value != 0 && !first) {
+        bl = "2px solid white"
+      }
+      return <div key={d.name} title={d.name + " " + d.value + "/" + totalValue} style={{borderLeft: bl,backgroundColor: d.colour, height: "100%", display: "inline-block", width: d.value/totalValue*100+"%" }}></div>
+    })
+  }
+
   return <div style={{overflow: "hidden", borderRadius:"12px", display:"flex", height:"30px"}}>
-    {data.map(d => {
-      return <div key={d.name} title={d.name + " " + d.value + "/" + totalValue} style={{backgroundColor: d.colour, height: "100%", display: "inline-block", width: d.value/totalValue*100+"%" }}></div>
-    })}
+    {render()}
   </div>
 }
