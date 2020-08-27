@@ -39,7 +39,6 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
   }
 
   const render = () => {
-
     const renderColourText = (paid, reserved, unreserved, quantity, dropdown, event) => {
       return <span className="eventTableColouredText">
       <span style={{color:"#4ae575"}}>{paid}</span>
@@ -72,14 +71,14 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
           <Col xs={3} sm={3}>
             <span>{ticket.type}</span>
           </Col>
-          <Col xs={4} sm={4}>
-            <div style={{paddingLeft: "15px", marginTop:"7px"}}><ColourBar data={[
+          <Col xs={5} sm={6} style={{paddingRight:"0px"}}>
+            <div className="colourBarPadding"><ColourBar data={[
               {name: "Paid", colour: "#4ae575", value: parseInt(ticket.paid)},
               {name: "Reserved", colour: "#ffb800", value: parseInt(ticket.reserved)},
               {name: "Unreserved", colour: "#de5959", value: parseInt(ticket.unreserved)},
               ]}></ColourBar></div>
           </Col>
-          <Col xs={5} sm={5}>
+          <Col xs={4} sm={3}>
             {
               renderColourText(ticket.paid, ticket.reserved, ticket.unreserved, ticket.quantity, false, event)
             }
