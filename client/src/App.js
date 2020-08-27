@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import PrivateRoute from './routing/PrivateRoute'
 import Create from './pages/create-event';
+import Event from './pages/event';
 import Login from './pages/login';
 import {isAuthenticated} from './services/authService'
 import ReactLoading from 'react-loading';
@@ -80,6 +81,7 @@ function App() {
         <Switch>
             <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events}/>} />
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
+            <PrivateRoute exact user={user} path='/event' render={(props) => <Event></Event>} />
             <Route exact path='/login' render={(props) => <Login setUser={setUser}/>}/>
         </Switch>
       </div>
