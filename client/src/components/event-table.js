@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import { Col, Row } from 'react-bootstrap';
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
 export default function EventTable({title, events, refreshButton, fetchEvents}) {
@@ -13,11 +15,27 @@ export default function EventTable({title, events, refreshButton, fetchEvents}) 
   }
 
   const render = () => {
-    console.log(events)
+    
+    const renderTicketsReserved = (event) => {
+      console.log(event)
+      if (new Date(event.dropTime).getTime() < new Date().getTime()) {
+        return <span className="eventTableColouredText">
+          <span style={{color:"#4ae575"}}>{event.total.paid}</span>
+          <span style={{color:"#363636"}}>{"/"}</span>
+          <span style={{color:"#ffb800"}}>{event.total.reserved}</span>
+          <span style={{color:"#363636"}}>{"/"}</span>
+          <span style={{color:"#de5959"}}>{event.total.unreserved}</span>
+          <span style={{color:"#363636"}}>{"/"}</span>
+          <span style={{color:"#363636"}}>{event.total.quantity}</span>
+        </span>
+      }
+    return <span  className="eventTableColouredText">Dropping in {dayjs().from(event.dropTime, true)}</span>
+    }
+
     return events.map(event =>
-      <div>
+      <div key={event.name}>
         <hr style={{"marginTop":"0px", "marginBottom":"0px"}}></hr>
-        <Row key={event.name}>
+        <Row>
           <Col xs={3} sm={3}>
           <span>{dayjs(event.eventDate).format(dateFormat)}</span>
           </Col>
@@ -25,15 +43,9 @@ export default function EventTable({title, events, refreshButton, fetchEvents}) 
             <span>{event.name}</span>
           </Col>
           <Col xs={5} sm={5}>
-              <span className="eventTableColouredText">
-                <span style={{color:"#4ae575"}}>{event.total.paid}</span>
-                <span style={{color:"#363636"}}>{"/"}</span>
-                <span style={{color:"#ffb800"}}>{event.total.reserved}</span>
-                <span style={{color:"#363636"}}>{"/"}</span>
-                <span style={{color:"#de5959"}}>{event.total.unreserved}</span>
-                <span style={{color:"#363636"}}>{"/"}</span>
-                <span style={{color:"#363636"}}>{event.total.quantity}</span>
-              </span>
+            {
+              renderTicketsReserved(event)
+            }
           </Col>
         </Row>
       </div>

@@ -49,7 +49,7 @@ function App() {
           object.splice(index, 1)
         }
       })
-      r.push({eventDate : event.eventDate, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId})
+      r.push({eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId})
     }))
 
     console.log(r)
