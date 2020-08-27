@@ -199,27 +199,29 @@ class GoogleSheetsReader {
   }
 
   async getTicketAllocations(callback) {
-    const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const responseRows = await this.responseSheet.getRows();
 
-    const data = [];
+    // const data = [];
 
-    ticketTypeRows.forEach((ticket) => {
+    const map = {};
 
-      if (ticket.type != "total") {
-        console.log(ticket.type)
-        const waitlist = this.getReservationInfo(ticket.type, "waitlist", responseRows);
-        if (waitlist.length != 0) {
-          data.push({ ticketType: ticket.type, reservationStatus: "waitlist", reservations: waitlist });
-        }
+    responseRows.forEach((row) => {
+      console.log(row)
 
-        const reservationslist = this.getReservationInfo(ticket.type, "reserved", responseRows);
-        if (reservationslist.length != 0) {
-          data.push({ ticketType: ticket.type, reservationStatus: "reserved", reservations: reservationslist });
-        }
+      let key = row.TicketType + '#' + row.ReservationStatus
+      console.log(row.FullName)
+
+      if (map[key] == null) {
+        map[key] = {ticketType : row.TicketType, reservationStatus : row.ReservationStatus, reservations : [{timestamp : row.Timestamp, name : row.FullName}]}
+      } else {
+        map[key] = {ticketType : row.TicketType, reservationStatus : row.ReservationStatus, reservations : map[key].reservations.concat([{timestamp : row.Timestamp, name : row.FullName}])}
       }
+    })
 
-    });
+    console.log(map)
+
+    const data = Object.values(map)
+
     callback(data);
   }
 

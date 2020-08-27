@@ -5,6 +5,7 @@ import { logout } from '../services/authService'
 import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
 import ChangePaymentStatus from './../services/changePaymentStatus.js';
+import TicketAllocations from './../services/ticketAllocations.js';
 import Button from '@material-ui/core/Button';
 import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
@@ -85,6 +86,18 @@ export default function Dashboard({ setUser, events, fetchEvents}) {
       console.log(res)
     }
 
+    const pressTicketAllocations = () => {
+      console.log("hi")
+      const reqBody = {
+          sheetId: '1Vz0SAgFXCGCvjhVXhbt6F2sLQGbdcnLmbyzM3q9PWBY'
+      }
+      const res = TicketAllocations(reqBody);
+      console.log(res)
+    }
+
+
+    
+
     const pressChangePaymentStatus = () => {
         const reqBody = {
             sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358',
@@ -144,6 +157,8 @@ export default function Dashboard({ setUser, events, fetchEvents}) {
             <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
             <br></br>
             <Button className="blueButton" onClick={pressTicketResInfo}> Ticket Reservation Info </Button>
+            <br></br>
+            <Button className="blueButton" onClick={pressTicketAllocations}> Ticket Allocations </Button>
             <br></br>
             <Button className="blueButton" onClick={pressChangePaymentStatus}> Change Payment Status </Button>
             <br></br>

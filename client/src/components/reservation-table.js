@@ -1,8 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
-import dayjs from 'dayjs'
 
-const dateFormat = 'DD/MM/YYYY HH:mm:ss'
 export default function ReservationTable({title, reservations}) {
 
 
