@@ -1,10 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Col, Row } from 'react-bootstrap';
 import dayjs from 'dayjs'
 
 const dateFormat = 'DD/MM/YYYY'
-export default function EventTable({title, events}) {
+export default function EventTable({title, events, refreshButton, fetchEvents}) {
   console.log(events)
+  const [refreshing, setRefreshing] = useState(false)
+  const refresh = async () => {
+    setRefreshing(true)
+    await fetchEvents()
+    setRefreshing(false)
+  }
 
   const render = () => {
     console.log(events)
@@ -36,7 +42,10 @@ export default function EventTable({title, events}) {
     <Row>
       <Col sm={12}>
         {/* <Button className="blueButton">{title}</Button> */}
-        <div className="eventTableHeader">{title}</div>
+        <div className="eventTableHeader">{title}
+          {refreshButton && !refreshing ? <div className="refreshButton" onClick={refresh}></div> : null}
+          {refreshing ? <span style={{padding: "0px", display: "inline", fontSize: "10px", marginLeft:"5px", verticalAlign: "middle"}}> Refreshing...</span> : null}
+        </div>
       </Col>
     </Row>
     <div style={{backgroundColor: "#f0f0f0", color:"#504e4e", width: "100%"}}>

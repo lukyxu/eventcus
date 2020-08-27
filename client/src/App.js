@@ -78,7 +78,7 @@ function App() {
         </nav>
         <hr /> */}
         <Switch>
-            <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events}/>} />
+            <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events} fetchEvents={fetchEvents}/>} />
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
             <Route exact path='/login' render={(props) => <Login setUser={setUser}/>}/>
         </Switch>
