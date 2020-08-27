@@ -67,8 +67,6 @@ export default function SignIn({setUser, setLoaded}) {
         setLoaded(false)
         history.push('/')
       }
-      
-      
     })
   }
 

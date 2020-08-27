@@ -30,6 +30,10 @@ function App() {
     })
   }, [])
 
+  const renderEvents = () => {
+    setEvents([...events])
+  }
+
   async function fetchEvents() {
     let res = await fetch("/events", {credentials: "include"})
     let e = await res.json()
@@ -50,7 +54,7 @@ function App() {
           object.splice(index, 1)
         }
       })
-      r.push({eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId})
+      r.push({eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId, dashboardDrop: false})
     }))
 
     console.log(r)
@@ -79,7 +83,7 @@ function App() {
         </nav>
         <hr /> */}
         <Switch>
-            <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events} fetchEvents={fetchEvents}/>} />
+            <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events} fetchEvents={fetchEvents} renderEvents={renderEvents}/>} />
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
             <PrivateRoute exact user={user} path='/event' render={(props) => <Event></Event>} />
             <Route exact path='/login' render={(props) => <Login setUser={setUser} setLoaded={setLoaded}/>}/>
