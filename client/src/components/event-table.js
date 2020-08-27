@@ -15,25 +15,28 @@ export default function EventTable({title, events, refreshButton, fetchEvents}) 
   const render = () => {
     console.log(events)
     return events.map(event =>
-      <Row key={event.name}>
-        <Col xs={3} sm={3}>
-        <span>{dayjs(event.eventDate).format(dateFormat)}</span>
-        </Col>
-        <Col xs={4} sm={4}>
-          <span>{event.name}</span>
-        </Col>
-        <Col xs={5} sm={5}>
-            <span className="eventTableColouredText">
-              <span style={{color:"#4ae575"}}>{event.total.paid}</span>
-              <span style={{color:"#363636"}}>{"/"}</span>
-              <span style={{color:"#ffb800"}}>{event.total.reserved}</span>
-              <span style={{color:"#363636"}}>{"/"}</span>
-              <span style={{color:"#de5959"}}>{event.total.unreserved}</span>
-              <span style={{color:"#363636"}}>{"/"}</span>
-              <span style={{color:"#363636"}}>{event.total.quantity}</span>
-            </span>
-        </Col>
-      </Row>
+      <div>
+        <hr style={{"marginTop":"0px", "marginBottom":"0px"}}></hr>
+        <Row key={event.name}>
+          <Col xs={3} sm={3}>
+          <span>{dayjs(event.eventDate).format(dateFormat)}</span>
+          </Col>
+          <Col xs={4} sm={4}>
+            <span>{event.name}</span>
+          </Col>
+          <Col xs={5} sm={5}>
+              <span className="eventTableColouredText">
+                <span style={{color:"#4ae575"}}>{event.total.paid}</span>
+                <span style={{color:"#363636"}}>{"/"}</span>
+                <span style={{color:"#ffb800"}}>{event.total.reserved}</span>
+                <span style={{color:"#363636"}}>{"/"}</span>
+                <span style={{color:"#de5959"}}>{event.total.unreserved}</span>
+                <span style={{color:"#363636"}}>{"/"}</span>
+                <span style={{color:"#363636"}}>{event.total.quantity}</span>
+              </span>
+          </Col>
+        </Row>
+      </div>
     )
   }
     
