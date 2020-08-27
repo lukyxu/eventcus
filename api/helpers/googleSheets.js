@@ -144,7 +144,8 @@ class GoogleSheetsReader {
     const data = []
     ticketTypeRows.forEach((row) => {
       const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
-      data.push({ "type": row.type, "paid": row.paid, "reserved": row.allocated, "unreserved": unreserved, "quantity": row.quantity });
+      const reserved = row.allocated - row.paid
+      data.push({ "type": row.type, "paid": row.paid, "reserved": reserved, "unreserved": unreserved, "quantity": row.quantity });
     })
 
     callback(data);
@@ -186,6 +187,41 @@ class GoogleSheetsReader {
     callback(data);
   }
 
+  getReservationInfos(ticketType, reservationStatus, responseRows) {
+    const reservationInfos = [];
+    responseRows.forEach((row) => {
+      console.log(row.FullName, reservationStatus)
+      if (row.TicketType == ticketType && row.ReservationStatus == reservationStatus) {
+        reservationInfos.push({timestamp : row.Timestamp, fullName : row.FullName});
+      }
+    });
+    return reservationInfos;
+  }
+
+  async getTicketAllocations(callback) {
+    const ticketTypeRows = await this.ticketTypeSheet.getRows();
+    const responseRows = await this.responseSheet.getRows();
+
+    const data = [];
+
+    ticketTypeRows.forEach((ticket) => {
+
+      if (ticket.type != "total") {
+        console.log(ticket.type)
+        const waitlist = this.getReservationInfo(ticket.type, "waitlist", responseRows);
+        if (waitlist.length != 0) {
+          data.push({ ticketType: ticket.type, reservationStatus: "waitlist", reservations: waitlist });
+        }
+
+        const reservationslist = this.getReservationInfo(ticket.type, "reserved", responseRows);
+        if (reservationslist.length != 0) {
+          data.push({ ticketType: ticket.type, reservationStatus: "reserved", reservations: reservationslist });
+        }
+      }
+
+    });
+    callback(data);
+  }
 
 }
 
