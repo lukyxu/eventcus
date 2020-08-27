@@ -145,7 +145,7 @@ class GoogleSheetsReader {
     ticketTypeRows.forEach((row) => {
       const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
       const reserved = row.allocated - row.paid
-      data.push({ "type": row.type, "paid": row.paid, "reserved": reserved, "unreserved": unreserved, "quantity": row.quantity });
+      data.push({ "type": row.type, "paid": parseInt(row.paid), "reserved": reserved, "unreserved": unreserved, "quantity": parseInt(row.quantity) });
     })
 
     callback(data);
