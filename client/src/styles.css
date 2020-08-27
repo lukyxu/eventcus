@@ -186,3 +186,18 @@ h2 {
   padding: 10px 15px;
   margin-right: 60px;
 }
+
+.refreshButton {
+  background-image: url("/refresh_button.png");
+  height: 17px;
+  width: 17px;
+  display: inline-block;
+  background-size: 17px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  margin-bottom: 3px;
+  margin-left: 4px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  cursor: pointer;
+}

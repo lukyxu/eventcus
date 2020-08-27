@@ -10,7 +10,7 @@ import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
 import { useHistory } from "react-router-dom";
 
-export default function Dashboard({ setUser, events}) {
+export default function Dashboard({ setUser, events, fetchEvents}) {
   const history = useHistory();
     const [searchValue, setSearchValue] = useState('');
 
@@ -132,7 +132,7 @@ export default function Dashboard({ setUser, events}) {
             </Row>
             <Row style={{paddingTop:"10px"}}>
               <Col sm={12}>
-                <EventTable title="Upcoming Events" events={filteredEvents.filter(e => new Date(e.eventDate).getTime() > new Date().getTime())}></EventTable> 
+                <EventTable title="Upcoming Events" refreshButton={true} fetchEvents={fetchEvents} events={filteredEvents.filter(e => new Date(e.eventDate).getTime() > new Date().getTime())}></EventTable> 
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>

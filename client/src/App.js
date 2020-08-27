@@ -50,7 +50,7 @@ function App() {
           object.splice(index, 1)
         }
       })
-      r.push({eventDate : event.eventDate, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId})
+      r.push({eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId})
     }))
 
     console.log(r)
@@ -79,10 +79,10 @@ function App() {
         </nav>
         <hr /> */}
         <Switch>
-            <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events}/>} />
+            <PrivateRoute exact user={user} path='/' setUser={setUser} render={(props) => <Dashboard setUser={setUser} events={events} fetchEvents={fetchEvents}/>} />
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
             <PrivateRoute exact user={user} path='/event' render={(props) => <Event></Event>} />
-            <Route exact path='/login' render={(props) => <Login setUser={setUser}/>}/>
+            <Route exact path='/login' render={(props) => <Login setUser={setUser} setLoaded={setLoaded}/>}/>
         </Switch>
       </div>
     </Router>
