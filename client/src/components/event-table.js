@@ -33,7 +33,6 @@ export default function EventTable({title, events}) {
     
   
   return <div className="eventTable">
-    <p>hello</p>
     <Row>
       <Col sm={12}>
         {/* <Button className="blueButton">{title}</Button> */}

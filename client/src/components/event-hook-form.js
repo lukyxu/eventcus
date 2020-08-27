@@ -1,11 +1,14 @@
-import React from "react";
+import React, {useState} from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { Col, Row, Container } from "react-bootstrap";
+import { Button, Spinner, Col, Row, Container } from "react-bootstrap";
 import { ErrorMessage } from "@hookform/error-message";
 import PostForm from './../services/post-form.js';
 import CurrencyInput from 'react-currency-input-field';
+import { useHistory } from "react-router-dom";
 
 export default function EventHookForm({fetchEvents}) {
+  const history = useHistory();
+  const [loadingSubmission, setLoadingSubmission] = useState(false)
   const { register, handleSubmit, getValues, errors, control } = useForm({
     criteriaMode: "all",
     defaultValues: {
@@ -33,6 +36,7 @@ export default function EventHookForm({fetchEvents}) {
   }
 
   const onSubmit = async (data) => {
+    setLoadingSubmission(true)
     var temp = {
       fullName: false,
       shortcode: false,
@@ -48,11 +52,28 @@ export default function EventHookForm({fetchEvents}) {
     let res = await PostForm(data);
     console.log(res)
     await fetchEvents()
-    console.log("Done")
-
+    history.push('/')
   }; // your form submit function which will invoke after successful validation
 
   // console.log(watch("eventName")); // you can watch individual input by pass the name of the input
+
+  const renderSubmitButton = () => {
+    if (loadingSubmission) {
+      return <Button className="blueButton" type="submit" disabled>
+        <Spinner
+          as="span"
+          animation="border"
+          size="sm"
+          role="status"
+          aria-hidden="true"
+          style={{marginRight:"5px", marginBottom:"2px"}}
+        />
+         Creating...
+      </Button>
+    } else {
+      return <Button className="blueButton" type="submit">Create Event</Button>
+    }
+  }
 
   return (
     <Container fluid className="eventFormMain">
@@ -254,7 +275,7 @@ export default function EventHookForm({fetchEvents}) {
           <Col xs={0} sm={0} xl={4}></Col>
           <Col xs={12} sm={12} xl={4} className="formSection">
             <hr></hr>
-            <button className="blueButton" type="submit">Create Event</button>
+            {renderSubmitButton()}
           </Col> 
           <Col xs={0} sm={0} xl={4}></Col>
           <Col></Col>      
