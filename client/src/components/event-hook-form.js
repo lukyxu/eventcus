@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 export default function EventHookForm({fetchEvents}) {
   const history = useHistory();
   const [loadingSubmission, setLoadingSubmission] = useState(false)
-  const { register, handleSubmit, getValues, errors, control } = useForm({
+  const { register, handleSubmit, getValues, errors, control, reset  } = useForm({
     criteriaMode: "all",
     defaultValues: {
       ticketTypes: [{ type: "", price: 0, quantity: 0 }]
@@ -225,14 +225,31 @@ export default function EventHookForm({fetchEvents}) {
                         name={`ticketTypes[${index}].quantity`}
                       />
                     </Col>
-                    <Col xs={2} sm={2} style={{padding: "0px 15px 0px 5px"}}>
-                        <button type="button" className="blueButton" style={{padding: "10px 10px"}} onClick={() =>{
-                           if (fields.length > 1) {
-                            remove(index)
-                           }
-                        }}>
+                    <Col xs={2} sm={2} style={{ padding: "0px 15px 0px 5px" }}>
+                      {fields.length > 1 ? (
+                        <button
+                          type="button"
+                          className="blueButton"
+                          style={{ padding: "10px 10px" }}
+                          onClick={() => remove(index)}>
                           X
                         </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="blueButton"
+                          style={{ padding: "10px 10px" }}
+                          onClick={() => {
+                            reset({
+                              ...getValues(),
+                              ticketTypes: [{ type: "", price: 0, quantity: 0 }]
+                            },{
+                              errors: true
+                            });
+                          }}>
+                          X
+                        </button>
+                      )}
                     </Col>
                   </Row>
                 </div>
@@ -264,6 +281,7 @@ export default function EventHookForm({fetchEvents}) {
                     name="fieldsChecked"
                     ref={register}
                     defaultChecked={fieldsOptions[option]}
+                    disabled={!option.localeCompare("Full Name") || !option.localeCompare("Email")}
                   />
                   <label>{option}</label>
                 </div>
