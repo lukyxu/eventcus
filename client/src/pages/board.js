@@ -3,10 +3,11 @@ import { UserAgentApplication } from 'msal';
 import { config } from '../services/config';
 import { getUserDetails } from '../services/graphService';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
-import Header from '../components/header';
+import EmailHeader from '../components/header-email';
 import Welcome from '../components/welcome';
 import SendEmail from '../components/send-email';
 import { Container } from 'react-bootstrap';
+import Email from './email-page';
 
 export default function Board() {
   const [error, setError] = useState(null);
@@ -144,7 +145,7 @@ export default function Board() {
   return (
     <Router>
       <div>
-        <Header
+        <EmailHeader
           title="Dashboard"
           isAuthenticated={isAuthenticated}
           authButtonMethod={isAuthenticated ? (() => logout()) : (() => login())}
@@ -161,7 +162,7 @@ export default function Board() {
           <Route exact path='/send-email'
             render={(props) =>
               isAuthenticated ?
-                <SendEmail {...props}
+                <Email {...props}
                   user={user} getAccessToken={(scopes) => getAccessToken(scopes)} /> :
                 <Redirect to="/" />
             } />

@@ -10,6 +10,7 @@ import './styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import Board from './pages/board';
+import Email from './pages/email-page';
 
 // function App() {
 //   useEffect(() => {
@@ -56,6 +57,7 @@ import Board from './pages/board';
 
 export default function App() {
   return (
-    <Board />
+    // <Board />
+    <Email />
   );
 }
