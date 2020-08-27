@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function SignIn({setUser}) {
+export default function SignIn({setUser, setLoaded}) {
   const history = useHistory()
   const classes = useStyles();
   const [email, setEmail] = useState('')
@@ -64,6 +64,7 @@ export default function SignIn({setUser}) {
         console.log("Not authenticated")
       } else {
         setUser(data.user)
+        setLoaded(false)
         history.push('/')
       }
       
