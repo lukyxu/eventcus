@@ -5,7 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
-export default function EventTable({title, events, refreshButton, fetchEvents}) {
+export default function EventTable({title, events, refreshButton, fetchEvents, renderEvents}) {
   console.log(events)
   const [refreshing, setRefreshing] = useState(false)
   const refresh = async () => {
@@ -27,9 +27,13 @@ export default function EventTable({title, events, refreshButton, fetchEvents}) 
           <span style={{color:"#de5959"}}>{event.total.unreserved}</span>
           <span style={{color:"#363636"}}>{"/"}</span>
           <span style={{color:"#363636"}}>{event.total.quantity}</span>
+          <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img>
         </span>
       }
-    return <span  className="eventTableColouredText">Dropping in {dayjs().from(event.dropTime, true)}</span>
+    return <span className="eventTableColouredText">
+      <span>Drop in {dayjs().from(event.dropTime, true)}</span>
+      <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img>
+    </span>
     }
 
     return events.map(event =>

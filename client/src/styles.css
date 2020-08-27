@@ -192,3 +192,18 @@ h2 {
   -webkit-filter: invert(1);
   cursor: pointer;
 }
+
+.dropdownDown {
+  height: 15px;
+  width: 15px;
+  margin-left: 5px;
+  transform: rotate(180deg);
+  cursor: pointer;
+}
+
+.dropdownUp {
+  height: 15px;
+  width: 15px;
+  margin-left: 5px;
+  cursor: pointer;
+}
