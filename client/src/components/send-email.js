@@ -5,7 +5,7 @@ import { config } from '../services/config';
 
 export default function SendEmail({ user, getAccessToken }) {
 
-  // const firstMailingList = ["app-test1@outlook.com"]
+  const mailingList = ["app-test1@outlook.com"]
 
   const sendMail = async () => {
     var accessToken = await getAccessToken(config.scopes);
@@ -13,15 +13,17 @@ export default function SendEmail({ user, getAccessToken }) {
       "subject": "Test email",
         "body": {
         "contentType": "Text",
-        "content": "TEST EMAIL TEXT"
+        "content":
+`TEST EMAIL
+TEST LINE 2`
       },
-      "toRecipients": [
-        {
+      "bccRecipients": mailingList.map(email => {
+        return ({
           "emailAddress": {
-            "address": "app-test1@outlook.com"
+            "address": email
           }
-        }
-      ]
+        })
+      })
     }
     sendNewEmail(accessToken, message);
   }
