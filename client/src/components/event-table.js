@@ -7,30 +7,6 @@ dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
 export default function EventTable({title, events, refreshButton, fetchEvents, renderEvents}) {
-  console.log(events)
-
-  const data = [
-    {
-        value: 300,
-        color: '#21bbce',
-        legendLabel: 'interest',
-        legendValue: 300,
-        tooltip: 'interest is $300',
-    }, {
-        value: 200,
-        color: '#4bc97d',
-        legendLabel: 'tax',
-        legendValue: 200,
-        tooltip: 'tax is $200',
-    }, {
-        value: 100,
-        color: '#eb5be1',
-        legendLabel: 'insurance',
-        legendValue: 100,
-        tooltip: 'insurance is $100',
-    },
-];
-
   const [refreshing, setRefreshing] = useState(false)
   const refresh = async () => {
     setRefreshing(true)
@@ -73,9 +49,9 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
           </Col>
           <Col xs={5} sm={6} style={{paddingRight:"0px"}}>
             <div className="colourBarPadding"><ColourBar data={[
-              {name: "Paid", colour: "#4ae575", value: parseInt(ticket.paid)},
-              {name: "Reserved", colour: "#ffb800", value: parseInt(ticket.reserved)},
-              {name: "Unreserved", colour: "#de5959", value: parseInt(ticket.unreserved)},
+              {name: "Paid", colour: "#4ae575", value: ticket.paid},
+              {name: "Reserved", colour: "#ffb800", value: ticket.reserved},
+              {name: "Unreserved", colour: "#de5959", value: ticket.unreserved},
               ]}></ColourBar></div>
           </Col>
           <Col xs={4} sm={3}>
