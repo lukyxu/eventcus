@@ -2,11 +2,35 @@ import React, {useState} from 'react';
 import { Col, Row } from 'react-bootstrap';
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import ColourBar from '../components/colour-bar';
 dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
 export default function EventTable({title, events, refreshButton, fetchEvents, renderEvents}) {
   console.log(events)
+
+  const data = [
+    {
+        value: 300,
+        color: '#21bbce',
+        legendLabel: 'interest',
+        legendValue: 300,
+        tooltip: 'interest is $300',
+    }, {
+        value: 200,
+        color: '#4bc97d',
+        legendLabel: 'tax',
+        legendValue: 200,
+        tooltip: 'tax is $200',
+    }, {
+        value: 100,
+        color: '#eb5be1',
+        legendLabel: 'insurance',
+        legendValue: 100,
+        tooltip: 'insurance is $100',
+    },
+];
+
   const [refreshing, setRefreshing] = useState(false)
   const refresh = async () => {
     setRefreshing(true)
@@ -15,25 +39,53 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
   }
 
   const render = () => {
+
+    const renderColourText = (paid, reserved, unreserved, quantity, dropdown, event) => {
+      return <span className="eventTableColouredText">
+      <span style={{color:"#4ae575"}}>{paid}</span>
+      <span style={{color:"#363636"}}>{"/"}</span>
+      <span style={{color:"#ffb800"}}>{reserved}</span>
+      <span style={{color:"#363636"}}>{"/"}</span>
+      <span style={{color:"#de5959"}}>{unreserved}</span>
+      <span style={{color:"#363636"}}>{"/"}</span>
+      <span style={{color:"#363636"}}>{quantity}</span>
+      {dropdown ? <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img> : null}
+    </span>
+    }
     
     const renderTicketsReserved = (event) => {
-      console.log(event)
       if (new Date(event.dropTime).getTime() < new Date().getTime()) {
-        return <span className="eventTableColouredText">
-          <span style={{color:"#4ae575"}}>{event.total.paid}</span>
-          <span style={{color:"#363636"}}>{"/"}</span>
-          <span style={{color:"#ffb800"}}>{event.total.reserved}</span>
-          <span style={{color:"#363636"}}>{"/"}</span>
-          <span style={{color:"#de5959"}}>{event.total.unreserved}</span>
-          <span style={{color:"#363636"}}>{"/"}</span>
-          <span style={{color:"#363636"}}>{event.total.quantity}</span>
-          <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img>
-        </span>
+        return renderColourText(event.total.paid, event.total.reserved, event.total.unreserved, event.total.quantity, true, event)
       }
     return <span className="eventTableColouredText">
       <span>Drop in {dayjs().from(event.dropTime, true)}</span>
       <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img>
     </span>
+    }
+
+    const renderDropdown= (event) => {
+      if (!event.dashboardDrop) {
+        return null
+      }
+      return event.tickets.map(ticket => {
+        return <Row key={ticket.type}>
+          <Col xs={3} sm={3}>
+            <span>{ticket.type}</span>
+          </Col>
+          <Col xs={4} sm={4}>
+            <div style={{paddingLeft: "15px", marginTop:"7px"}}><ColourBar data={[
+              {name: "Paid", colour: "#4ae575", value: parseInt(ticket.paid)},
+              {name: "Reserved", colour: "#ffb800", value: parseInt(ticket.reserved)},
+              {name: "Unreserved", colour: "#de5959", value: parseInt(ticket.unreserved)},
+              ]}></ColourBar></div>
+          </Col>
+          <Col xs={5} sm={5}>
+            {
+              renderColourText(ticket.paid, ticket.reserved, ticket.unreserved, ticket.quantity, false, event)
+            }
+          </Col>
+        </Row>
+      })
     }
 
     return events.map(event =>
@@ -52,6 +104,7 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
             }
           </Col>
         </Row>
+        {renderDropdown(event)}
       </div>
     )
   }
