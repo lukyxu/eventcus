@@ -129,9 +129,8 @@ router.post('/createForm', passport.authenticate('jwt',{session : false}), funct
     agenda.schedule(new Date(body.ticketRelease), 'openForm', {formId})
 
     console.log(sheetId);
-    res.json({success : true});
     let reader = new GoogleSheetsReader(sheetId);
-    reader.init(() => reader.configSheet(body.ticketTypes));
+    reader.init(async () => {await reader.configSheet(body.ticketTypes); res.json({success : true})});
   });
 });
 

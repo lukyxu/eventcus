@@ -5,7 +5,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import PostForm from './../services/post-form.js';
 import CurrencyInput from 'react-currency-input-field';
 
-export default function EventHookForm() {
+export default function EventHookForm({fetchEvents}) {
   const { register, handleSubmit, getValues, errors, control, reset } = useForm({
     criteriaMode: "all",
     defaultValues: {
@@ -32,7 +32,7 @@ export default function EventHookForm() {
     return text.substr(0, 1).toLowerCase() + text.substr(1);
   }
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     var temp = {
       fullName: false,
       shortcode: false,
@@ -44,7 +44,12 @@ export default function EventHookForm() {
       temp[camelize(option)] = true;
     })
     data.fieldsChecked = temp;
-    PostForm(data);
+    console.log(typeof data.ticketRelease);
+    let res = await PostForm(data);
+    console.log(res)
+    await fetchEvents()
+    console.log("Done")
+
   }; // your form submit function which will invoke after successful validation
 
   // console.log(watch("eventName")); // you can watch individual input by pass the name of the input
