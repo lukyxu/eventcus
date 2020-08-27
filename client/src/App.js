@@ -35,8 +35,8 @@ function App() {
       let e = await res.json()
       let r = []
 
-      e.forEach(async (event) => {
-
+      await Promise.all(e.map(async (event) => {
+        console.log(event)
         const reqBody = {
           sheetId: event.sheetId
         }
@@ -50,12 +50,12 @@ function App() {
             object.splice(index, 1)
           }
         })
-
         r.push({eventDate : event.eventDate, name : event.name, total : total, tickets : tickets})
+      }))
 
-      })
-
-
+      console.log(r)
+      // console.log(typeof r)
+      r.sort((e1,e2) => new Date(e2.eventDate).getTime() - new Date(e1.eventDate).getTime())
       setEvents(r)
       setLoaded(true)
     }
