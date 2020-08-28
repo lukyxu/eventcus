@@ -6,6 +6,7 @@ import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
 import ChangePaymentStatus from './../services/changePaymentStatus.js';
 import TicketAllocations from './../services/ticketAllocations.js';
+import EmailingList from './../services/emailingList.js';
 import Button from '@material-ui/core/Button';
 import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
@@ -37,16 +38,22 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
     }
 
     const pressTicketAllocations = () => {
-      console.log("hi")
       const reqBody = {
-          sheetId: '1Vz0SAgFXCGCvjhVXhbt6F2sLQGbdcnLmbyzM3q9PWBY'
+          sheetId: '16rjpk9A0Si_ZcK8SIiomkNXzKoMa8xptwMYcXf5KhIE'
       }
       const res = TicketAllocations(reqBody);
       console.log(res)
     }
 
 
-    
+    const pressEmailingList = () => {
+      const reqBody = {
+          sheetId: '16rjpk9A0Si_ZcK8SIiomkNXzKoMa8xptwMYcXf5KhIE'
+      }
+      const res = EmailingList(reqBody);
+      console.log(res)
+    }
+
 
     const pressChangePaymentStatus = () => {
         const reqBody = {
@@ -112,6 +119,8 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
             <Button className="blueButton" onClick={pressTicketAllocations}> Ticket Allocations </Button>
             <br></br>
             <Button className="blueButton" onClick={pressChangePaymentStatus}> Change Payment Status </Button>
+            <br></br>
+            <Button className="blueButton" onClick={pressEmailingList}> Emailing List</Button>
             <br></br>
             <Button className="blueButton" onClick={() => { logout(() => { setUser(null); history.push('/login') })}}> Logout </Button>
             <br></br>

@@ -47,31 +47,30 @@ class GoogleSheetsReader {
   async configSheet(ticketTypes) {
     // Add payment and reservation status headers 
     await this.responseSheet.loadHeaderRow();
-    const newHeaders = [];
-    this.responseSheet.headerValues.map((header) => {
-      newHeaders.push(this.toCamelCase(header));
-    })
-    console.log(this.responseSheet.headerValues);
-    const ticketTypeColumnAddress = String.fromCharCode(64 + newHeaders.length);
-    const reservationStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 1);
-    const paymentStatusColumnAddress = String.fromCharCode(64 + newHeaders.length + 2);
 
-    await this.responseSheet.setHeaderRow(newHeaders.concat(["ReservationStatus", "PaymentStatus"]));
+    let headerLength =  this.responseSheet.headerValues.length
+    
+    console.log(this.responseSheet.headerValues);
+    const ticketTypeColumnAddress = String.fromCharCode(64 + headerLength);
+    const reservationStatusColumnAddress = String.fromCharCode(64 + headerLength + 1);
+    const paymentStatusColumnAddress = String.fromCharCode(64 + headerLength + 2);
+
+    await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Reservation Status", "Payment Status"]));
 
     // Create Ticket Type sheet
     await this.ticketTypeSheet.updateProperties({ title: "Ticket Types" })
     await this.ticketTypeSheet.setHeaderRow(["type", "price", "quantity", "allocated", "paid"])
     const rows = await this.ticketTypeSheet.addRows(ticketTypes)
     rows.map(async (row) => {
-      row.allocated = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
-      row.paid = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row.type}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
+      row["allocated"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["type"]}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
+      row["paid"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["type"]}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
 
       await row.save();
     })
     const totalRow = await this.ticketTypeSheet.addRow({ type: "total" })
-    totalRow.quantity = `=SUM(C2:C${ticketTypes.length + 1})`
-    totalRow.allocated = `=SUM(D2:D${ticketTypes.length + 1})`
-    totalRow.paid = `=SUM(E2:E${ticketTypes.length + 1})`
+    totalRow["quantity"] = `=SUM(C2:C${ticketTypes.length + 1})`
+    totalRow["allocated"] = `=SUM(D2:D${ticketTypes.length + 1})`
+    totalRow["paid"] = `=SUM(E2:E${ticketTypes.length + 1})`
     await totalRow.save();
   }
 
@@ -79,10 +78,9 @@ class GoogleSheetsReader {
     var res = false;
     await ticketTypeRows.forEach(async (row) => {
 
-      if (row.type != "total") {
-        if (row.type === ticketType && row.allocated < row.quantity) {
-          row.allocated = parseInt(row.allocated) + 1;
-          // console.log(row.type);
+      if (row["type"] != "total") {
+        if (row["type"] === ticketType && row["allocated"] < row["quantity"]) {
+          row["allocated"] = parseInt(row["allocated"]) + 1;
           res = true;
         }
       }
@@ -95,7 +93,7 @@ class GoogleSheetsReader {
     const responseRows = await this.responseSheet.getRows();
     var res;
     await responseRows.forEach((row) => {
-      if (row.Timestamp == timestamp && row.FullName == fullName) {
+      if (row["Timestamp"] == timestamp && row["Full Name"] == fullName) {
         res = row
       }
     });
@@ -123,13 +121,13 @@ class GoogleSheetsReader {
 
     await responseRows.map(async (row) => {
       // console.log(row.Timestamp);
-      if (row.ReservationStatus == null) {
-        const bool = await this.isTicketAvaliable(row.TicketType, ticketTypeRows);
+      if (row["Reservation Status"] == null) {
+        const bool = await this.isTicketAvaliable(row["Ticket Type"], ticketTypeRows);
         // console.log(bool)
         if (bool) {
-          row.ReservationStatus = 'reserved';
+          row["Reservation Status"] = 'reserved';
         } else {
-          row.ReservationStatus = 'waitlist';
+          row["Reservation Status"] = 'waitlist';
         }
         await row.save();
       }
@@ -139,86 +137,80 @@ class GoogleSheetsReader {
     console.log('allocated');
   }
 
+  async camelCaseHeaders(callback) {
+    try {
+      console.log(this)
+      await this.responseSheet.loadHeaderRow();
+      const newHeaders = [];
+      this.responseSheet.headerValues.map((header) => {
+        newHeaders.push(this.toCamelCase(header));
+      })
+      console.log(newHeaders)
+      await this.responseSheet.setHeaderRow(newHeaders);
+      await this.responseSheet.addRow({Timestamp : "hi"})
+
+  
+      if (typeof callback === "function") {
+        callback(this)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+   
+  }
+
   async ticketReservationInfo(callback) {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const data = []
     ticketTypeRows.forEach((row) => {
-      const unreserved = parseInt(row.quantity) - parseInt(row.allocated)
-      const reserved = row.allocated - row.paid
-      data.push({ "type": row.type, "paid": parseInt(row.paid), "reserved": reserved, "unreserved": unreserved, "quantity": parseInt(row.quantity) });
+      const unreserved = parseInt(row["quantity"]) - parseInt(row["allocated"])
+      const reserved = row["allocated"] - row["paid"]
+      data.push({ "type": row["type"], "paid": parseInt(row["paid"]), "reserved": reserved, "unreserved": unreserved, "quantity": parseInt(row["quantity"]) });
     })
 
     callback(data);
   }
 
-  getEmails(ticketType, reservationStatus, responseRows) {
-    const emails = [];
-    responseRows.forEach((row) => {
-      console.log(row.FullName, reservationStatus)
-      if (row.TicketType == ticketType && row.ReservationStatus == reservationStatus) {
-        emails.push(row.EmailAddress);
-      }
-    });
-    return emails;
-  }
 
   async getEmailsAndTicketTypes(callback) {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const responseRows = await this.responseSheet.getRows();
 
-    const data = [];
+    const map = {};
 
-    ticketTypeRows.forEach((ticket) => {
-
-      if (ticket.type != "total") {
-        console.log(ticket.type)
-        const waitlistEmails = this.getEmails(ticket.type, "waitlist", responseRows);
-        if (waitlistEmails.length != 0) {
-          data.push({ ticketType: ticket.type, reservationStatus: "waitlist", emails: waitlistEmails });
-        }
-
-        const reservedEmails = this.getEmails(ticket.type, "reserved", responseRows);
-        if (reservedEmails.length != 0) {
-          data.push({ ticketType: ticket.type, reservationStatus: "reserved", emails: reservedEmails });
-        }
-      }
-
-    });
-    callback(data);
-  }
-
-  getReservationInfos(ticketType, reservationStatus, responseRows) {
-    const reservationInfos = [];
     responseRows.forEach((row) => {
-      console.log(row.FullName, reservationStatus)
-      if (row.TicketType == ticketType && row.ReservationStatus == reservationStatus) {
-        reservationInfos.push({timestamp : row.Timestamp, fullName : row.FullName});
+
+      let key = row["Ticket Type"] + '#' + row["Reservation Status"]
+
+      if (map[key] == null) {
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [ row["Email Address"] ] }
+      } else {
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat( [row["Email Address"]])}
       }
-    });
-    return reservationInfos;
+    })
+
+
+    const data = Object.values(map)
+
+    callback(data);
   }
 
   async getTicketAllocations(callback) {
     const responseRows = await this.responseSheet.getRows();
 
-    // const data = [];
-
     const map = {};
 
     responseRows.forEach((row) => {
-      console.log(row)
 
-      let key = row.TicketType + '#' + row.ReservationStatus
-      console.log(row.FullName)
+      let key = row["Ticket Type"] + '#' + row["Reservation Status"]
 
       if (map[key] == null) {
-        map[key] = {ticketType : row.TicketType, reservationStatus : row.ReservationStatus, reservations : [{timestamp : row.Timestamp, name : row.FullName}]}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }]}
       } else {
-        map[key] = {ticketType : row.TicketType, reservationStatus : row.ReservationStatus, reservations : map[key].reservations.concat([{timestamp : row.Timestamp, name : row.FullName}])}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }])}
       }
     })
 
-    console.log(map)
 
     const data = Object.values(map)
 

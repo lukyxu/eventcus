@@ -1,35 +1,38 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useForm } from "react-hook-form";
 import { Button, Spinner, Row, Container } from "react-bootstrap";
-import { useHistory } from "react-router-dom";
 import { config } from "../services/config";
 import { UserAgentApplication } from 'msal';
-import { getUserDetails } from '../services/graphService';
 import { sendNewEmail } from '../services/graphService';
 
 async function getEmails(reqBody) {
-  let res = await fetch('/getEmailsAndTicketTypes', {
-    method: "post",
-    body: JSON.stringify(reqBody),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: "include"
-  })
-  if (res.status === 401) {
-    console.log(`ERROR: ${res.status}`)
-    return null
+  try {
+    let res = await fetch('/getEmailsAndTicketTypes', {
+      method: "post",
+      body: JSON.stringify(reqBody),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include"
+    })
+    if (res.status === 401) {
+      console.log(`ERROR ${res.status}`);
+      return ({
+        error: "User not authenticated"
+      });
+    }
+    return await res.json();
+  } catch (error) {
+    return ({
+      error
+    });
   }
-  return await res.json();
 }
 
 export default function EmailForm({ event, sheetId }) {
-  // const history = useHistory();
-  const [loadingSend, setLoadingSend] = useState(false)
 
-  const [error, setError] = useState(null);
+  const [loadingSend, setLoadingSend] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState({})
 
   var userAgentApplication = new UserAgentApplication({
     auth: {
@@ -71,39 +74,14 @@ export default function EmailForm({ event, sheetId }) {
     [userAgentApplication],
   )
 
-  const getUserProfile = useCallback(
-    async () => {
-      try {
-        var accessToken = await getAccessToken(config.scopes);
-        if (accessToken) {
-          // Get the user's profile from Graph
-          var user = await getUserDetails(accessToken);
-          setIsAuthenticated(true);
-          setUser({
-            displayName: user.displayName,
-            email: user.mail || user.userPrincipalName
-          });
-          setError(null);
-        }
-      }
-      catch (err) {
-        setIsAuthenticated(false);
-        setUser({});
-        setError(normalizedError(err));
-      }
-    },
-    [getAccessToken],
-  )
-
   // If MSAL already has an account, the user is already logged in
   useEffect(() => {
     var account = userAgentApplication.getAccount();
 
     if (account) {
-      // Enhance user object with data from Graph
-      getUserProfile();
+      setIsAuthenticated(true);
     }
-  }, [userAgentApplication, getUserProfile])
+  }, [userAgentApplication])
 
   async function login() {
     try {
@@ -113,34 +91,15 @@ export default function EmailForm({ event, sheetId }) {
           scopes: config.scopes,
           prompt: "select_account"
         });
-      // After login, get the user's profile
-      await getUserProfile();
+      setIsAuthenticated(true);
     }
     catch (err) {
       setIsAuthenticated(false);
-      setUser({});
-      setError(normalizedError(err));
     }
   }
 
   function logout() {
     userAgentApplication.logout();
-  }
-
-  function normalizedError(error) {
-    var normalizedError = {};
-    if (typeof (error) === 'string') {
-      var errParts = error.split('|');
-      normalizedError = errParts.length > 1 ?
-        { message: errParts[1], debug: errParts[0] } :
-        { message: error };
-    } else {
-      normalizedError = {
-        message: error.message,
-        debug: JSON.stringify(error)
-      };
-    }
-    return normalizedError;
   }
 
   function isInteractionRequired(error) {
@@ -168,76 +127,77 @@ export default function EmailForm({ event, sheetId }) {
   });
 
   const onSubmit = async (data) => {
+    setLoadingSend(true);
     if (!isAuthenticated) {
-      login();
-    } else {
-      setLoadingSend(true)
-      var accessToken = await getAccessToken(config.scopes);
-      const reqBody = {
-        sheetId: sheetId
-      };
-      const info = await getEmails(reqBody);
-      const normal = info[info.findIndex(x => x.ticketType === "normal" && x.reservationStatus === "reserved")];
-      const vip = info[info.findIndex(x => x.ticketType === "vip" && x.reservationStatus === "reserved")];
-      const normalWaitlist = info[info.findIndex(x => x.ticketType === "normal" && x.reservationStatus === "waitlist")];
-      const emailNormal = {
-        "subject": `Ticket information for ${event.eventName}`,
-        "body": {
-          "contentType": "Text",
-          "content": data.messageNormal
-        },
-        "bccRecipients": normal.emails.map(email => {
-          return ({
-            "emailAddress": {
-              "address": email
-            }
-          })
-        })
-      }
-      const emailVip = {
-        "subject": `Ticket information for ${event.eventName}`,
-        "body": {
-          "contentType": "Text",
-          "content": data.messageVip
-        },
-        "bccRecipients": vip.emails.map(email => {
-          return ({
-            "emailAddress": {
-              "address": email
-            }
-          })
-        })
-      }
-      const emailNormalWaitlist = {
-        "subject": `Ticket information for ${event.eventName}`,
-        "body": {
-          "contentType": "Text",
-          "content": data.messageNormalWaitlist
-        },
-        "bccRecipients": normalWaitlist.emails.map(email => {
-          return ({
-            "emailAddress": {
-              "address": email
-            }
-          })
-        })
-      }
-      let res
-      try {
-        // res = await sendNewEmail(accessToken, emailNormal);
-        // console.log(res);
-        // res = await sendNewEmail(accessToken, emailVip);
-        // console.log(res);
-        // res = await sendNewEmail(accessToken, emailNormalWaitlist);
-        // console.log(res);
-        alert("Emails Sent")
-      } catch (err) {
-        alert(err)
-      }
-      setLoadingSend(false);
-      // history.push('/')
+      await login();
     }
-  }; // your form submit function which will invoke after successful validation
+    var accessToken = await getAccessToken(config.scopes);
+    const reqBody = {
+      sheetId: sheetId
+    };
+    const info = await getEmails(reqBody);
+    if (info.error) {
+      alert(JSON.stringify(info.error));
+    }
+    const normal = info[info.findIndex(x => x.ticketType === "normal" && x.reservationStatus === "reserved")];
+    const vip = info[info.findIndex(x => x.ticketType === "vip" && x.reservationStatus === "reserved")];
+    const normalWaitlist = info[info.findIndex(x => x.ticketType === "normal" && x.reservationStatus === "waitlist")];
+    const emailNormal = {
+      "subject": `Ticket information for ${event.eventName}`,
+      "body": {
+        "contentType": "Text",
+        "content": data.messageNormal
+      },
+      "bccRecipients": normal.emails.map(email => {
+        return ({
+          "emailAddress": {
+            "address": email
+          }
+        })
+      })
+    }
+    const emailVip = {
+      "subject": `Ticket information for ${event.eventName}`,
+      "body": {
+        "contentType": "Text",
+        "content": data.messageVip
+      },
+      "bccRecipients": vip.emails.map(email => {
+        return ({
+          "emailAddress": {
+            "address": email
+          }
+        })
+      })
+    }
+    const emailNormalWaitlist = {
+      "subject": `Ticket information for ${event.eventName}`,
+      "body": {
+        "contentType": "Text",
+        "content": data.messageNormalWaitlist
+      },
+      "bccRecipients": normalWaitlist.emails.map(email => {
+        return ({
+          "emailAddress": {
+            "address": email
+          }
+        })
+      })
+    }
+    let res
+    try {
+      // res = await sendNewEmail(accessToken, emailNormal);
+      // console.log(res);
+      // res = await sendNewEmail(accessToken, emailVip);
+      // console.log(res);
+      // res = await sendNewEmail(accessToken, emailNormalWaitlist);
+      // console.log(res);
+      alert("Emails Sent")
+    } catch (err) {
+      alert(err)
+    }
+    setLoadingSend(false);
+  };
 
   const renderSendButton = () => {
     if (loadingSend) {
