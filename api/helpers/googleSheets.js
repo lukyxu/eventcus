@@ -186,25 +186,44 @@ class GoogleSheetsReader {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const responseRows = await this.responseSheet.getRows();
 
-    const data = [];
+    const map = {};
 
-    ticketTypeRows.forEach((ticket) => {
+    responseRows.forEach((row) => {
 
-      if (ticket.type != "total") {
-        console.log(ticket.type)
-        const waitlistEmails = this.getEmails(ticket.type, "waitlist", responseRows);
-        if (waitlistEmails.length != 0) {
-          data.push({ ticketType: ticket.type, reservationStatus: "waitlist", emails: waitlistEmails });
-        }
+      let key = row["Ticket Type"] + '#' + row["Reservation Status"]
 
-        const reservedEmails = this.getEmails(ticket.type, "reserved", responseRows);
-        if (reservedEmails.length != 0) {
-          data.push({ ticketType: ticket.type, reservationStatus: "reserved", emails: reservedEmails });
-        }
+      if (map[key] == null) {
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [ row["Email Address"]] }
+      } else {
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat( row["Email Address"] )}
       }
+    })
 
-    });
+    console.log(map)
+
+    const data = Object.values(map)
+
     callback(data);
+
+    // const data = [];
+
+    // ticketTypeRows.forEach((ticket) => {
+
+    //   if (ticket.type != "total") {
+    //     console.log(ticket.type)
+    //     const waitlistEmails = this.getEmails(ticket.type, "waitlist", responseRows);
+    //     if (waitlistEmails.length != 0) {
+    //       data.push({ ticketType: ticket.type, reservationStatus: "waitlist", emails: waitlistEmails });
+    //     }
+
+    //     const reservedEmails = this.getEmails(ticket.type, "reserved", responseRows);
+    //     if (reservedEmails.length != 0) {
+    //       data.push({ ticketType: ticket.type, reservationStatus: "reserved", emails: reservedEmails });
+    //     }
+    //   }
+
+    // });
+    // callback(data);
   }
 
   getReservationInfos(ticketType, reservationStatus, responseRows) {
@@ -221,12 +240,9 @@ class GoogleSheetsReader {
   async getTicketAllocations(callback) {
     const responseRows = await this.responseSheet.getRows();
 
-    // const data = [];
-
     const map = {};
 
     responseRows.forEach((row) => {
-      console.log(row)
 
       let key = row["Ticket Type"] + '#' + row["Reservation Status"]
 
