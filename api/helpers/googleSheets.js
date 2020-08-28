@@ -171,16 +171,6 @@ class GoogleSheetsReader {
     callback(data);
   }
 
-  getEmails(ticketType, reservationStatus, responseRows) {
-    const emails = [];
-    responseRows.forEach((row) => {
-      console.log(row["FullName"], reservationStatus)
-      if (row["Ticket Type"] == ticketType && row["Reservation Status"] == reservationStatus) {
-        emails.push(row["Email Address"]);
-      }
-    });
-    return emails;
-  }
 
   async getEmailsAndTicketTypes(callback) {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
@@ -193,48 +183,16 @@ class GoogleSheetsReader {
       let key = row["Ticket Type"] + '#' + row["Reservation Status"]
 
       if (map[key] == null) {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [ row["Email Address"]] }
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [ row["Email Address"] ] }
       } else {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat( row["Email Address"] )}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat( [row["Email Address"]])}
       }
     })
 
-    console.log(map)
 
     const data = Object.values(map)
 
     callback(data);
-
-    // const data = [];
-
-    // ticketTypeRows.forEach((ticket) => {
-
-    //   if (ticket.type != "total") {
-    //     console.log(ticket.type)
-    //     const waitlistEmails = this.getEmails(ticket.type, "waitlist", responseRows);
-    //     if (waitlistEmails.length != 0) {
-    //       data.push({ ticketType: ticket.type, reservationStatus: "waitlist", emails: waitlistEmails });
-    //     }
-
-    //     const reservedEmails = this.getEmails(ticket.type, "reserved", responseRows);
-    //     if (reservedEmails.length != 0) {
-    //       data.push({ ticketType: ticket.type, reservationStatus: "reserved", emails: reservedEmails });
-    //     }
-    //   }
-
-    // });
-    // callback(data);
-  }
-
-  getReservationInfos(ticketType, reservationStatus, responseRows) {
-    const reservationInfos = [];
-    responseRows.forEach((row) => {
-      console.log(row["FullName"], reservationStatus)
-      if (row["Ticket Type"] == ticketType && row["Reservation Status"] == reservationStatus) {
-        reservationInfos.push({timestamp : row["Timestamp"], fullName : row["Full Name"]});
-      }
-    });
-    return reservationInfos;
   }
 
   async getTicketAllocations(callback) {
@@ -247,13 +205,12 @@ class GoogleSheetsReader {
       let key = row["Ticket Type"] + '#' + row["Reservation Status"]
 
       if (map[key] == null) {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [{timestamp : row["Timestamp"], name : row["Full Name"]}]}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }]}
       } else {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"]}])}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }])}
       }
     })
 
-    console.log(map)
 
     const data = Object.values(map)
 

@@ -183,7 +183,6 @@ router.post('/getTicketAllocations', function (req, res, next) {
   reader.init(() => {
     reader.getTicketAllocations((data) => {
       console.log(data);
-      console.log(data.reservations);
       res.json(data);
     });
   });
