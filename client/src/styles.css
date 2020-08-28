@@ -29,6 +29,10 @@ html *
     color: #ffffff;
 }
 
+.emailFormMain {
+	padding: 50px;
+}
+
 .eventFormErrorMessage {
     color: #bf1650;
 }
