@@ -222,13 +222,18 @@ export default function EmailForm({ event, sheetId }) {
           })
         })
       }
-      // let res = await sendNewEmail(accessToken, emailNormal);
-      // console.log(res);
-      // res = await sendNewEmail(accessToken, emailVip);
-      // console.log(res);
-      // res = await sendNewEmail(accessToken, emailNormalWaitlist);
-      // console.log(res);
-      console.log("hi");
+      let res
+      try {
+        // res = await sendNewEmail(accessToken, emailNormal);
+        // console.log(res);
+        // res = await sendNewEmail(accessToken, emailVip);
+        // console.log(res);
+        // res = await sendNewEmail(accessToken, emailNormalWaitlist);
+        // console.log(res);
+        alert("Emails Sent")
+      } catch (err) {
+        alert(err)
+      }
       setLoadingSend(false);
       // history.push('/')
     }
