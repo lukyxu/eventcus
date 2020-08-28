@@ -74,21 +74,22 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
               <Col xs={12} sm={5}><SearchBar
                 value={searchValue}
                 onChange={(newValue) => setSearchValue(newValue)}
-                onRequestSearch={() => null}/>
+                onRequestSearch={() => null}
+                onCancelSearch={(() => setSearchValue(''))}/>
               </Col>
               <Col xs={12} sm={7}>
-                <Row className="colouredKeys">
+                <Row className="colouredKeys" style={{textAlign:"center"}}>
                   <Col>
-                  <span className = "circle" style={{backgroundColor:"#4ae575"}}> </span> Paid
+                  <span className = "circle" style={{backgroundColor:"#4ae575"}}> </span> <span> Paid</span>
                   </Col>
                   <Col>
-                  <span className = "circle" style={{backgroundColor:"#ffb800"}}> </span><span> Not Paid </span>
+                  <span className = "circle" style={{backgroundColor:"#ffb800"}}> </span><span> Not Paid</span>
                   </Col>
                   <Col>
-                  <span className = "circle" style={{backgroundColor:"#de5959"}}> </span><span> Not Reserved </span>
+                  <span className = "circle" style={{backgroundColor:"#de5959"}}> </span><span> Not Reserved</span>
                   </Col>
                   <Col>
-                  <span className = "circle" style={{backgroundColor:"#363636"}}> </span><span> Total </span>
+                  <span className = "circle" style={{backgroundColor:"#363636"}}> </span><span> Total</span>
                   </Col>
                 </Row>
               </Col>

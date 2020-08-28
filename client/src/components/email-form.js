@@ -16,8 +16,8 @@ async function getEmails(reqBody) {
     },
     credentials: "include"
   })
-  if (res.status === 201) {
-    console.log(`ERROR ${res.status}`)
+  if (res.status === 401) {
+    console.log(`ERROR: ${res.status}`)
     return null
   }
   return await res.json();

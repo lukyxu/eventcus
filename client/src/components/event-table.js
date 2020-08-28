@@ -3,11 +3,13 @@ import { Col, Row } from 'react-bootstrap';
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ColourBar from '../components/colour-bar';
+import { useHistory } from "react-router-dom";
 dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
 export default function EventTable({title, events, refreshButton, fetchEvents, renderEvents}) {
   const [refreshing, setRefreshing] = useState(false)
+  const history = useHistory()
   const refresh = async () => {
     setRefreshing(true)
     await fetchEvents()
@@ -71,7 +73,7 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
           <span>{dayjs(event.eventDate).format(dateFormat)}</span>
           </Col>
           <Col xs={4} sm={4}>
-            <span>{event.name}</span>
+            <span style={{cursor: "pointer"}} onClick={() => history.push(`event/${event._id}`)}>{event.name}</span>
           </Col>
           <Col xs={5} sm={5}>
             {
@@ -95,7 +97,7 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
         </div>
       </Col>
     </Row>
-    <div style={{backgroundColor: "#f0f0f0", color:"#504e4e", width: "100%"}}>
+    <div style={{backgroundColor: "#ffffff", color:"#504e4e", width: "100%"}}>
       <Row>
         <Col xs={3} sm={3}>
           <b>{"Date"}</b>

@@ -33,6 +33,10 @@ html *
 	padding: 50px;
 }
 
+.eventFormMain {
+  padding-top: 30px;
+}
+
 .eventFormErrorMessage {
     color: #bf1650;
 }

@@ -7,12 +7,13 @@ import ChangePaymentStatus from '../services/changePaymentStatus.js';
 import Button from '@material-ui/core/Button';
 import SearchBar from 'material-ui-search-bar';
 import ReservationTable from '../components/reservation-table.js'
-import { useHistory } from "react-router-dom";
 
-export default function Dashboard() {
-
+export default function Event({event}) {
   const [searchValue, setSearchValue] = useState('');
-  const sheetId = '1'
+  console.log(event)
+  // const event = loc.state.event
+  const sheetId = 'a'
+  console.log(sheetId)
 
   const title = "normal"
   const reservations = [

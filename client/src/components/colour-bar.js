@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { Form, Col, Row, Button } from 'react-bootstrap';
-import PostForm from './../services/post-form.js';
+import React from 'react';
 
 export default function ColourBar({data}) {
   // Data = [{name, value, colour}]
@@ -16,9 +14,9 @@ export default function ColourBar({data}) {
     let first = true
     return data.map((d, i) => {
       let bl = "none"
-      if (d.value != 0 && first) {
+      if (d.value !== 0 && first) {
         first = false
-      } else if (d.value != 0 && !first) {
+      } else if (d.value !== 0 && !first) {
         bl = "2px solid white"
       }
       return <div key={d.name} title={d.name + " " + d.value + "/" + totalValue} style={{borderLeft: bl,backgroundColor: d.colour, height: "100%", display: "inline-block", width: d.value/totalValue*100+"%" }}></div>

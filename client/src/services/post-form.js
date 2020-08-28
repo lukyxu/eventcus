@@ -8,9 +8,9 @@ export default async function PostForm(formData) {
         },
         credentials: "include"
     })
-    if(res.status === 201) {
-        console.log(`ERROR ${res.status}`)
-        return null
+    if (res.status === 401) {
+      console.log(`ERROR: ${res.status}`)
+      return null
     }
-    return await res.json();
+    return res.json().then(data => data);;
 }

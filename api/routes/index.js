@@ -110,7 +110,7 @@ router.post('/createForm', passport.authenticate('jwt',{session : false}), funct
     form.addTextItem().setTitle("If yes, please specify")
   }
 
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => x.type)).setRequired()
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
 
   form.linkWithSheets()
 
