@@ -61,7 +61,7 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
               renderColourText(ticket.paid, ticket.reserved, ticket.unreserved, ticket.quantity, false, event)
             }
           </Col>
-        </Row>
+          </Row>
       })
     }
 
