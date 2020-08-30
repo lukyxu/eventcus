@@ -168,7 +168,7 @@ export default function EmailForm({ event }) {
     var accessToken = await getAccessToken(config.scopes);
     ticketTypes.forEach((ticket, index) => {
       const email = {
-        "subject": `Ticket information for ${name}`,
+        "subject": data.subject,
         "body": {
           "contentType": "Text",
           "content": data[getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)]
@@ -215,6 +215,18 @@ export default function EmailForm({ event }) {
     <Container fluid className="emailFormMain">
       {isAuthenticated ? (<Button onClick={() => logout()}>Sign Out</Button>) : null}
       <form onSubmit={handleSubmit(onSubmit)}>
+        <Row className="formSection" style={{ marginBottom: "15px" }}>
+          <h4>Email Subject</h4>
+          <input
+            className="fieldInput"
+            name="subject"
+            placeholder="Subject of email"
+            defaultValue={`Ticket Information for ${name}`}
+            ref={register({ required: true })}
+          />
+          {errors.subject && <p className="eventFormErrorMessage">This field is required</p>}
+        </Row>
+
         {ticketTypes.map((ticket, index) => {
           return(
             <div key={index}>
