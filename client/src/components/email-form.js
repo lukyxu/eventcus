@@ -48,19 +48,19 @@ export default function EmailForm({ event }) {
   const [ticketTypes, setTicketTypes] = useState([]);
   const {name, eventDate, sheetId} = event
 
-  const info = [{
-    ticketType: "normal (£5)",
-    reservationStatus: "reserved",
-    emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  }, {
-    ticketType: "vip (£10)",
-    reservationStatus: "reserved",
-    emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  }, {
-    ticketType: "normal (£5)",
-    reservationStatus: "waitlist",
-    emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  }];
+  // const info = [{
+  //   ticketType: "normal (£5)",
+  //   reservationStatus: "reserved",
+  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  // }, {
+  //   ticketType: "vip (£10)",
+  //   reservationStatus: "reserved",
+  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  // }, {
+  //   ticketType: "normal (£5)",
+  //   reservationStatus: "waitlist",
+  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  // }];
 
   useEffect(() => {
     const fetchEmails = async () => {
@@ -74,8 +74,7 @@ export default function EmailForm({ event }) {
       setTicketTypes(tickets);
     };
     fetchEmails();
-  }, [event]);
-
+  }, [event, sheetId]);
 
   var userAgentApplication = new UserAgentApplication({
     auth: {
@@ -167,14 +166,14 @@ export default function EmailForm({ event }) {
       await login();
     }
     var accessToken = await getAccessToken(config.scopes);
-    info.map((ticket, index) => {
+    ticketTypes.forEach((ticket, index) => {
       const email = {
         "subject": `Ticket information for ${name}`,
         "body": {
           "contentType": "Text",
-          "content": data[getFieldName("message", info[index].ticketType, info[index].reservationStatus)]
+          "content": data[getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)]
         },
-        "bccRecipients": ticket.emails.map(email => {
+        "bccRecipients": ticket.reservations.map(email => {
           return ({
             "emailAddress": {
               "address": email
@@ -182,6 +181,7 @@ export default function EmailForm({ event }) {
           })
         })
       };
+      console.log(email);
       try {
         // let res = await sendNewEmail(accessToken, email);
         // console.log(res);
@@ -215,23 +215,22 @@ export default function EmailForm({ event }) {
     <Container fluid className="emailFormMain">
       {isAuthenticated ? (<Button onClick={() => logout()}>Sign Out</Button>) : null}
       <form onSubmit={handleSubmit(onSubmit)}>
-        {info.map((ticket, index) => {
-          // console.log(ticketTypes);
+        {ticketTypes.map((ticket, index) => {
           return(
             <div key={index}>
               <Row className="formSection" style={{ marginBottom: "15px" }}>
                 <h4>Email Body ({getCapitalizedType(ticket.ticketType)} {getCapitalized(ticket.reservationStatus)})</h4>
                 <textarea
                   className="fieldInput"
-                  name={getFieldName("message", info[index].ticketType, info[index].reservationStatus)}
-                  placeholder={`Email content for ${info[index].ticketType} ${info[index].reservationStatus}`}
+                  name={getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)}
+                  placeholder={`Email content for ${ticketTypes[index].ticketType} ${ticketTypes[index].reservationStatus}`}
                   rows="8"
-                  defaultValue={info[index].reservationStatus === 'reserved' ?
-                    `Hi,\nYou have secured a ${info[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}.\nPayment Details:\nXXXXX`
-                    : `Hi,\nYou have been waitlisted for a ${info[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}`}
+                  defaultValue={ticketTypes[index].reservationStatus === 'reserved' ?
+                    `Hi,\nYou have secured a ${ticketTypes[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}.\nPayment Details:\nXXXXX`
+                    : `Hi,\nYou have been waitlisted for a ${ticketTypes[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}`}
                   ref={register({ required: <p className="eventFormErrorMessage">This field is required</p> })}
                 />
-                <ErrorMessage errors={errors} name={getFieldName("message", info[index].ticketType, info[index].reservationStatus)} />
+                <ErrorMessage errors={errors} name={getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)} />
               </Row>
             </div>
         );})}
