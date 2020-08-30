@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
+import Interval from "react-interval-rerender"
 dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
@@ -31,13 +32,19 @@ export default function EventTable({title, events, refreshButton, fetchEvents, r
     }
     
     const renderTicketsReserved = (event) => {
-      if (new Date(event.dropTime).getTime() < new Date().getTime()) {
-        return renderColourText(event.total.paid, event.total.reserved, event.total.unreserved, event.total.quantity, true, event)
-      }
-    return <span className="eventTableColouredText">
-      <span>Drop in {dayjs().from(event.dropTime, true)}</span>
-      <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img>
-    </span>
+      // if (new Date(event.dropTime).getTime() < new Date().getTime()) {
+      //   return renderColourText(event.total.paid, event.total.reserved, event.total.unreserved, event.total.quantity, true, event)
+      // }
+    return  <Interval delay={1000}>{() => {
+        if (new Date(event.dropTime).getTime() < new Date().getTime()) {
+          return renderColourText(event.total.paid, event.total.reserved, event.total.unreserved, event.total.quantity, true, event)
+        }
+        return <span className="eventTableColouredText">
+          <span>Drop in {dayjs().from(event.dropTime, true)}</span>
+          <img src="/dropdown.svg" alt="dropdown" onClick={() => {event.dashboardDrop = !event.dashboardDrop; renderEvents()}} className={event.dashboardDrop ? "dropdownUp":"dropdownDown"}></img>
+        </span>
+      }}</Interval>
+
     }
 
     const renderDropdown= (event) => {
