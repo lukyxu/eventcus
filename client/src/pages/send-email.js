@@ -3,22 +3,21 @@ import Header from './../components/header.js'
 import EmailForm from '../components/email-form.js';
 
 export default function Send() {
-  const sheetId = "1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358";
   return (
     <div>
       <Header title='Create Event' />
       <EmailForm event={{
-        eventName: "Test Event",
-        ticketTypes: [{
+        name: "Chess",
+        eventDate: "2020-08-27T18:40:00.000Z",
+        tickets: [{
+          paid: 2,
+          quantity: 23,
+          reserved: 2,
           type: "normal",
-          price: 5,
-          quantity: 0
-        }, {
-          type: "vip",
-          price: 10,
-          quantity: 0
-        }]
-      }} sheetId={sheetId} />
+          unreserved: 19
+        }],
+        sheetId: "16rjpk9A0Si_ZcK8SIiomkNXzKoMa8xptwMYcXf5KhIE"
+      }} />
     </div>
   );
 }
