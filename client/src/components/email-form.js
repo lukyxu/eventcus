@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Button, Spinner, Row, Container } from "react-bootstrap";
 import { config } from "../services/config";
 import { UserAgentApplication } from 'msal';
+import { ErrorMessage } from "@hookform/error-message";
 import { sendNewEmail } from '../services/graphService';
 
 async function getEmails(reqBody) {
@@ -29,10 +30,52 @@ async function getEmails(reqBody) {
   }
 }
 
-export default function EmailForm({ event, sheetId }) {
+const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
+
+const getCapitalizedType = (ticketType) => {
+  return getCapitalized(ticketType.replace(/ .*/, ''));
+}
+
+const getFieldName = (prefix, ticketType, reservationStatus) => {
+  const status = reservationStatus.charAt(0).toUpperCase() + reservationStatus.slice(1);
+  return prefix + getCapitalizedType(ticketType) + status;
+}
+
+export default function EmailForm({ event }) {
 
   const [loadingSend, setLoadingSend] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [ticketTypes, setTicketTypes] = useState([]);
+  const {name, eventDate, sheetId} = event
+
+  const info = [{
+    ticketType: "normal (£5)",
+    reservationStatus: "reserved",
+    emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  }, {
+    ticketType: "vip (£10)",
+    reservationStatus: "reserved",
+    emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  }, {
+    ticketType: "normal (£5)",
+    reservationStatus: "waitlist",
+    emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  }];
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      const reqBody = {
+        sheetId: sheetId
+      };
+      const tickets = await getEmails(reqBody);
+      if (tickets.error) {
+        alert(JSON.stringify(tickets.error));
+      }
+      setTicketTypes(tickets);
+    };
+    fetchEmails();
+  }, [event]);
+
 
   var userAgentApplication = new UserAgentApplication({
     auth: {
@@ -114,16 +157,8 @@ export default function EmailForm({ event, sheetId }) {
     );
   }
 
-  const normalPrice = event.ticketTypes[event.ticketTypes.findIndex(x => x.type === 'normal')].price;
-  const vipPrice = event.ticketTypes[event.ticketTypes.findIndex(x => x.type === 'vip')].price;
-
   const { register, handleSubmit, errors } = useForm({
     criteriaMode: "all",
-    defaultValues: {
-      messageNormal: `Hi,\nYou have secured a normal ticket with price £${normalPrice}.\nPayment Details:\nXXXXX`,
-      messageVip: `Hi,\nYou have secured a vip ticket with price £${vipPrice}.\nPayment Details:\nXXXXX`,
-      messageNormalWaitlist: "Hi,\nYou have been waitlisted for a normal ticket."
-    }
   });
 
   const onSubmit = async (data) => {
@@ -132,70 +167,29 @@ export default function EmailForm({ event, sheetId }) {
       await login();
     }
     var accessToken = await getAccessToken(config.scopes);
-    const reqBody = {
-      sheetId: sheetId
-    };
-    const info = await getEmails(reqBody);
-    if (info.error) {
-      alert(JSON.stringify(info.error));
-    }
-    const normal = info[info.findIndex(x => x.ticketType === "normal" && x.reservationStatus === "reserved")];
-    const vip = info[info.findIndex(x => x.ticketType === "vip" && x.reservationStatus === "reserved")];
-    const normalWaitlist = info[info.findIndex(x => x.ticketType === "normal" && x.reservationStatus === "waitlist")];
-    const emailNormal = {
-      "subject": `Ticket information for ${event.eventName}`,
-      "body": {
-        "contentType": "Text",
-        "content": data.messageNormal
-      },
-      "bccRecipients": normal.emails.map(email => {
-        return ({
-          "emailAddress": {
-            "address": email
-          }
+    info.map((ticket, index) => {
+      const email = {
+        "subject": `Ticket information for ${name}`,
+        "body": {
+          "contentType": "Text",
+          "content": data[getFieldName("message", info[index].ticketType, info[index].reservationStatus)]
+        },
+        "bccRecipients": ticket.emails.map(email => {
+          return ({
+            "emailAddress": {
+              "address": email
+            }
+          })
         })
-      })
-    }
-    const emailVip = {
-      "subject": `Ticket information for ${event.eventName}`,
-      "body": {
-        "contentType": "Text",
-        "content": data.messageVip
-      },
-      "bccRecipients": vip.emails.map(email => {
-        return ({
-          "emailAddress": {
-            "address": email
-          }
-        })
-      })
-    }
-    const emailNormalWaitlist = {
-      "subject": `Ticket information for ${event.eventName}`,
-      "body": {
-        "contentType": "Text",
-        "content": data.messageNormalWaitlist
-      },
-      "bccRecipients": normalWaitlist.emails.map(email => {
-        return ({
-          "emailAddress": {
-            "address": email
-          }
-        })
-      })
-    }
-    let res
-    try {
-      // res = await sendNewEmail(accessToken, emailNormal);
-      // console.log(res);
-      // res = await sendNewEmail(accessToken, emailVip);
-      // console.log(res);
-      // res = await sendNewEmail(accessToken, emailNormalWaitlist);
-      // console.log(res);
-      alert("Emails Sent")
-    } catch (err) {
-      alert(err)
-    }
+      };
+      try {
+        // let res = await sendNewEmail(accessToken, email);
+        // console.log(res);
+      } catch (err) {
+        alert(err)
+      }
+    });
+    alert("Emails Sent");
     setLoadingSend(false);
   };
 
@@ -221,39 +215,26 @@ export default function EmailForm({ event, sheetId }) {
     <Container fluid className="emailFormMain">
       {isAuthenticated ? (<Button onClick={() => logout()}>Sign Out</Button>) : null}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Row className="formSection" style={{marginBottom: "15px"}}>
-          <h4>Email Content (Normal)</h4>
-          <textarea
-            className="fieldInput"
-            name="messageNormal"
-            placeholder="Email content for normal tickets holder"
-            rows="8"
-            ref={register({ required: true })}
-          />
-          {errors.messageNormal && <p className="eventFormErrorMessage">This field is required</p>}
-        </Row>
-        <Row className="formSection" style={{ marginBottom: "15px" }}>
-          <h4>Email Content (Vip)</h4>
-          <textarea
-            className="fieldInput"
-            name="messageVip"
-            placeholder="Email content for vip tickets holder"
-            rows="8"
-            ref={register({ required: true })}
-          />
-          {errors.messageVip && <p className="eventFormErrorMessage">This field is required</p>}
-        </Row>
-        <Row className="formSection" style={{ marginBottom: "15px" }}>
-          <h4>Email Content (Normal Waitlist)</h4>
-          <textarea
-            className="fieldInput"
-            name="messageNormalWaitlist"
-            placeholder="Email content for normal tickets waitlist"
-            rows="8"
-            ref={register({ required: true })}
-          />
-          {errors.messageNormalWaitlist && <p className="eventFormErrorMessage">This field is required</p>}
-        </Row>
+        {info.map((ticket, index) => {
+          // console.log(ticketTypes);
+          return(
+            <div key={index}>
+              <Row className="formSection" style={{ marginBottom: "15px" }}>
+                <h4>Email Body ({getCapitalizedType(ticket.ticketType)} {getCapitalized(ticket.reservationStatus)})</h4>
+                <textarea
+                  className="fieldInput"
+                  name={getFieldName("message", info[index].ticketType, info[index].reservationStatus)}
+                  placeholder={`Email content for ${info[index].ticketType} ${info[index].reservationStatus}`}
+                  rows="8"
+                  defaultValue={info[index].reservationStatus === 'reserved' ?
+                    `Hi,\nYou have secured a ${info[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}.\nPayment Details:\nXXXXX`
+                    : `Hi,\nYou have been waitlisted for a ${info[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}`}
+                  ref={register({ required: <p className="eventFormErrorMessage">This field is required</p> })}
+                />
+                <ErrorMessage errors={errors} name={getFieldName("message", info[index].ticketType, info[index].reservationStatus)} />
+              </Row>
+            </div>
+        );})}
         <Row className="formSection">
           <hr></hr>
           {renderSendButton()}

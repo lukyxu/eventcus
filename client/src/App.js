@@ -88,7 +88,7 @@ function App() {
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create fetchEvents={fetchEvents}></Create>} />
             <PrivateRoute exact user={user} path='/event' render={(props) => <Event></Event>} />
             <PrivateRoute exact user={user} path='/send-email' render={(props) => <Send></Send>} />
-            {events.map(e => <PrivateRoute exact user={user} path={`/event/${e._id}`} render={(props) => <Event event={e}></Event>} />)}
+            {events.map(e => <PrivateRoute exact user={user} path={`/event/${e._id}`} key={e._id} render={(props) => <Event event={e}></Event>} />)}
             <Route exact path='/login' render={(props) => <Login setUser={setUser} setLoaded={setLoaded}/>}/>
             <Route render={() => <h1>404: page not found</h1>}></Route>
         </Switch>
