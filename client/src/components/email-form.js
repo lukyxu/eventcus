@@ -211,46 +211,53 @@ export default function EmailForm({ event }) {
     }
   }
 
+  if (ticketTypes.length > 1) {
+    return (
+      <Container fluid className="emailFormMain">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Row className="formSection" style={{ marginBottom: "15px" }}>
+            <h4>Email Subject</h4>
+            <input
+              className="fieldInput"
+              name="subject"
+              placeholder="Subject of email"
+              defaultValue={`Ticket Information for ${name}`}
+              ref={register({ required: true })}
+            />
+            {errors.subject && <p className="eventFormErrorMessage">This field is required</p>}
+          </Row>
+
+          {ticketTypes.map((ticket, index) => {
+            return (
+              <div key={index}>
+                <Row className="formSection" style={{ marginBottom: "15px" }}>
+                  <h4>Email Body ({getCapitalizedType(ticket.ticketType)} {getCapitalized(ticket.reservationStatus)})</h4>
+                  <textarea
+                    className="fieldInput"
+                    name={getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)}
+                    placeholder={`Email content for ${ticketTypes[index].ticketType} ${ticketTypes[index].reservationStatus}`}
+                    rows="8"
+                    defaultValue={ticketTypes[index].reservationStatus === 'reserved' ?
+                      `Hi,\nYou have secured a ${ticketTypes[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}.\nPayment Details:\nXXXXX`
+                      : `Hi,\nYou have been waitlisted for a ${ticketTypes[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}`}
+                    ref={register({ required: <p className="eventFormErrorMessage">This field is required</p> })}
+                  />
+                  <ErrorMessage errors={errors} name={getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)} />
+                </Row>
+              </div>
+            );
+          })}
+          <Row className="formSection">
+            <hr></hr>
+            {renderSendButton()}
+          </Row>
+        </form>
+      </Container>
+    );
+  }
   return (
     <Container fluid className="emailFormMain">
-      {isAuthenticated ? (<Button onClick={() => logout()}>Sign Out</Button>) : null}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Row className="formSection" style={{ marginBottom: "15px" }}>
-          <h4>Email Subject</h4>
-          <input
-            className="fieldInput"
-            name="subject"
-            placeholder="Subject of email"
-            defaultValue={`Ticket Information for ${name}`}
-            ref={register({ required: true })}
-          />
-          {errors.subject && <p className="eventFormErrorMessage">This field is required</p>}
-        </Row>
-
-        {ticketTypes.map((ticket, index) => {
-          return(
-            <div key={index}>
-              <Row className="formSection" style={{ marginBottom: "15px" }}>
-                <h4>Email Body ({getCapitalizedType(ticket.ticketType)} {getCapitalized(ticket.reservationStatus)})</h4>
-                <textarea
-                  className="fieldInput"
-                  name={getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)}
-                  placeholder={`Email content for ${ticketTypes[index].ticketType} ${ticketTypes[index].reservationStatus}`}
-                  rows="8"
-                  defaultValue={ticketTypes[index].reservationStatus === 'reserved' ?
-                    `Hi,\nYou have secured a ${ticketTypes[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}.\nPayment Details:\nXXXXX`
-                    : `Hi,\nYou have been waitlisted for a ${ticketTypes[index].ticketType} ticket for ${name} on ${new Date(eventDate).toLocaleString()}`}
-                  ref={register({ required: <p className="eventFormErrorMessage">This field is required</p> })}
-                />
-                <ErrorMessage errors={errors} name={getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)} />
-              </Row>
-            </div>
-        );})}
-        <Row className="formSection">
-          <hr></hr>
-          {renderSendButton()}
-        </Row>
-      </form>
+      <h1>No ticket holder information</h1>
     </Container>
   );
 }
