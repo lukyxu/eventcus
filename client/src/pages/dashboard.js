@@ -20,7 +20,7 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
 
     return (
       <div>
-        <Header title='Dashboard' />
+        <Header title='Dashboard' setUser={setUser} />
         <div className='centralDashboardContainer'>
           <Container fluid style={{minHeight:"100vh"}}>
             <Row>
