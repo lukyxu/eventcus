@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import PrivateRoute from './routing/PrivateRoute'
@@ -16,9 +16,17 @@ function App() {
   const [user, setUser] = useState(null)
   const [loaded, setLoaded] = useState(false)
   const [events, setEvents] = useState([])
+  const loadedRef = useRef(loaded)
+  loadedRef.current = loaded;
 
   useEffect(() => {
     console.log("ok")
+    const timer = setTimeout(() => {
+      if (!loadedRef.current) {
+        alert("Connection timeout, please refresh the page")
+      }
+    }, 20000)
+
     isAuthenticated( (data) => {
       if (data.error){
         console.log(data.error)
@@ -29,6 +37,7 @@ function App() {
         setUser(data.user)
       }
     })
+    return () => clearTimeout(timer)
   }, [])
 
   const renderEvents = () => {
