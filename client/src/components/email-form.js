@@ -5,30 +5,7 @@ import { config } from "../services/config";
 import { UserAgentApplication } from 'msal';
 import { ErrorMessage } from "@hookform/error-message";
 import { sendNewEmail } from '../services/graphService';
-
-async function getEmails(reqBody) {
-  try {
-    let res = await fetch('/getEmailsAndTicketTypes', {
-      method: "post",
-      body: JSON.stringify(reqBody),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: "include"
-    })
-    if (res.status === 401) {
-      console.log(`ERROR ${res.status}`);
-      return ({
-        error: "User not authenticated"
-      });
-    }
-    return await res.json();
-  } catch (error) {
-    return ({
-      error
-    });
-  }
-}
+import getEmails from "../services/emailingList";
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -47,20 +24,6 @@ export default function EmailForm({ event }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [ticketTypes, setTicketTypes] = useState([]);
   const {name, eventDate, sheetId} = event
-
-  // const info = [{
-  //   ticketType: "normal (£5)",
-  //   reservationStatus: "reserved",
-  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  // }, {
-  //   ticketType: "vip (£10)",
-  //   reservationStatus: "reserved",
-  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  // }, {
-  //   ticketType: "normal (£5)",
-  //   reservationStatus: "waitlist",
-  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  // }];
 
   useEffect(() => {
     const fetchEmails = async () => {
