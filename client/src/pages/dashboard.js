@@ -2,11 +2,6 @@ import React, {useState} from 'react';
 import {Container, Row, Col} from 'react-bootstrap'
 import Header from '../components/header.js'
 import { logout } from '../services/authService'
-import AllocateTickets from '../services/allocate.js';
-import TicketReservationInfo from './../services/ticketReservationInfo.js';
-import ChangePaymentStatus from './../services/changePaymentStatus.js';
-import TicketAllocations from './../services/ticketAllocations.js';
-import EmailingList from './../services/emailingList.js';
 import Button from '@material-ui/core/Button';
 import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
@@ -21,49 +16,7 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
 
     const filteredEvents = events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
 
-    const pressAllocate = () => {
-      const reqBody = {
-          sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
-      }
-      const res = AllocateTickets(reqBody);
-      console.log(res)
-  }
-
-    const pressTicketResInfo = () => {
-      const reqBody = {
-          sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358'
-      }
-      const res = TicketReservationInfo(reqBody);
-      console.log(res)
-    }
-
-    const pressTicketAllocations = () => {
-      const reqBody = {
-          sheetId: '16rjpk9A0Si_ZcK8SIiomkNXzKoMa8xptwMYcXf5KhIE'
-      }
-      const res = TicketAllocations(reqBody);
-      console.log(res)
-    }
-
-
-    const pressEmailingList = () => {
-      const reqBody = {
-          sheetId: '16rjpk9A0Si_ZcK8SIiomkNXzKoMa8xptwMYcXf5KhIE'
-      }
-      const res = EmailingList(reqBody);
-      console.log(res)
-    }
-
-
-    const pressChangePaymentStatus = () => {
-        const reqBody = {
-            sheetId: '1-B59r_kFGsAebgBlmaW18i5SU9jsbVRNIx2PkbIr358',
-            timestamp: '25/08/2020 07:35:04',
-            fullName: 'Alex Liu',
-        }
-        const res = ChangePaymentStatus(reqBody);
-        console.log(res)
-    }
+    
 
     return (
       <div>
@@ -111,16 +64,6 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
                 <EventTable title="Past Events" renderEvents={renderEvents} events={filteredEvents.filter(e => new Date(e.eventDate).getTime() <= new Date().getTime())}></EventTable>
               </Col>
             </Row>
-            <br></br>
-            <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
-            <br></br>
-            <Button className="blueButton" onClick={pressTicketResInfo}> Ticket Reservation Info </Button>
-            <br></br>
-            <Button className="blueButton" onClick={pressTicketAllocations}> Ticket Allocations </Button>
-            <br></br>
-            <Button className="blueButton" onClick={pressChangePaymentStatus}> Change Payment Status </Button>
-            <br></br>
-            <Button className="blueButton" onClick={pressEmailingList}> Emailing List</Button>
             <br></br>
             <Button className="blueButton" onClick={() => { logout(() => { setUser(null); history.push('/login') })}}> Logout </Button>
             <br></br>

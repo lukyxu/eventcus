@@ -69,7 +69,7 @@ const agenda = new Agenda({
   maxConcurrency: 1
 });
 
-// agenda.start()
+agenda.start()
 // (async () => {
 //   await agenda.start()
 //   agenda.now('openForm', {formId: '16hBNIrFtADFndtsAP8UNgWl_SuIT3ZVjKQ_BuGpjKgE', sheetId : '1p436B5I29HC-9pIULmAqN4i8oAJW7Ygttcki54PKq-E'})
