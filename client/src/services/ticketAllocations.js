@@ -12,6 +12,6 @@ export default function TicketAllocations(data) {
         console.log(`ERROR: ${res.status}`)
         return null
       }
-      return res.json().then(data => data);;
+      return res.json().then(data => data);
     })
 }

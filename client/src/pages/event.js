@@ -88,7 +88,7 @@ export default function Event({ event, setUser }) {
 
   return (
     <div>
-      <Header title={"Ten10"} setUser={setUser} />
+      <Header title={event.name} setUser={setUser} />
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
 

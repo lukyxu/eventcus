@@ -184,6 +184,7 @@ router.post('/getTicketAllocations', function (req, res, next) {
     reader.getTicketAllocations((data) => {
       console.log(data);
       res.json(data);
+      console.log(data)
     });
   });
 
