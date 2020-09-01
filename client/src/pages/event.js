@@ -8,7 +8,6 @@ import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
 import ChangePaymentStatus from './../services/changePaymentStatus.js';
 import TicketAllocations from './../services/ticketAllocations.js';
-import EmailingList from './../services/emailingList.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
 

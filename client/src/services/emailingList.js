@@ -1,14 +1,23 @@
-export default function EmailingList(data) {
-    return fetch('/getEmailsAndTicketTypes', {
-        method: "post",
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: "include"
-    }).then(res => {
-        if (res.status !== 201) {
-            return res.json().then(data => data);;
+export default async function getEmails(reqBody) {
+    try {
+        let res = await fetch('/getEmailsAndTicketTypes', {
+            method: "post",
+            body: JSON.stringify(reqBody),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: "include"
+        })
+        if (res.status === 401) {
+            console.log(`ERROR ${res.status}`);
+            return ({
+                error: "User not authenticated"
+            });
         }
-    })
+        return await res.json();
+    } catch (error) {
+        return ({
+            error
+        });
+    }
 }
