@@ -11,7 +11,7 @@ import TicketAllocations from './../services/ticketAllocations.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
 
-export default function Event({ event }) {
+export default function Event({ event, setUser }) {
   const [searchValue, setSearchValue] = useState('');
   const history = useHistory();
 
@@ -88,7 +88,7 @@ export default function Event({ event }) {
 
   return (
     <div>
-      <Header title={event.name} />
+      <Header title={event.name} setUser={setUser} />
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
 
