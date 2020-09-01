@@ -88,7 +88,7 @@ export default function Event({ event }) {
 
   return (
     <div>
-      <Header title={"Ten10"} />
+      <Header title={event.name} />
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
 

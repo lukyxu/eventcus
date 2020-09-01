@@ -12,8 +12,9 @@ async function getTicketReservations(reqBody) {
   //   });
   // }
 
-  const res =  await TicketAllocations(reqBody);
-    return await res.json
+  const res = await TicketAllocations(reqBody);
+  console.log(res)
+  return res
 }
 
 // fake data generator
@@ -67,28 +68,43 @@ const getListStyle = isDraggingOver => ({
   width: 250
 });
 
-export default function ReservationTable({event}) {
-  const [state, setState] = useState([getItems(10), getItems(5, 10)]);
+export default function ReservationTable({ event }) {
+  const [state, setState] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
 
   useEffect(() => {
-    const fetchTicketReservations = async () => {
-      const reqBody = {
-        sheetId: event.sheetId
-      };
-      const tickets = await getTicketReservations(reqBody);
-      // if (tickets.error) {
-      //   alert(JSON.stringify(tickets.error));
-      // }
-      setTicketTypes(tickets);
-    };
-    fetchTicketReservations();
+    if (state.length == 0) {
+      const fetchTicketReservations = async () => {
+        const reqBody = {
+          sheetId: event.sheetId
+        };
+        const tickets = await getTicketReservations(reqBody);
 
-    console.log(ticketTypes)
+        setTicketTypes(tickets)
+        // if (tickets.error) {
+        //   alert(JSON.stringify(tickets.error));
+        // }
+        const reservations = []
+        tickets.map((ticket) => {
+          reservations.push(ticket.reservations)
+        })
+        setState(reservations);
+        console.log("useeffect")
+      };
+      fetchTicketReservations();
+
+    }
+
   }, [event]);
+
+  console.log(state)
+
+
 
   function onDragEnd(result) {
     const { source, destination } = result;
+    console.log(source)
+    console.log(destination)
 
     // dropped outside the list
     if (!destination) {
@@ -101,12 +117,14 @@ export default function ReservationTable({event}) {
       const items = reorder(state[sInd], source.index, destination.index);
       const newState = [...state];
       newState[sInd] = items;
+      console.log(newState)
       setState(newState);
     } else {
       const result = move(state[sInd], state[dInd], source, destination);
       const newState = [...state];
       newState[sInd] = result[sInd];
       newState[dInd] = result[dInd];
+      console.log(newState)
 
       setState(newState.filter(group => group.length));
     }
@@ -114,7 +132,7 @@ export default function ReservationTable({event}) {
 
   return (
     <div>
-      <button
+      {/* <button
         type="button"
         onClick={() => {
           setState([...state, []]);
@@ -129,7 +147,7 @@ export default function ReservationTable({event}) {
         }}
       >
         Add new item
-      </button>
+      </button> */}
       <div style={{ display: "flex" }}>
         <DragDropContext onDragEnd={onDragEnd}>
           {state.map((el, ind) => (
@@ -140,10 +158,14 @@ export default function ReservationTable({event}) {
                   style={getListStyle(snapshot.isDraggingOver)}
                   {...provided.droppableProps}
                 >
+                  <div>{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
+                  {console.log(ind)}
+                  {console.log(ticketTypes[ind])}
+
                   {el.map((item, index) => (
                     <Draggable
-                      key={item.id}
-                      draggableId={item.id}
+                      key={`item-${item.timestamp}-${item.name}`}
+                      draggableId={`item-${item.timestamp}-${item.name}`}
                       index={index}
                     >
                       {(provided, snapshot) => (
@@ -162,7 +184,7 @@ export default function ReservationTable({event}) {
                               justifyContent: "space-around"
                             }}
                           >
-                            {item.content}
+                            {item.name}
                             <button
                               type="button"
                               onClick={() => {
