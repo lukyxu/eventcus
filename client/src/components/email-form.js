@@ -166,7 +166,7 @@ export default function EmailForm({ event }) {
       await login();
     }
     var accessToken = await getAccessToken(config.scopes);
-    ticketTypes.forEach((ticket, index) => {
+    await Promise.all(ticketTypes.map(async (ticket, index) => {
       const email = {
         "subject": data.subject,
         "body": {
@@ -182,13 +182,13 @@ export default function EmailForm({ event }) {
         })
       };
       console.log(email);
-      try {
+      // try {
         // let res = await sendNewEmail(accessToken, email);
         // console.log(res);
-      } catch (err) {
-        alert(err)
-      }
-    });
+      // } catch (err) {
+      //   alert(err);
+      // }  
+    }))
     alert("Emails Sent");
     setLoadingSend(false);
   };
