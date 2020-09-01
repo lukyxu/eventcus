@@ -5,6 +5,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import PostForm from './../services/post-form.js';
 import CurrencyInput from 'react-currency-input-field';
 import { useHistory } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 export default function EventHookForm({fetchEvents}) {
   const history = useHistory();
@@ -49,10 +50,18 @@ export default function EventHookForm({fetchEvents}) {
     })
     data.fieldsChecked = temp;
     console.log(typeof data.ticketRelease);
-    let res = await PostForm(data);
-    console.log(res)
+    try {
+      let res = await PostForm(data);
+      console.log(res)
+      if (res.error) {
+        toast.error(`Event creation unsuccessful: ${res.error}`)
+      }
+    } catch (err) {
+      toast.error(`Event creation unsuccessful: ${err}`)
+    }
     await fetchEvents()
     history.push('/')
+    toast.success("Event created")
   }; // your form submit function which will invoke after successful validation
 
   // console.log(watch("eventName")); // you can watch individual input by pass the name of the input

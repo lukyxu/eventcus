@@ -36,7 +36,7 @@ export var isAuthenticated = (cb) =>{
     {method: "post", credentials: "include"})
     .then(res=>{
         if(res.status !== 401){
-            return res.json().then(data => cb(data));
+          return res.json().then(data => cb(data));
         }
         else {
             return cb({ isAuthenticated : false });

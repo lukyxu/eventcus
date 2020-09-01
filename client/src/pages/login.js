@@ -14,7 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {login} from '../services/authService'
 import { useHistory } from "react-router-dom";
-
+import { toast } from 'react-toastify';
 
 function Copyright() {
   return (
@@ -59,9 +59,9 @@ export default function SignIn({setUser, setLoaded}) {
     e.preventDefault()
     login({email, password}, (data) => {
       if (data.error) {
-        console.log(data.error)
+        toast.error(`Error with login: ${data.error}`)
       } else if (!data.isAuthenticated) {
-        console.log("Not authenticated")
+        toast.info(`Incorrect credentials`)
       } else {
         setUser(data.user)
         setLoaded(false)

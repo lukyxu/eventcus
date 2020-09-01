@@ -3,6 +3,7 @@ import { Navbar, Nav, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { logout } from '../services/authService'
 import { useHistory } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 export default function Header({ title, setUser }) {
   const history = useHistory();
@@ -13,7 +14,12 @@ export default function Header({ title, setUser }) {
               : <Nav.Link as={Link} to="/">Dashboard</Nav.Link> }
       </Nav>
       <Nav className="justify-content-end">
-          <Button onClick={() => { logout(() => { setUser(null); history.push('/login') })}}> Sign out</Button>
+          <Button onClick={() => { logout((res) => { 
+            if (res.error) {
+              toast.error(`Error with logout: ${res.error}`)
+            }
+            setUser(null); history.push('/login') 
+            })}}> Sign out</Button>
       </Nav>
   </Navbar>
     

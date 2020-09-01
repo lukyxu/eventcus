@@ -22,7 +22,7 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
       <div>
         <Header title='Dashboard' setUser={setUser} />
         <div className='centralDashboardContainer'>
-          <Container fluid style={{minHeight:"100vh"}}>
+          <Container fluid>
             <Row>
               <Col xs sm={12}>
                 <Button onClick= {() => history.push("/create-event")} className='blueButton' style={{width: "100%"}}>

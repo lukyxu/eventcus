@@ -5,7 +5,31 @@ import { config } from "../services/config";
 import { UserAgentApplication } from 'msal';
 import { ErrorMessage } from "@hookform/error-message";
 import { sendNewEmail } from '../services/graphService';
-import getEmails from "../services/emailingList";
+import { toast } from 'react-toastify';
+
+async function getEmails(reqBody) {
+  try {
+    let res = await fetch('/getEmailsAndTicketTypes', {
+      method: "post",
+      body: JSON.stringify(reqBody),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include"
+    })
+    if (res.status === 401) {
+      console.log(`ERROR ${res.status}`);
+      return ({
+        error: "User not authenticated"
+      });
+    }
+    return await res.json();
+  } catch (error) {
+    return ({
+      error
+    });
+  }
+}
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -25,6 +49,20 @@ export default function EmailForm({ event }) {
   const [ticketTypes, setTicketTypes] = useState([]);
   const {name, eventDate, sheetId} = event
 
+  // const info = [{
+  //   ticketType: "normal (£5)",
+  //   reservationStatus: "reserved",
+  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  // }, {
+  //   ticketType: "vip (£10)",
+  //   reservationStatus: "reserved",
+  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  // }, {
+  //   ticketType: "normal (£5)",
+  //   reservationStatus: "waitlist",
+  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
+  // }];
+
   useEffect(() => {
     const fetchEmails = async () => {
       const reqBody = {
@@ -32,9 +70,10 @@ export default function EmailForm({ event }) {
       };
       const tickets = await getEmails(reqBody);
       if (tickets.error) {
-        alert(JSON.stringify(tickets.error));
+        toast.error(`Error with getting emails: ${tickets.error}`);
+      } else {
+        setTicketTypes(tickets);
       }
-      setTicketTypes(tickets);
     };
     fetchEmails();
   }, [event, sheetId]);
@@ -125,34 +164,34 @@ export default function EmailForm({ event }) {
 
   const onSubmit = async (data) => {
     setLoadingSend(true);
-    if (!isAuthenticated) {
-      await login();
-    }
-    var accessToken = await getAccessToken(config.scopes);
-    await Promise.all(ticketTypes.map(async (ticket, index) => {
-      const email = {
-        "subject": data.subject,
-        "body": {
-          "contentType": "Text",
-          "content": data[getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)]
-        },
-        "bccRecipients": ticket.reservations.map(email => {
-          return ({
-            "emailAddress": {
-              "address": email
-            }
+    try {
+      if (!isAuthenticated) {
+        await login();
+      }
+      var accessToken = await getAccessToken(config.scopes);
+      await Promise.all(ticketTypes.map(async (ticket, index) => {
+        const email = {
+          "subject": data.subject,
+          "body": {
+            "contentType": "Text",
+            "content": data[getFieldName("message", ticketTypes[index].ticketType, ticketTypes[index].reservationStatus)]
+          },
+          "bccRecipients": ticket.reservations.map(email => {
+            return ({
+              "emailAddress": {
+                "address": email
+              }
+            })
           })
-        })
-      };
-      console.log(email);
-      // try {
+        };
+        console.log(email);
         // let res = await sendNewEmail(accessToken, email);
         // console.log(res);
-      // } catch (err) {
-      //   alert(err);
-      // }  
-    }))
-    alert("Emails Sent");
+        toast.success(`Emails sent`)
+      }));
+    } catch(err) {
+      toast.error(`Error in sending email: ${err}`)
+    }
     setLoadingSend(false);
   };
 

@@ -7,9 +7,11 @@ import Event from './pages/event';
 import Login from './pages/login';
 import {isAuthenticated} from './services/authService'
 import ReactLoading from 'react-loading';
-import './styles.css';
 import TicketReservationInfo from './services/ticketReservationInfo.js';
 import Send from './pages/send-email';
+import { toast, ToastContainer, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './styles.css';
 
 function App() {
 
@@ -23,13 +25,14 @@ function App() {
     console.log("ok")
     const timer = setTimeout(() => {
       if (!loadedRef.current) {
-        alert("Connection timeout, please refresh the page")
+        toast.error("Connection timeout, please refresh the page", {autoClose: false,closeOnClick: false, draggable: false})
       }
     }, 20000)
 
     isAuthenticated( (data) => {
+      console.log(data)
       if (data.error){
-        console.log(data.error)
+        toast.error(`Error authenticating user: ${data.error}`)
       } else if (!data.isAuthenticated) {
         console.log("Not authenticated")
         setLoaded(true)
@@ -45,27 +48,31 @@ function App() {
   }
 
   async function fetchEvents() {
-    let res = await fetch("/events", {credentials: "include"})
-    let e = await res.json()
     let r = []
+    try {
+      let res = await fetch("/events", {credentials: "include"})
+      let e = await res.json()
 
-    await Promise.all(e.map(async (event) => {
-      console.log(event)
-      const reqBody = {
-        sheetId: event.sheetId
-      }
-
-      let tickets = await TicketReservationInfo(reqBody)
-      let total;
-
-      tickets.forEach((ticket, index, object) => {
-        if (ticket.type === "total") {
-          total = ticket;
-          object.splice(index, 1)
+      await Promise.all(e.map(async (event) => {
+        console.log(event)
+        const reqBody = {
+          sheetId: event.sheetId
         }
-      })
-      r.push({_id: event._id, eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId, dashboardDrop: false})
-    }))
+
+        let tickets = await TicketReservationInfo(reqBody)
+        let total;
+
+        tickets.forEach((ticket, index, object) => {
+          if (ticket.type === "total") {
+            total = ticket;
+            object.splice(index, 1)
+          }
+        })
+        r.push({_id: event._id, eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId, dashboardDrop: false})
+      }))
+    } catch(err) {
+      toast.error(`Unable to fetch events: ${err}`)
+    }
 
     console.log(r)
     // console.log(typeof r)
@@ -81,10 +88,39 @@ function App() {
   }, [user])
 
   if (!loaded) {
-    return <div style={{display: 'flex', alignItems: 'center', justifyContent:'center', height:'100vh'}}><ReactLoading type={"spinningBubbles"} color={"#5e99f1"}/></div>
+    return <div style={{display: 'flex', alignItems: 'center', justifyContent:'center', height:'100vh'}}>
+      <ToastContainer
+        limit={3}
+        position="top-center"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        transition={Slide}
+      />
+      <ReactLoading type={"spinningBubbles"} color={"#5e99f1"}/>
+    </div>
   }
+
   return (
   <Router>
+    <ToastContainer
+      limit={3}
+      position="top-center"
+      autoClose={4000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover={false}
+      transition={Slide}
+    />
       <div>
         {/* <h2>Welcome to React Router Tutorial</h2>
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
