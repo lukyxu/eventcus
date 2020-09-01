@@ -92,11 +92,12 @@ class GoogleSheetsReader {
   async findPerson(timestamp, fullName) {
     const responseRows = await this.responseSheet.getRows();
     var res;
-    await responseRows.forEach((row) => {
+    responseRows.forEach((row) => {
       if (row["Timestamp"] == timestamp && row["Full Name"] == fullName) {
         res = row
       }
     });
+    console.log(res)
     return res;
 
   }
@@ -104,7 +105,7 @@ class GoogleSheetsReader {
   async changePaymentStatus(timestamp, fullName) {
     const person = await this.findPerson(timestamp, fullName);
 
-    person.PaymentStatus = (person.PaymentStatus == "paid" ? "" : "paid");
+    person["Payment Status"] = (person["Payment Status"] == "paid" ? "" : "paid");
     await person.save();
   }
 
