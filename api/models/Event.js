@@ -21,6 +21,18 @@ const EventSchema = mongoose.Schema({
   formId: {
     type: String,
     required: true
+  },
+  sheetUrl: {
+    type: String,
+    required: true
+  },
+  formEditUrl: {
+    type: String,
+    required: true
+  },
+  formResUrl: {
+    type: String,
+    required: true
   }
 });
 

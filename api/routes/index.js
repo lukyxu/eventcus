@@ -120,8 +120,8 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     console.log("CLOSED")
   }
   googleAppLinker.createForm(form.toFunctionString(), formRes => {
-    const { sheetId, formId } = formRes;
-    const newEvent = new Event({ name: body.eventName, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, eventDate: body.eventDate })
+    const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
+    const newEvent = new Event({ name: body.eventName, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate })
     newEvent.save(err => {
       console.error(err)
     })
