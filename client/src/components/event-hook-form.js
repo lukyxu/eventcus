@@ -269,7 +269,7 @@ export default function EventHookForm({fetchEvents}) {
               type="button"
               className="blueButton"
               onClick={() => {
-                append();
+                append({type: "", price: 0, quantity: 0});
               }}
             >
               Add another ticket
