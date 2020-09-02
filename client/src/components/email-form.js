@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button, Spinner, Row } from "react-bootstrap";
-
 export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll }) {
 
   const [loadingSend, setLoadingSend] = useState(false);
@@ -59,7 +58,7 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
   }
 
   return (
-    <div className="emailFormMain">
+    <div>
       <form>
         <Row className="formSection" style={{ marginBottom: "15px" }}>
           <h4>Email Subject</h4>

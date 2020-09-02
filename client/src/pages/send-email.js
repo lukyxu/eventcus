@@ -7,9 +7,10 @@ import getEmails from '../services/emailingList';
 import { toast } from 'react-toastify';
 import { config } from "../services/config";
 import { UserAgentApplication } from 'msal';
+import Select from 'react-select'
+import { Container, Row } from "react-bootstrap";
 import { sendNewEmail } from '../services/graphService';
-
-var localizedFormat = require('dayjs/plugin/localizedFormat');
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 dayjs.extend(localizedFormat);
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
@@ -25,6 +26,18 @@ export default function Send({ event, setUser }) {
   const [emailLoaded, setEmailLoaded] = useState(false);
   const [ticketIndex, setTicketIndex] = useState(0);
   const { name, eventDate, sheetId } = event
+  console.log(ticketTypes)
+
+  const ticketOptions = ticketTypes.map((t, i) => ({value: i, label: t.name, reservationStatus: t.reservationStatus}))
+  const reservedOptions = ticketOptions.filter(t => t.reservationStatus === "reserved")
+  const waitlistOptions = ticketOptions.filter(t => t.reservationStatus === "waitlist")
+  const groupedOptions = [{
+    label: 'Reserved',
+    options: reservedOptions
+  }, {
+    label: 'Waitlist',
+    options: waitlistOptions
+  }]
 
   var userAgentApplication = new UserAgentApplication({
     auth: {
@@ -212,26 +225,36 @@ export default function Send({ event, setUser }) {
     );
   }
 
+
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      borderBottom: '2px dotted green',
+      color: state.isSelected ? 'yellow' : 'black',
+      backgroundColor: state.isSelected ? 'green' : 'white'
+    }),
+    control: (provided) => ({
+      ...provided,
+      marginTop: "5%",
+    })
+  }
+
   return (
-    <div>
+    <Container fluid>
       <Header title='Create Event' setUser = {setUser}/>
       <div className="emailFormMain">
-        <select className="ticketSelect" onChange={e => setTicketIndex(e.target.value)}>
-          {ticketTypes.map((ticket, index) => {
-            return(
-              <option key={index} value={index}>
-                {ticket.name}
-              </option>
-            )
-          })}
-        </select>
-      </div>
-      <EmailForm
+        <Row>
+          <div className="formSection" style={{width: "100%"}}>
+            <Select options={groupedOptions} style={{width: "100%"}} onChange={(v) => setTicketIndex(v.value)}/>
+          </div>
+        </Row>
+        <EmailForm
         event={event}
         ticket={ticketTypes[ticketIndex]}
         updateTickets={updateTickets}
         sendEmail={sendOne}
         sendAll={sendAll}/>
-    </div>
+      </div>
+    </Container>
   );
 }
