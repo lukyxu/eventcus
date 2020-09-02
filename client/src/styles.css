@@ -239,3 +239,12 @@ h2 {
   padding: 0px;
 }
 
+.reservationColumnHeader {
+  background-color: #cccccc;
+  color:#2e2e2e;
+  font-weight: bold;
+  padding: 6px 15px;
+  width: 100%;
+  display: inherit;
+}
+

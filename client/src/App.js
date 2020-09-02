@@ -63,7 +63,7 @@ function App() {
         let total;
 
         tickets.forEach((ticket, index, object) => {
-          if (ticket.type === "total") {
+          if (ticket.type === "Total") {
             total = ticket;
             object.splice(index, 1)
           }

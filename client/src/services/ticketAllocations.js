@@ -1,5 +1,4 @@
 export default function TicketAllocations(data) {
-    console.log("here")
     return fetch('/getTicketAllocations', {
         method: "post",
         body: JSON.stringify(data),

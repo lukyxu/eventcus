@@ -182,7 +182,6 @@ router.post('/getTicketAllocations', function (req, res, next) {
   let reader = new GoogleSheetsReader(sheetId);
   reader.init(() => {
     reader.getTicketAllocations((data) => {
-      console.log(data);
       res.json(data);
       console.log(data)
     });

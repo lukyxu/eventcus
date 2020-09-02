@@ -67,7 +67,7 @@ class GoogleSheetsReader {
 
       await row.save();
     })
-    const totalRow = await this.ticketTypeSheet.addRow({ type: "total" })
+    const totalRow = await this.ticketTypeSheet.addRow({ type: "Total" })
     totalRow["quantity"] = `=SUM(C2:C${ticketTypes.length + 1})`
     totalRow["allocated"] = `=SUM(D2:D${ticketTypes.length + 1})`
     totalRow["paid"] = `=SUM(E2:E${ticketTypes.length + 1})`
@@ -78,7 +78,7 @@ class GoogleSheetsReader {
     var res = false;
     await ticketTypeRows.forEach(async (row) => {
 
-      if (row["type"] != "total") {
+      if (row["type"] != "Total") {
         if (row["type"] === ticketType && row["allocated"] < row["quantity"]) {
           row["allocated"] = parseInt(row["allocated"]) + 1;
           res = true;
@@ -97,7 +97,6 @@ class GoogleSheetsReader {
         res = row
       }
     });
-    console.log(res)
     return res;
 
   }

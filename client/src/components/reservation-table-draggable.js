@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import TicketAllocations from './../services/ticketAllocations.js';
 import UpdatePaymentStatus from "../services/changePaymentStatus.js";
+import { Button } from "react-bootstrap";
+import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 async function getTicketReservations(reqBody) {
   // try {
@@ -58,7 +60,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   margin: `0 0 ${grid}px 0`,
 
   // change background colour if dragging
-  background: isDragging ? "lightgreen" : "grey",
+  background: isDragging ? "lightgreen" : "white",
 
   // styles we need to apply on draggables
   ...draggableStyle
@@ -70,52 +72,63 @@ const getListStyle = isDraggingOver => ({
 });
 
 
-export default function ReservationTable({ event }) {
+export default function ReservationTable({ event, fetchTicketInfo }) {
   const [state, setState] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [payments, setPaymentStatus] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchTicketReservations = async () => {
+    const reqBody = {
+      sheetId: event.sheetId
+    };
+    const tickets = await getTicketReservations(reqBody);
+    console.log(tickets)
+
+    // if (tickets.error) {
+    //   alert(JSON.stringify(tickets.error));
+    // }
+    const reservations = []
+    tickets.map((ticket) => {
+      reservations.push(ticket.reservations)
+    })
+    setState(reservations);
+
+    setTicketTypes(tickets);
+    console.log("useeffect")
+  };
 
   useEffect(() => {
-    const fetchTicketReservations = async () => {
-      const reqBody = {
-        sheetId: event.sheetId
-      };
-      const tickets = await getTicketReservations(reqBody);
-      console.log(tickets)
-
-      // if (tickets.error) {
-      //   alert(JSON.stringify(tickets.error));
-      // }
-      const reservations = []
-      tickets.map((ticket) => {
-        reservations.push(ticket.reservations)
-      })
-      setState(reservations);
-
-      setTicketTypes(tickets);
-      console.log("useeffect")
-    };
     fetchTicketReservations();
 
-
   }, [event]);
+
+  const refresh = async () => {
+    console.log("refresh")
+    setRefreshing(true)
+    await fetchTicketReservations()
+    setRefreshing(false)
+  }
 
   console.log(state)
   console.log(ticketTypes)
 
-  const changePaymentStatus = (timestamp, name) => {
-    let key = timestamp + '#' + name
+  const changePaymentStatus = (item) => {
+    let key = item.timestamp + '#' + item.name
     const newPayments = { ...payments }
     if (newPayments[key] == null) {
       newPayments[key] = true;
     } else {
       delete newPayments[key];
     }
+
+    console.log()
     setPaymentStatus(newPayments);
   }
 
-  const updatePayments = () => {
-      for (var key in payments) {
+  const updatePayments = async () => {
+    console.log("ola")
+    for (var key in payments) {
       let strings = key.split('#');
       const reqBody = {
         sheetId: event.sheetId,
@@ -124,9 +137,31 @@ export default function ReservationTable({ event }) {
       }
       const res = UpdatePaymentStatus(reqBody);
     }
+    console.log("here")
+    setTimeout(async () => {
+      await fetchTicketReservations()
+      await fetchTicketInfo()
+      console.log("fetched")
+      setPaymentStatus({})
+    }, 4000);
 
-    setPaymentStatus({})
 
+
+  }
+
+  const renderPaidButton = (item) => {
+    return (
+      <BootstrapSwitchButton
+        onlabel="Paid"
+        onstyle="success"
+        offstyle="outline-secondary"
+        size="sm"
+        checked={item.paymentStatus != null}
+        onChange={() => {
+          changePaymentStatus(item)
+        }}
+      />
+    )
   }
 
   function onDragEnd(result) {
@@ -177,66 +212,64 @@ export default function ReservationTable({ event }) {
       >
         Add new item
       </button> */}
-        <button
+        <Button
           type="button"
           onClick={() => {
             updatePayments()
           }}
         >
           Save Payments
-      </button>
+      </Button>
         <div style={{ display: "flex" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
               <Droppable key={ind} droppableId={`${ind}`}>
                 {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}
-                    {...provided.droppableProps}
-                  >
-                    {/* <div>{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div> */}
-                    <div>{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
+                  <div>
+                    <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
+                    <div
+                      ref={provided.innerRef}
+                      style={getListStyle(snapshot.isDraggingOver)}
+                      {...provided.droppableProps}
+                    >
+                      {/* <div>{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div> */}
 
 
-                    {state[ind].map((item, index) => (
-                      <Draggable
-                        key={`item-${item.timestamp}-${item.name}`}
-                        draggableId={`item-${item.timestamp}-${item.name}`}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={getItemStyle(
-                              snapshot.isDragging,
-                              provided.draggableProps.style
-                            )}
-                          >
+
+                      {state[ind].map((item, index) => (
+                        <Draggable
+                          key={`item-${item.timestamp}-${item.name}`}
+                          draggableId={`item-${item.timestamp}-${item.name}`}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
                             <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-around"
-                              }}
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )}
                             >
-                              {item.name}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  changePaymentStatus(item.timestamp, item.name)
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-around"
                                 }}
                               >
-                                paid
-                            </button>
+                                {item.name}
+                                {renderPaidButton(item)}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
                   </div>
+
+
                 )}
               </Droppable>
             ))}
