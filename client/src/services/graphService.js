@@ -13,12 +13,6 @@ function getAuthenticatedClient(accessToken) {
   return client;
 }
 
-export async function getUserDetails(accessToken) {
-  const client = getAuthenticatedClient(accessToken);
-  const user = await client.api('/me').get();
-  return user;
-}
-
 export async function sendNewEmail(accessToken, message) {
   const client = getAuthenticatedClient(accessToken);
   const mail = {
