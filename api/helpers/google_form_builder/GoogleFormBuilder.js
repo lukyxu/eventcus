@@ -37,7 +37,7 @@ class GoogleFormBuilder {
       content += closeFormStr()
     }
     if(this.linked) {
-      content += `var sheet = SpreadsheetApp.create("Responses", 50, 20);form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());sheet.addEditor("${this.serviceAccount}");Logger.log('Published URL: ' + form.getPublishedUrl());Logger.log('Editor URL: ' + form.getEditUrl());var res = {'formResLink' : form.getPublishedUrl(), 'formEditLink' : form.getEditUrl(), 'sheetId' : sheet.getId(), 'formId' :form.getId(), 'sheetLink' : sheet.getUrl() };return res;`
+      content += `var sheet = SpreadsheetApp.create("Responses", 50, 20);form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId());sheet.addEditor("${this.serviceAccount}");Logger.log('Published URL: ' + form.getPublishedUrl());Logger.log('Editor URL: ' + form.getEditUrl());var res = {'formResUrl' : form.getPublishedUrl(), 'formEditUrl' : form.getEditUrl(), 'sheetId' : sheet.getId(), 'formId' :form.getId(), 'sheetUrl' : sheet.getUrl() };return res;`
     }
     return content.replace(/;/g, ';\n')
   }

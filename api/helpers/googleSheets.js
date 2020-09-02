@@ -181,11 +181,12 @@ class GoogleSheetsReader {
     responseRows.forEach((row) => {
 
       let key = row["Ticket Type"] + '#' + row["Reservation Status"]
-
+      let reservationStatus = row["Reservation Status"] || "Pending"
+      console.log(reservationStatus)
       if (map[key] == null) {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [ row["Email Address"] ] }
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : [ row["Email Address"] ] }
       } else {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat( [row["Email Address"]])}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : map[key].reservations.concat( [row["Email Address"]])}
       }
     })
 
@@ -201,13 +202,12 @@ class GoogleSheetsReader {
     const map = {};
 
     responseRows.forEach((row) => {
-
       let key = row["Ticket Type"] + '#' + row["Reservation Status"]
-
+      let reservationStatus = row["Reservation Status"] || "Pending"
       if (map[key] == null) {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }]}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }]}
       } else {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus : row["Reservation Status"], reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }])}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }])}
       }
     })
 

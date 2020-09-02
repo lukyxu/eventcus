@@ -207,7 +207,7 @@ export default function Send({ event, setUser }) {
   if (!emailLoaded) {
     return (
     <div>
-      <Header title='Create Event' setUser={setUser} />
+      <Header title={`${event.name} Email`} setUser={setUser} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <ReactLoading type={"spinningBubbles"} color={"#5e99f1"} />
       </div>
@@ -217,7 +217,7 @@ export default function Send({ event, setUser }) {
   if (ticketTypes.length === 0) {
     return (
       <div>
-        <Header title='Create Event' setUser={setUser} />
+        <Header title={`${event.name} Email`} setUser={setUser} />
         <div className="emailFormMain">
           <h1>No ticket holder information</h1>
         </div>
@@ -241,7 +241,7 @@ export default function Send({ event, setUser }) {
 
   return (
     <div>
-      <Header title='Create Event' setUser = {setUser}/>
+      <Header title={`${event.name} Email`} setUser = {setUser}/>
       <Container fluid>
         <div className="emailFormMain">
           <Row>
@@ -249,6 +249,7 @@ export default function Send({ event, setUser }) {
               <Select options={groupedOptions} style={{width: "100%"}} onChange={(v) => setTicketIndex(v.value)}/>
             </div>
           </Row>
+          <br></br>
           <EmailForm
           event={event}
           ticket={ticketTypes[ticketIndex]}

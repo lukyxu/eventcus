@@ -102,6 +102,12 @@ export default function Event({ event, setUser }) {
           <br></br>
           <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
           <br></br>
+          <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
+          <br></br>
+          <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
+          <br></br>
+          <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Google Form Edit </Button>
+          <br></br>
         </Container>
       </div>
     </div>

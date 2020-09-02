@@ -68,7 +68,18 @@ function App() {
             object.splice(index, 1)
           }
         })
-        r.push({_id: event._id, eventDate : event.eventDate, dropTime:event.dropTime, name : event.name, total : total, tickets : tickets, sheetId: event.sheetId, dashboardDrop: false})
+        r.push({_id: event._id, 
+          eventDate : event.eventDate, 
+          dropTime:event.dropTime, 
+          name : event.name, 
+          total : total, 
+          tickets : tickets, 
+          sheetId: event.sheetId, 
+          dashboardDrop: false, 
+          sheetUrl: event.sheetUrl, 
+          formEditUrl: event.formEditUrl, 
+          formResUrl: event.formResUrl
+        })
       }))
     } catch(err) {
       toast.error(`Unable to fetch events: ${err}`)
@@ -78,6 +89,7 @@ function App() {
     // console.log(typeof r)
     r.sort((e1,e2) => new Date(e2.eventDate).getTime() - new Date(e1.eventDate).getTime())
     setEvents(r)
+    console.log(r)
     setLoaded(true)
   }
 
