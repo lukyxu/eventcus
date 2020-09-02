@@ -5,31 +5,9 @@ import { config } from "../services/config";
 import { UserAgentApplication } from 'msal';
 import { ErrorMessage } from "@hookform/error-message";
 import { sendNewEmail } from '../services/graphService';
-import { toast } from 'react-toastify';
-
-async function getEmails(reqBody) {
-  try {
-    let res = await fetch('/getEmailsAndTicketTypes', {
-      method: "post",
-      body: JSON.stringify(reqBody),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: "include"
-    })
-    if (res.status === 401) {
-      console.log(`ERROR ${res.status}`);
-      return ({
-        error: "User not authenticated"
-      });
-    }
-    return await res.json();
-  } catch (error) {
-    return ({
-      error
-    });
-  }
-}
+import { toast, ToastContainer, Slide } from 'react-toastify';
+import getEmails from '../services/emailingList';
+import ReactLoading from 'react-loading';
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -47,21 +25,8 @@ export default function EmailForm({ event }) {
   const [loadingSend, setLoadingSend] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [ticketTypes, setTicketTypes] = useState([]);
+  const [emailLoaded, setEmailLoaded] = useState(false);
   const {name, eventDate, sheetId} = event
-
-  // const info = [{
-  //   ticketType: "normal (£5)",
-  //   reservationStatus: "reserved",
-  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  // }, {
-  //   ticketType: "vip (£10)",
-  //   reservationStatus: "reserved",
-  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  // }, {
-  //   ticketType: "normal (£5)",
-  //   reservationStatus: "waitlist",
-  //   emails: ["app-test1@outlook.com", "ben@gmail.com"]
-  // }];
 
   useEffect(() => {
     const fetchEmails = async () => {
@@ -73,6 +38,7 @@ export default function EmailForm({ event }) {
         toast.error(`Error with getting emails: ${tickets.error}`);
       } else {
         setTicketTypes(tickets);
+        setEmailLoaded(true);
       }
     };
     fetchEmails();
@@ -142,10 +108,6 @@ export default function EmailForm({ event }) {
     }
   }
 
-  function logout() {
-    userAgentApplication.logout();
-  }
-
   function isInteractionRequired(error) {
     if (!error.message || error.message.length <= 0) {
       return false;
@@ -211,6 +173,25 @@ export default function EmailForm({ event }) {
     } else {
       return <Button className="blueButton" type="submit">Send</Button>
     }
+  }
+
+  if (!emailLoaded) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <ToastContainer
+        limit={3}
+        position="top-center"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        transition={Slide}
+      />
+      <ReactLoading type={"spinningBubbles"} color={"#5e99f1"} />
+    </div>
   }
 
   if (ticketTypes.length > 1) {
