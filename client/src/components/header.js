@@ -14,7 +14,7 @@ export default function Header({ title, setUser }) {
               : <Nav.Link as={Link} to="/">Dashboard</Nav.Link> }
       </Nav>
       <Nav className="justify-content-end">
-          <Button onClick={() => { logout((res) => { 
+          <Button variant="outline-light" onClick={() => { logout((res) => { 
             if (res.error) {
               toast.error(`Error with logout: ${res.error}`)
             }
