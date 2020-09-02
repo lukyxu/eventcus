@@ -106,6 +106,7 @@ export default function Send({ event, setUser }) {
     try {
       if (!isAuthenticated) {
         await login();
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
       var accessToken = await getAccessToken(config.scopes);
       const email = {
@@ -135,6 +136,7 @@ export default function Send({ event, setUser }) {
     try {
       if (!isAuthenticated) {
         await login();
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
       await Promise.all(ticketTypes.map(async (ticket) => {
       const email = {
