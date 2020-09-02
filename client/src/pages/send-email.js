@@ -240,21 +240,23 @@ export default function Send({ event, setUser }) {
   }
 
   return (
-    <Container fluid>
+    <div>
       <Header title='Create Event' setUser = {setUser}/>
-      <div className="emailFormMain">
-        <Row>
-          <div className="formSection" style={{width: "100%"}}>
-            <Select options={groupedOptions} style={{width: "100%"}} onChange={(v) => setTicketIndex(v.value)}/>
-          </div>
-        </Row>
-        <EmailForm
-        event={event}
-        ticket={ticketTypes[ticketIndex]}
-        updateTickets={updateTickets}
-        sendEmail={sendOne}
-        sendAll={sendAll}/>
-      </div>
-    </Container>
+      <Container fluid>
+        <div className="emailFormMain">
+          <Row>
+            <div className="formSection" style={{width: "100%"}}>
+              <Select options={groupedOptions} style={{width: "100%"}} onChange={(v) => setTicketIndex(v.value)}/>
+            </div>
+          </Row>
+          <EmailForm
+          event={event}
+          ticket={ticketTypes[ticketIndex]}
+          updateTickets={updateTickets}
+          sendEmail={sendOne}
+          sendAll={sendAll}/>
+        </div>
+      </Container>
+    </div>
   );
 }
