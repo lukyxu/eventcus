@@ -201,8 +201,10 @@ router.post('/changePaymentStatus', function (req, res, next) {
 router.post('/changeReservationStatus', function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
+  console.log(req.body.ticketType)
+  console.log(req.body.reservationStatus)
   let reader = new GoogleSheetsReader(sheetId);
-  reader.init(() => reader.changePaymentStatus(req.body.timestamp, req.body.fullName));
+  reader.init(() => reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus));
 });
 
 module.exports = router;
