@@ -17,6 +17,7 @@
     "googleapis": "^59.0.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "jsesc": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.27",
     "morgan": "~1.9.1",
