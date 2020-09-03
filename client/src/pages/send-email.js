@@ -151,31 +151,34 @@ export default function Send({ event, setUser }) {
         await login();
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
-      var accessToken = await getAccessToken(config.scopes);
-      await Promise.all(ticketTypes.map(async (ticket) => {
-        if (ticket.reservationStatus !== "reserved" && ticket.reservationStatus !== "waitlist") {
-          return
-        }
-        console.log("OK33")
-        const email = {
-        "subject": ticket.subject,
-        "body": {
-          "contentType": "Text",
-          "content": ticket.message
-        },
-        "bccRecipients": ticket.reservations.map(email => {
-          return ({
-            "emailAddress": {
-              "address": email
-              }
+      for (let i = 0; i < ticketTypes.length; i++) {
+        await (async (ticket) => {
+          if (ticket.reservationStatus !== "reserved" && ticket.reservationStatus !== "waitlist") {
+            return
+          }
+          var accessToken = await getAccessToken(config.scopes);
+          console.log("OK33")
+          const email = {
+          "subject": ticket.subject,
+          "body": {
+            "contentType": "Text",
+            "content": ticket.message
+          },
+          "bccRecipients": ticket.reservations.map(email => {
+            return ({
+              "emailAddress": {
+                "address": email
+                }
+              })
             })
-          })
-        }
-        console.log(accessToken)
-        console.log(email);
-        let res = await sendNewEmail(accessToken, email);
-        console.log(res);
-        }));
+          }
+          console.log(accessToken)
+          console.log(email);
+          let res = await sendNewEmail(accessToken, email);
+          console.log(res);
+          await new Promise(resolve => setTimeout(resolve, 200));
+          }) (ticketTypes[i])
+      }
       toast.success(`Emails sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)
