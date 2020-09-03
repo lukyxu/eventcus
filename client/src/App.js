@@ -12,6 +12,11 @@ import Send from './pages/send-email';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles.css';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+dayjs.extend(localizedFormat);
+dayjs.extend(relativeTime)
 
 function App() {
 
@@ -71,7 +76,9 @@ function App() {
         r.push({_id: event._id, 
           eventDate : event.eventDate, 
           dropTime:event.dropTime, 
-          name : event.name, 
+          name : event.name,
+          description: event.description,
+          paymentInfo: event.paymentInfo,
           total : total, 
           tickets : tickets, 
           sheetId: event.sheetId, 

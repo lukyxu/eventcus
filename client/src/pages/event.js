@@ -10,6 +10,7 @@ import ChangePaymentStatus from './../services/changePaymentStatus.js';
 import TicketAllocations from './../services/ticketAllocations.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
+import dayjs from 'dayjs'
 
 export default function Event({ event, setUser }) {
   const [searchValue, setSearchValue] = useState('');
@@ -82,10 +83,12 @@ export default function Event({ event, setUser }) {
             </Row>
           })}
           <hr></hr>
-          <h3>Event Info</h3>
-          Information regarding the event<br/>
-          Date<br/>
-          Payment Info
+          <b>Event Details</b> <br/>
+          {event.description} <br/><br/>
+          <b>Event Date</b><br/>
+          {dayjs(event.eventDate).format('LLLL')} <br/><br/>
+          <b>Payment Info</b><br/>
+          {event.paymentInfo}<br/>
           <hr></hr>
           <Row>
             <Col style={{marginBottom: "10px"}} xs={12} sm={4}>
@@ -95,7 +98,7 @@ export default function Event({ event, setUser }) {
               <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
             </Col>
             <Col style={{marginBottom: "10px"}} xs={12} sm={4}>
-              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Google Form Edit </Button>
+              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
             </Col>
             <Col style={{marginBottom: "10px"}} xs={12} sm={6}>
               <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>

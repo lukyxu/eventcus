@@ -193,8 +193,12 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       setState(newState);
     }
   }
+
   if (!loading) {
     console.log(payments)
+    if (ticketTypes.length === 0) {
+      return <div> No Sign Ups</div>
+    }
     return (
       <div>
         {/* <button
@@ -279,6 +283,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       </div>
     );
   }
+
   return (
     <div>
       Loading
