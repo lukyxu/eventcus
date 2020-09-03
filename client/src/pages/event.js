@@ -62,7 +62,6 @@ export default function Event({ event, setUser }) {
       <Header title={event.name} setUser={setUser} />
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
-
           {ticketInfo.map(ticket => {
             return <Row key={ticket.type}>
               <Col xs={3} sm={3}>
@@ -82,6 +81,29 @@ export default function Event({ event, setUser }) {
               </Col>
             </Row>
           })}
+          <hr></hr>
+          <h3>Event Info</h3>
+          Information regarding the event<br/>
+          Date<br/>
+          Payment Info
+          <hr></hr>
+          <Row>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={4}>
+              <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
+            </Col>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={4}>
+              <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
+            </Col>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={4}>
+              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Google Form Edit </Button>
+            </Col>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={6}>
+              <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
+            </Col>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={6}>
+              <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
+            </Col>
+          </Row>
 
           <br></br>
           <Row style={{ paddingTop: "10px" }}>
@@ -97,17 +119,6 @@ export default function Event({ event, setUser }) {
               <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} />
             </Col>
           </Row>
-          <br></br>
-          <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
-          <br></br>
-          <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
-          <br></br>
-          <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
-          <br></br>
-          <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
-          <br></br>
-          <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Google Form Edit </Button>
-          <br></br>
         </Container>
       </div>
     </div>
