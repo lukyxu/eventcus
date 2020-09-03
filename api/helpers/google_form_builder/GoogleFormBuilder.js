@@ -26,10 +26,10 @@ class GoogleFormBuilder {
   toString() {
     let content = `var form = FormApp.create('${this.formName}');`;
     if (this.title.length){
-      content += `form.setTitle(${jsesc(this.title)});`
+      content += `form.setTitle('${jsesc(this.title)}');`
     }
     if (this.description.length){
-      content += `form.setDescription(${jsesc(this.description)});`
+      content += `form.setDescription('${jsesc(this.description)}');`
     }
     for (let i = 0; i < this.items.length; i++) {
       content += this.items[i].toString()

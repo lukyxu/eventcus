@@ -8,9 +8,9 @@ import TicketReservationInfo from './../services/ticketReservationInfo.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
 import dayjs from 'dayjs'
+import nl2br from 'react-nl2br';
 
 export default function Event({ event, setUser }) {
-
   const history = useHistory();
 
   let tickets = [...event.tickets]
@@ -19,7 +19,6 @@ export default function Event({ event, setUser }) {
   const [ticketInfo, setTicketInfo] = useState(tickets)
 
   console.log(event)
-
 
   const pressAllocate = () => {
     const reqBody = {
@@ -83,11 +82,12 @@ export default function Event({ event, setUser }) {
           <Row>
             <Col>
               <b>Event Details</b> <br />
-              {event.description} <br /><br />
+              <div>{nl2br(event.description)}</div>
+              <br /><br />
               <b>Event Date</b><br />
               {dayjs(event.eventDate).format('LLLL')} <br /><br />
               <b>Payment Info</b><br />
-              {event.paymentInfo}<br />
+              {nl2br(event.paymentInfo)}<br />
             </Col>
 
             <Col style={{ marginBottom: "10px" }} xs={12} sm={4}>

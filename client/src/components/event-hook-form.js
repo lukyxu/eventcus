@@ -37,7 +37,7 @@ export default function EventHookForm({fetchEvents}) {
   }
 
   const onSubmit = async (data) => {
-    setLoadingSubmission(true)
+    // setLoadingSubmission(true)
     var temp = {
       fullName: false,
       shortcode: false,
@@ -60,7 +60,7 @@ export default function EventHookForm({fetchEvents}) {
       toast.error(`Event creation unsuccessful: ${err}`)
     }
     await fetchEvents()
-    history.push('/')
+    // history.push('/')
     toast.success("Event created")
   }; // your form submit function which will invoke after successful validation
 
