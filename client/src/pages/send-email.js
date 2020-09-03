@@ -152,7 +152,10 @@ export default function Send({ event, setUser }) {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
       await Promise.all(ticketTypes.map(async (ticket) => {
-      const email = {
+        if (ticket.reservationStatus !== "reserved" || ticket.reservationStatus !== "waitlist") {
+          return
+        }
+        const email = {
         "subject": ticket.subject,
         "body": {
           "contentType": "Text",
@@ -162,20 +165,20 @@ export default function Send({ event, setUser }) {
           return ({
             "emailAddress": {
               "address": email
-            }
+              }
+            })
           })
-        })
-      };
+        };
       console.log(email);
       // let res = await sendNewEmail(accessToken, email);
       // console.log(res);
-      toast.success(`Emails sent`)
       }));
+      toast.success(`Emails sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)
     }
   }
-
+  
   useEffect(() => {
     const fetchEmails = async () => {
       const reqBody = {
@@ -246,7 +249,7 @@ export default function Send({ event, setUser }) {
         <div className="emailFormMain">
           <Row>
             <div className="formSection" style={{width: "100%"}}>
-              <Select options={groupedOptions} style={{width: "100%"}} onChange={(v) => setTicketIndex(v.value)}/>
+              <Select defaultValue={ticketOptions[0]} options={groupedOptions} style={{width: "100%"}} onChange={(v) => setTicketIndex(v.value)}/>
             </div>
           </Row>
           <br></br>

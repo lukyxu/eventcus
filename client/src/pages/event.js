@@ -69,7 +69,7 @@ export default function Event({ event, setUser }) {
                 <span>{ticket.type}</span>
               </Col>
               <Col xs={5} sm={6} style={{ paddingRight: "0px" }}>
-                <div className="colourBarPadding"><ColourBar data={[
+                <div className="colourBarPadding" style={{marginTop: "0px", marginBottom: "10px"}}><ColourBar data={[
                   { name: "Paid", colour: "#4ae575", value: ticket.paid },
                   { name: "Reserved", colour: "#ffb800", value: ticket.reserved },
                   { name: "Unreserved", colour: "#de5959", value: ticket.unreserved },

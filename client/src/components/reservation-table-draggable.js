@@ -76,6 +76,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
   const [state, setState] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [payments, setPaymentStatus] = useState({});
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchTicketReservations = async () => {
@@ -95,7 +96,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     setState(reservations);
 
     setTicketTypes(tickets);
-    console.log("useeffect")
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -192,7 +193,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       setState(newState);
     }
   }
-  if (ticketTypes.length > 0) {
+  if (!loading) {
     console.log(payments)
     return (
       <div>
