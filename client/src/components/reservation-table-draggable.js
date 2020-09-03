@@ -3,8 +3,9 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import TicketAllocations from './../services/ticketAllocations.js';
 import UpdatePaymentStatus from "../services/changePaymentStatus.js";
 import UpdateReservationStatus from "../services/changeReservationStatus.js";
-import { Button } from "react-bootstrap";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
+import { Button, Container, Row, Col } from 'react-bootstrap'
+import SearchBar from 'material-ui-search-bar';
 
 async function getTicketReservations(reqBody) {
   // try {
@@ -64,6 +65,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [reservations, setReservations] = useState({});
+  const [searchValue, setSearchValue] = useState('');
 
   const fetchTicketReservations = async () => {
     const reqBody = {
@@ -76,9 +78,9 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     //   alert(JSON.stringify(tickets.error));
     // }
     const reservations = []
-    tickets.sort(function(a, b){
-      if (a.ticketType === b.ticketType) {return (a.reservationStatus < b.reservationStatus) ? -1 : 1}
-      if (a.ticketType < b.ticketType) {return -1}
+    tickets.sort(function (a, b) {
+      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
+      if (a.ticketType < b.ticketType) { return -1 }
       return 1;
     })
 
@@ -148,7 +150,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
 
     delete newReservations[key]
 
-    if (item.src != dst) {
+    if (item.src !== dst) {
       item.dst = dst;
       newReservations[key] = item;
     }
@@ -171,11 +173,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       }
       const res = UpdateReservationStatus(reqBody);
     }
-    // setTimeout(async () => {
-    //   await fetchTicketReservations()
-    //   await fetchTicketInfo()
-    //   setPayments({})
-    // }, 4000);
+
   }
 
   const updatePayments = async () => {
@@ -188,11 +186,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       }
       const res = UpdatePaymentStatus(reqBody);
     }
-    // setTimeout(async () => {
-    //   await fetchTicketReservations()
-    //   await fetchTicketInfo()
-    //   setPayments({})
-    // }, 4000);
+
   }
 
   const renderPaidButton = (item) => {
@@ -221,13 +215,6 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     await fetchTicketInfo()
     setPayments({})
     setReservations({})
-
-    // setTimeout(async () => {
-    //   await fetchTicketReservations()
-    //   await fetchTicketInfo()
-    //   setPayments({})
-    //   setReservations({})
-    // }, 4000);
 
   }
 
@@ -287,14 +274,25 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       >
         Add new item
       </button> */}
-        <Button
-          type="button"
-          onClick={() => {
-            save()
-          }}
-        >
-          Save
-      </Button>
+        <Row style={{ paddingTop: "10px" }}>
+          <Col xs={12} sm={5}><SearchBar
+            value={searchValue}
+            onChange={(newValue) => setSearchValue(newValue)}
+            onRequestSearch={() => null} />
+          </Col>
+          <Col>
+            <Button
+              type="button"
+              onClick={() => {
+                save()
+              }}
+            >
+              Save
+            </Button>
+          </Col>
+
+
+        </Row>
         <div style={{ display: "flex" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
