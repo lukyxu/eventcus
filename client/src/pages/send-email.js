@@ -10,8 +10,6 @@ import { UserAgentApplication } from 'msal';
 import Select from 'react-select'
 import { Container, Row } from "react-bootstrap";
 import { sendNewEmail } from '../services/graphService';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-dayjs.extend(localizedFormat);
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -119,7 +117,7 @@ export default function Send({ event, setUser }) {
     try {
       if (!isAuthenticated) {
         await login();
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       var accessToken = await getAccessToken(config.scopes);
       const email = {
@@ -137,8 +135,8 @@ export default function Send({ event, setUser }) {
         })
       }
       console.log(email);
-      // let res = await sendNewEmail(accessToken, email);
-      // console.log(res);
+      let res = await sendNewEmail(accessToken, email);
+      console.log(res);
       toast.success(`Email sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)
@@ -149,30 +147,36 @@ export default function Send({ event, setUser }) {
     try {
       if (!isAuthenticated) {
         await login();
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
-      await Promise.all(ticketTypes.map(async (ticket) => {
-        if (ticket.reservationStatus !== "reserved" || ticket.reservationStatus !== "waitlist") {
-          return
-        }
-        const email = {
-        "subject": ticket.subject,
-        "body": {
-          "contentType": "Text",
-          "content": ticket.message
-        },
-        "bccRecipients": ticket.reservations.map(email => {
-          return ({
-            "emailAddress": {
-              "address": email
-              }
+      for (let i = 0; i < ticketTypes.length; i++) {
+        await (async (ticket) => {
+          if (ticket.reservationStatus !== "reserved" && ticket.reservationStatus !== "waitlist") {
+            return
+          }
+          var accessToken = await getAccessToken(config.scopes);
+          console.log("OK33")
+          const email = {
+          "subject": ticket.subject,
+          "body": {
+            "contentType": "Text",
+            "content": ticket.message
+          },
+          "bccRecipients": ticket.reservations.map(email => {
+            return ({
+              "emailAddress": {
+                "address": email
+                }
+              })
             })
-          })
-        };
-      console.log(email);
-      // let res = await sendNewEmail(accessToken, email);
-      // console.log(res);
-      }));
+          }
+          console.log(accessToken)
+          console.log(email);
+          let res = await sendNewEmail(accessToken, email);
+          console.log(res);
+          await new Promise(resolve => setTimeout(resolve, 200));
+          }) (ticketTypes[i])
+      }
       toast.success(`Emails sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)
@@ -192,7 +196,7 @@ export default function Send({ event, setUser }) {
           ticket.name = getCapitalizedType(ticket.ticketType) + ' ' + getCapitalized(ticket.reservationStatus);
           ticket.subject = `${getCapitalizedType(ticket.ticketType)} Ticket ${getCapitalized(ticket.reservationStatus)} for ${name}`;
           ticket.message = ticket.reservationStatus === 'reserved' ?
-            `Hi,\nYou have secured a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.\nPayment Details:\nXXXXX`
+            `Hi,\nYou have secured a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.\n\nPayment Details:\n${event.paymentInfo}`
             : `Hi,\nYou have been waitlisted for a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.`;
         });
         console.log(tickets);

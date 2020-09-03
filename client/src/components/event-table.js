@@ -1,11 +1,9 @@
 import React, {useState} from 'react';
 import { Col, Row } from 'react-bootstrap';
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
 import Interval from "react-interval-rerender"
-dayjs.extend(relativeTime)
 
 const dateFormat = 'DD/MM/YYYY'
 export default function EventTable({title, events, refreshButton, fetchEvents, renderEvents}) {

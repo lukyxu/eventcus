@@ -123,7 +123,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
     console.log("hello")
     console.log(sheetUrl)
-    const newEvent = new Event({ name: body.eventName, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate })
+    const newEvent = new Event({ name: body.eventName, description: body.eventDetails, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate, paymentInfo: body.paymentInfo })
     newEvent.save(err => {
       console.error(err)
     })
