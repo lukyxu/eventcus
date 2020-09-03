@@ -60,13 +60,13 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   margin: `0 0 ${grid}px 0`,
 
   // change background colour if dragging
-  background: isDragging ? "lightgreen" : "white",
+  background: isDragging ? "#5E99F1" : "white",
 
   // styles we need to apply on draggables
   ...draggableStyle
 });
 const getListStyle = isDraggingOver => ({
-  background: isDraggingOver ? "lightblue" : "lightgrey",
+  background: isDraggingOver ? "#D4F9F9" : "#E8E8E8",
   padding: grid,
   width: 250
 });
@@ -226,7 +226,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
             {ticketTypes.map((el, ind) => (
               <Droppable key={ind} droppableId={`${ind}`}>
                 {(provided, snapshot) => (
-                  <div>
+                  <div style={{ padding : '20px 25px 0 0'}}>
                     <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
                     <div
                       ref={provided.innerRef}
