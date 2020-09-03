@@ -119,7 +119,7 @@ export default function Send({ event, setUser }) {
     try {
       if (!isAuthenticated) {
         await login();
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       var accessToken = await getAccessToken(config.scopes);
       const email = {
@@ -137,8 +137,8 @@ export default function Send({ event, setUser }) {
         })
       }
       console.log(email);
-      // let res = await sendNewEmail(accessToken, email);
-      // console.log(res);
+      let res = await sendNewEmail(accessToken, email);
+      console.log(res);
       toast.success(`Email sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)
@@ -149,12 +149,14 @@ export default function Send({ event, setUser }) {
     try {
       if (!isAuthenticated) {
         await login();
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
+      var accessToken = await getAccessToken(config.scopes);
       await Promise.all(ticketTypes.map(async (ticket) => {
-        if (ticket.reservationStatus !== "reserved" || ticket.reservationStatus !== "waitlist") {
+        if (ticket.reservationStatus !== "reserved" && ticket.reservationStatus !== "waitlist") {
           return
         }
+        console.log("OK33")
         const email = {
         "subject": ticket.subject,
         "body": {
@@ -168,11 +170,12 @@ export default function Send({ event, setUser }) {
               }
             })
           })
-        };
-      console.log(email);
-      // let res = await sendNewEmail(accessToken, email);
-      // console.log(res);
-      }));
+        }
+        console.log(accessToken)
+        console.log(email);
+        let res = await sendNewEmail(accessToken, email);
+        console.log(res);
+        }));
       toast.success(`Emails sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)

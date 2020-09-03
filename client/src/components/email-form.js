@@ -49,7 +49,9 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
       <Button className="blueButton"
         onClick={async () => {
           setLoadingSendAll(true);
+          console.log("22")
           await sendAll(ticket);
+          console.log("23")
           setLoadingSendAll(false);
         }}>
           Send All
