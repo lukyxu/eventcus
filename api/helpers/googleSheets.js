@@ -85,6 +85,11 @@ class GoogleSheetsReader {
       const cell = this.memberSheet.getCell(0, 0);
       cell.formula = '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1xnPmklouiafFZkaih4eI5qX3pHsHdViRN4w8SjsE8jo", "A:N")';
       await cell.save();
+
+      // Add Member/Non-Member/Fresher column if shortcode column exists
+      if (this.responseSheet.headerValues.indexOf("Imperial Shortcode") >= 0) {
+        await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Member Status"]));
+      }
     } catch (error) {
       console.log(error);
     }
@@ -152,14 +157,9 @@ class GoogleSheetsReader {
     });
 
     await this.responseSheet.loadHeaderRow();
-    const shortcodeIndex = this.responseSheet.headerValues.indexOf("Imperial Shortcode");
-    // Add Member/Non-Member/Fresher column if shortcode column exists
-    if (shortcodeIndex >= 0) {
-      if (this.responseSheet.headerValues.indexOf("Member Status") < 0) {
-        await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Member Status"]));
-      }
-      responseRows = await this.responseSheet.getRows();
-      const shortcodeColumnAddress = String.fromCharCode(64 + 1 + shortcodeIndex);
+    // Fill the Member Status column if it exists
+    if (this.responseSheet.headerValues.indexOf("Member Status") >= 0) {
+      const shortcodeColumnAddress = String.fromCharCode(64 + 1 + this.responseSheet.headerValues.indexOf("Imperial Shortcode"));
       responseRows.map(async (row, index) => {
         row["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${shortcodeColumnAddress}${index + 2}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
         try {
