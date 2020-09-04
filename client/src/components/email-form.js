@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Spinner, Row } from "react-bootstrap";
+import {toast} from 'react-toastify'
 export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll }) {
 
   const [loadingSend, setLoadingSend] = useState(false);
@@ -30,6 +31,22 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
       </Button>);
     }
   }
+
+  const renderGetEmailButton = () => {
+      return (
+      <Button className="blueButton"
+        onClick={async () => {
+          try{
+            await navigator.clipboard.writeText(ticket.reservations.join())
+            toast.success(`Emails copied to clipboard`)
+          } catch(err) {
+            toast.error(`Failed to copy emails to clipboard: ${err}`)
+          }
+          
+      }}>
+        Copy Emails To Clipboard
+      </Button>);
+    }
 
   const renderSendAllButton = () => {
     if (loadingSendAll) {
@@ -94,6 +111,10 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
         <hr></hr>
         <Row className="formSection">
           {renderSendAllButton()}
+        </Row>
+        <hr></hr>
+        <Row className="formSection">
+          {renderGetEmailButton()}
         </Row>
       </form>
     </div>
