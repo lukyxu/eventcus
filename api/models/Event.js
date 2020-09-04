@@ -5,6 +5,14 @@ const EventSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String,
+    required: true
+  },
+  paymentInfo: {
+    type:String,
+    required:true
+  },
   dropTime: Date,
   eventDate: {
     type: Date,

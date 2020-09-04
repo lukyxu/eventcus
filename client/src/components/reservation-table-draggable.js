@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import TicketAllocations from './../services/ticketAllocations.js';
 import UpdatePaymentStatus from "../services/changePaymentStatus.js";
-import { Button } from "react-bootstrap";
+import UpdateReservationStatus from "../services/changeReservationStatus.js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
+import { Button, Container, Row, Col } from 'react-bootstrap'
+import SearchBar from 'material-ui-search-bar';
 
 async function getTicketReservations(reqBody) {
   // try {
@@ -53,31 +55,17 @@ const move = (source, destination, droppableSource, droppableDestination) => {
 };
 const grid = 8;
 
-const getItemStyle = (isDragging, draggableStyle) => ({
-  // some basic styles to make the items look a bit nicer
-  userSelect: "none",
-  padding: grid * 2,
-  margin: `0 0 ${grid}px 0`,
 
-  // change background colour if dragging
-  background: isDragging ? "#5E99F1" : "white",
-
-  // styles we need to apply on draggables
-  ...draggableStyle
-});
-const getListStyle = isDraggingOver => ({
-  background: isDraggingOver ? "#D4F9F9" : "#E8E8E8",
-  padding: grid,
-  width: 250
-});
 
 
 export default function ReservationTable({ event, fetchTicketInfo }) {
   const [state, setState] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
-  const [payments, setPaymentStatus] = useState({});
-  const [loading, setLoading] = useState(true)
+  const [payments, setPayments] = useState({});
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [reservations, setReservations] = useState({});
+  const [searchValue, setSearchValue] = useState('');
 
   const fetchTicketReservations = async () => {
     const reqBody = {
@@ -90,8 +78,17 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     //   alert(JSON.stringify(tickets.error));
     // }
     const reservations = []
-    tickets.map((ticket) => {
-      reservations.push(ticket.reservations)
+    tickets.sort(function (a, b) {
+      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
+      if (a.ticketType < b.ticketType) { return -1 }
+      return 1;
+    })
+
+    tickets.map((ticket, index) => {
+      reservations.push(ticket.reservations.map(item => {
+        item["src"] = index;
+        return item
+      }))
     })
     setState(reservations);
 
@@ -103,6 +100,25 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     fetchTicketReservations();
 
   }, [event]);
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    // some basic styles to make the items look a bit nicer
+    userSelect: "none",
+    padding: grid * 2,
+    margin: `0 0 ${grid}px 0`,
+
+    // change background colour if dragging
+    background: isDragging ? "#5E99F1" : "white",
+
+    // styles we need to apply on draggables
+    ...draggableStyle
+  });
+
+  const getListStyle = isDraggingOver => ({
+    background: isDraggingOver ? "#D4F9F9" : "#E8E8E8",
+    padding: grid,
+    width: (ticketTypes.length >= 2) ? 1200 / ticketTypes.length : 500
+  });
 
   const refresh = async () => {
     console.log("refresh")
@@ -123,12 +139,44 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       delete newPayments[key];
     }
 
-    console.log()
-    setPaymentStatus(newPayments);
+    item.paymentStatus = (item.paymentStatus != null) ? undefined : "Paid"
+
+    setPayments(newPayments);
+  }
+
+  const changeReservationStatus = (item, dst) => {
+    let key = item.timestamp + '#' + item.name
+    const newReservations = { ...reservations }
+
+    delete newReservations[key]
+
+    if (item.src !== dst) {
+      item.dst = dst;
+      newReservations[key] = item;
+    }
+
+    setReservations(newReservations);
+  }
+
+  const updateReservations = async () => {
+    for (var key in reservations) {
+      let strings = key.split('#');
+      let ind = reservations[key].dst
+      let newTicket = ticketTypes[ind]
+
+      const reqBody = {
+        sheetId: event.sheetId,
+        timestamp: strings[0],
+        fullName: strings[1],
+        ticketType: newTicket.ticketType,
+        reservationStatus: newTicket.reservationStatus,
+      }
+      const res = UpdateReservationStatus(reqBody);
+    }
+
   }
 
   const updatePayments = async () => {
-    console.log("ola")
     for (var key in payments) {
       let strings = key.split('#');
       const reqBody = {
@@ -138,15 +186,6 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       }
       const res = UpdatePaymentStatus(reqBody);
     }
-    console.log("here")
-    setTimeout(async () => {
-      await fetchTicketReservations()
-      await fetchTicketInfo()
-      console.log("fetched")
-      setPaymentStatus({})
-    }, 4000);
-
-
 
   }
 
@@ -154,6 +193,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     return (
       <BootstrapSwitchButton
         onlabel="Paid"
+        offlabel=" "
         onstyle="success"
         offstyle="outline-secondary"
         size="sm"
@@ -163,6 +203,19 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         }}
       />
     )
+  }
+
+  const save = async () => {
+    await updatePayments();
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    await updateReservations();
+    await new Promise(resolve => setTimeout(resolve, 4000));
+
+    await fetchTicketReservations()
+    await fetchTicketInfo()
+    setPayments({})
+    setReservations({})
+
   }
 
   function onDragEnd(result) {
@@ -184,6 +237,11 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       console.log(newState)
       setState(newState);
     } else {
+
+      console.log(state[sInd][source.index])
+      console.log(dInd)
+      changeReservationStatus(state[sInd][source.index], dInd)
+
       const result = move(state[sInd], state[dInd], source, destination);
       const newState = [...state];
       newState[sInd] = result[sInd];
@@ -193,8 +251,11 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       setState(newState);
     }
   }
+
   if (!loading) {
-    console.log(payments)
+    if (ticketTypes.length === 0) {
+      return <div> No Sign Ups</div>
+    }
     return (
       <div>
         {/* <button
@@ -213,20 +274,31 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       >
         Add new item
       </button> */}
-        <Button
-          type="button"
-          onClick={() => {
-            updatePayments()
-          }}
-        >
-          Save Payments
-      </Button>
+        <Row style={{ paddingTop: "10px" }}>
+          <Col xs={12} sm={5}><SearchBar
+            value={searchValue}
+            onChange={(newValue) => setSearchValue(newValue)}
+            onRequestSearch={() => null} />
+          </Col>
+          <Col>
+            <Button
+              type="button"
+              onClick={() => {
+                save()
+              }}
+            >
+              Save
+            </Button>
+          </Col>
+
+
+        </Row>
         <div style={{ display: "flex" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
               <Droppable key={ind} droppableId={`${ind}`}>
                 {(provided, snapshot) => (
-                  <div style={{ padding : '20px 25px 0 0'}}>
+                  <div style={{ padding: '20px 25px 0 0' }}>
                     <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
                     <div
                       ref={provided.innerRef}
@@ -256,11 +328,16 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
                               <div
                                 style={{
                                   display: "flex",
-                                  justifyContent: "space-around"
                                 }}
                               >
-                                {item.name}
-                                {renderPaidButton(item)}
+                                <div style={{ alignSelf: "center", flex: 1 }}>
+                                  {item.name}
+                                </div>
+                                <div>
+                                  {renderPaidButton(item)}
+                                </div>
+
+
                               </div>
                             </div>
                           )}
@@ -279,6 +356,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       </div>
     );
   }
+
   return (
     <div>
       Loading

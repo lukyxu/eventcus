@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap'
 import Header from '../components/header.js'
 import Button from '@material-ui/core/Button';
-import SearchBar from 'material-ui-search-bar';
 import ReservationTable from '../components/reservation-table-draggable.js'
 import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
-import ChangePaymentStatus from './../services/changePaymentStatus.js';
-import TicketAllocations from './../services/ticketAllocations.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
+import dayjs from 'dayjs'
+import nl2br from 'react-nl2br';
 
 export default function Event({ event, setUser }) {
-  const [searchValue, setSearchValue] = useState('');
   const history = useHistory();
 
   let tickets = [...event.tickets]
@@ -21,7 +19,6 @@ export default function Event({ event, setUser }) {
   const [ticketInfo, setTicketInfo] = useState(tickets)
 
   console.log(event)
-
 
   const pressAllocate = () => {
     const reqBody = {
@@ -62,14 +59,13 @@ export default function Event({ event, setUser }) {
       <Header title={event.name} setUser={setUser} />
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
-
           {ticketInfo.map(ticket => {
             return <Row key={ticket.type}>
               <Col xs={3} sm={3}>
                 <span>{ticket.type}</span>
               </Col>
               <Col xs={5} sm={6} style={{ paddingRight: "0px" }}>
-                <div className="colourBarPadding" style={{marginTop: "0px", marginBottom: "10px"}}><ColourBar data={[
+                <div className="colourBarPadding" style={{ marginTop: "0px", marginBottom: "10px" }}><ColourBar data={[
                   { name: "Paid", colour: "#4ae575", value: ticket.paid },
                   { name: "Reserved", colour: "#ffb800", value: ticket.reserved },
                   { name: "Unreserved", colour: "#de5959", value: ticket.unreserved },
@@ -82,32 +78,46 @@ export default function Event({ event, setUser }) {
               </Col>
             </Row>
           })}
+          <hr></hr>
+          <Row>
+            <Col>
+              <b>Event Details</b> <br />
+              <div>{nl2br(event.description)}</div>
+              <br /><br />
+              <b>Event Date</b><br />
+              {dayjs(event.eventDate).format('LLLL')} <br /><br />
+              <b>Payment Info</b><br />
+              {nl2br(event.paymentInfo)}<br />
+            </Col>
+
+            <Col style={{ marginBottom: "10px" }} xs={12} sm={4}>
+              <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
+            <br></br>
+              {/* </Col>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={4}> */}
+              <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
+              {/* </Col>
+            <Col style={{marginBottom: "10px"}} xs={12} sm={4}> */}
+            <br></br>
+              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
+            </Col>
+          </Row>
+          <hr></hr>
+          <Row>
+            <Col style={{ marginBottom: "10px" }} xs={12} sm={6}>
+              <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
+            </Col>
+            <Col style={{ marginBottom: "10px" }} xs={12} sm={6}>
+              <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
+            </Col>
+          </Row>
 
           <br></br>
           <Row style={{ paddingTop: "10px" }}>
-            <Col xs={12} sm={5}><SearchBar
-              value={searchValue}
-              onChange={(newValue) => setSearchValue(newValue)}
-              onRequestSearch={() => null} />
-            </Col>
-          </Row>
-          <br></br>
-          <Row style={{ paddingTop: "10px"}}>
             <Col sm={12}>
               <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} />
             </Col>
           </Row>
-          <br></br>
-          <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
-          <br></br>
-          <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
-          <br></br>
-          <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
-          <br></br>
-          <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
-          <br></br>
-          <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Google Form Edit </Button>
-          <br></br>
         </Container>
       </div>
     </div>

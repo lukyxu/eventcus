@@ -10,8 +10,6 @@ import { UserAgentApplication } from 'msal';
 import Select from 'react-select'
 import { Container, Row } from "react-bootstrap";
 import { sendNewEmail } from '../services/graphService';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-dayjs.extend(localizedFormat);
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -198,7 +196,7 @@ export default function Send({ event, setUser }) {
           ticket.name = getCapitalizedType(ticket.ticketType) + ' ' + getCapitalized(ticket.reservationStatus);
           ticket.subject = `${getCapitalizedType(ticket.ticketType)} Ticket ${getCapitalized(ticket.reservationStatus)} for ${name}`;
           ticket.message = ticket.reservationStatus === 'reserved' ?
-            `Hi,\nYou have secured a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.\nPayment Details:\nXXXXX`
+            `Hi,\nYou have secured a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.\n\nPayment Details:\n${event.paymentInfo}`
             : `Hi,\nYou have been waitlisted for a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.`;
         });
         console.log(tickets);
