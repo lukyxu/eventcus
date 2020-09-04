@@ -197,7 +197,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         onstyle="success"
         offstyle="outline-secondary"
         size="sm"
-        checked={item.paymentStatus != null}
+        checked={item.paymentStatus === "paid"}
         onChange={() => {
           changePaymentStatus(item)
         }}
