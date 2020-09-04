@@ -142,9 +142,24 @@ class GoogleSheetsReader {
     var responseRows = await this.responseSheet.getRows();
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
 
-    await responseRows.map(async (row) => {
-      // console.log(row.Timestamp);
-      if (row["Reservation Status"] == null) {
+    
+
+    await this.responseSheet.loadHeaderRow();
+    // Fill the Member Status column if it exists
+    if (this.responseSheet.headerValues.indexOf("Member Status") >= 0) {
+      const shortcodeColumnAddress = String.fromCharCode(64 + 1 + this.responseSheet.headerValues.indexOf("Imperial Shortcode"));
+      responseRows.map(async (row, index) => {
+        row["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${shortcodeColumnAddress}${index + 2}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
+        // try {
+        //   await row.save();
+        // } catch (error) {
+        //   console.log(error);
+        // }
+      });
+    }
+
+    responseRows.map(async (row) => {
+      if (row["Reservation Status"] === "") {
         const bool = await this.isTicketAvaliable(row["Ticket Type"], ticketTypeRows);
         // console.log(bool)
         if (bool) {
@@ -155,20 +170,6 @@ class GoogleSheetsReader {
         await row.save();
       }
     });
-
-    await this.responseSheet.loadHeaderRow();
-    // Fill the Member Status column if it exists
-    if (this.responseSheet.headerValues.indexOf("Member Status") >= 0) {
-      const shortcodeColumnAddress = String.fromCharCode(64 + 1 + this.responseSheet.headerValues.indexOf("Imperial Shortcode"));
-      responseRows.map(async (row, index) => {
-        row["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${shortcodeColumnAddress}${index + 2}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
-        try {
-          await row.save();
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    }
 
     console.log('allocated');
   }
