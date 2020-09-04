@@ -7,8 +7,10 @@ import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
-import dayjs from 'dayjs'
+import dayjs from 'dayjs';
 import nl2br from 'react-nl2br';
+import { toast } from 'react-toastify';
+import LoadingButton from '../components/loading-button.js';
 
 export default function Event({ event, setUser }) {
   const history = useHistory();
@@ -20,12 +22,17 @@ export default function Event({ event, setUser }) {
 
   console.log(event)
 
-  const pressAllocate = () => {
+  const pressAllocate = async () => {
     const reqBody = {
       sheetId: event.sheetId,
     }
-    const res = AllocateTickets(reqBody);
-    console.log(res)
+    try {
+      const res = await AllocateTickets(reqBody);
+      console.log(res);
+      toast.success(`Tickets allocated`);
+    } catch (error) {
+      toast.error(`Error with allocating tickets: ${error}`);
+    }
   }
 
   const fetchTicketReservationInfo = async () => {
@@ -127,7 +134,7 @@ export default function Event({ event, setUser }) {
           <hr></hr>
           <Row>
             <Col style={{ marginBottom: "10px" }} xs={12} sm={6}>
-              <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
+              <LoadingButton title="Allocate" loadingTitle="Allocating" onClick={pressAllocate} />
             </Col>
             <Col style={{ marginBottom: "10px" }} xs={12} sm={6}>
               <Button className="blueButton" onClick={pressEmailingList}> Email </Button>

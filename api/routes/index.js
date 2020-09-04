@@ -150,7 +150,7 @@ router.post('/allocate', function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
   let reader = new GoogleSheetsReader(sheetId);
-  reader.init(() => reader.allocate());
+  reader.init(async () => { await reader.allocate(); res.json({ success: true }) });
 });
 
 router.post('/ticketReservationInfo', function (req, res, next) {

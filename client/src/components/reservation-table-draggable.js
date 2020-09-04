@@ -6,6 +6,8 @@ import UpdateReservationStatus from "../services/changeReservationStatus.js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import { Button, Container, Row, Col } from 'react-bootstrap'
 import SearchBar from 'material-ui-search-bar';
+import LoadingButton from "./loading-button.js";
+import { toast } from 'react-toastify';
 
 async function getTicketReservations(reqBody) {
   // try {
@@ -215,7 +217,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     await fetchTicketInfo()
     setPayments({})
     setReservations({})
-
+    toast.success("Payment and reservation saved");
   }
 
   function onDragEnd(result) {
@@ -281,14 +283,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
             onRequestSearch={() => null} />
           </Col>
           <Col>
-            <Button
-              type="button"
-              onClick={() => {
-                save()
-              }}
-            >
-              Save
-            </Button>
+            <LoadingButton style={{width: "120px"}} title="Save" loadingTitle="Saving" onClick={save} />
           </Col>
 
 
