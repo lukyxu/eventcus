@@ -1,37 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Spinner, Row } from "react-bootstrap";
 import {toast} from 'react-toastify'
+import LoadingButton from './loading-button';
+
 export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll }) {
-
-  const [loadingSend, setLoadingSend] = useState(false);
-  const [loadingSendAll, setLoadingSendAll] = useState(false);
-
-  const renderSendButton = () => {
-    if (loadingSend) {
-      return <Button className="blueButton" type="button" disabled>
-        <Spinner
-          as="span"
-          animation="border"
-          size="sm"
-          role="status"
-          aria-hidden="true"
-          style={{ marginRight: "5px", marginBottom: "2px" }}
-        />
-         Sending...
-      </Button>
-    } else {
-      return (
-      <Button className="blueButton"
-        onClick={async () => {
-          setLoadingSend(true);
-          await sendEmail(ticket);
-          setLoadingSend(false);
-      }}>
-        Send
-      </Button>);
-    }
-  }
-
   const renderGetEmailButton = () => {
       return (
       <Button className="blueButton"
@@ -47,34 +19,6 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
         Copy Emails To Clipboard
       </Button>);
     }
-
-  const renderSendAllButton = () => {
-    if (loadingSendAll) {
-      return <Button className="blueButton" type="button" disabled>
-        <Spinner
-          as="span"
-          animation="border"
-          size="sm"
-          role="status"
-          aria-hidden="true"
-          style={{ marginRight: "5px", marginBottom: "2px" }}
-        />
-         Sending All...
-      </Button>
-    } else {
-      return (
-      <Button className="blueButton"
-        onClick={async () => {
-          setLoadingSendAll(true);
-          console.log("22")
-          await sendAll(ticket);
-          console.log("23")
-          setLoadingSendAll(false);
-        }}>
-          Send All
-      </Button>);
-    }
-  }
 
   return (
     <div>
@@ -106,11 +50,11 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
         </Row>
         <hr></hr>
         <Row className="formSection">
-          {renderSendButton()}
+          <LoadingButton title="Send" loadingTitle="Sending" onClick={async () => {await sendEmail(ticket);}}/>
         </Row>
         <hr></hr>
         <Row className="formSection">
-          {renderSendAllButton()}
+          <LoadingButton title="Send All" loadingTitle="Sending All" onClick={async () => { await sendAll(); }} />
         </Row>
         <hr></hr>
         <Row className="formSection">

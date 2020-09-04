@@ -24,7 +24,6 @@ export default function Send({ event, setUser }) {
   const [emailLoaded, setEmailLoaded] = useState(false);
   const [ticketIndex, setTicketIndex] = useState(0);
   const { name, eventDate, sheetId } = event
-  console.log(ticketTypes)
 
   const ticketOptions = ticketTypes.map((t, i) => ({value: i, label: t.name, reservationStatus: t.reservationStatus}))
   const reservedOptions = ticketOptions.filter(t => t.reservationStatus === "reserved")
