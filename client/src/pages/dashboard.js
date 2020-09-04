@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
 import { useHistory } from "react-router-dom";
+import Calendar from 'react-calendar'
 
 export default function Dashboard({ setUser, events, fetchEvents, renderEvents}) {
   const history = useHistory();
@@ -24,10 +25,15 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
         <div className='centralDashboardContainer'>
           <Container fluid>
             <Row>
-              <Col xs sm={12}>
-                <Button onClick= {() => history.push("/create-event")} className='blueButton' style={{width: "100%"}}>
-                  CREATE A NEW EVENT
-                </Button>
+              <Col style={{marginBottom:"10px"}} xs={12} sm={8}>
+                <Calendar defaultValue={new Date()} defaultActiveStartDate={new Date()} tileClassName={({view, date}) => view === 'month' && (events.some(e => new Date(e.eventDate).getFullYear() === date.getFullYear() && new Date(e.eventDate).getMonth() === date.getMonth() && new Date(e.eventDate).getDate() === date.getDate())) ? "selectedDate":null}/>
+              </Col>
+              <Col style={{marginBottom:"10px"}} xs={12} sm={4}>
+                <div style={{height:"100%"}}>
+                  <Button style={{height:"100%", fontSize:"1.5em"}} onClick= {() => history.push("/create-event")} className='blueButton'>
+                    CREATE A NEW EVENT
+                  </Button>
+                </div>
               </Col>
             </Row>
             <Row style={{paddingTop:"10px"}}>
