@@ -55,12 +55,14 @@ export default function EventHookForm({fetchEvents}) {
       console.log(res)
       if (res.error) {
         toast.error(`Event creation unsuccessful: ${res.error}`)
+      } else {
+        toast.success("Event created")
       }
     } catch (err) {
       toast.error(`Event creation unsuccessful: ${err}`)
     }
     await fetchEvents()
-    // history.push('/')
+    history.push('/')
     toast.success("Event created")
   }; // your form submit function which will invoke after successful validation
 
