@@ -251,3 +251,10 @@ h2 {
 .ticketSelect {
   padding: 8px 16px;
 }
+
+.eventName {
+  font: inherit;
+  color: #2e2e2e;
+  font-weight: bold;
+  font-size: 72px;
+}

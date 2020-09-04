@@ -59,6 +59,27 @@ export default function Event({ event, setUser }) {
       <Header title={event.name} setUser={setUser} />
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
+
+          <Row>
+            <Col xs={3} sm={3} xl={9}>
+              <div className='eventName'>{event.name}</div>
+            </Col>
+            <Col xs={3} sm={3} xl={1}>
+              <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
+            </Col>
+            <Col xs={3} sm={3} xl={1}>
+              <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
+            </Col>
+            <Col xs={3} sm={3} xl={1}>
+              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              {dayjs(event.eventDate).format('LLLL')}
+            </Col>
+          </Row>
+          <br></br>
           {ticketInfo.map(ticket => {
             return <Row key={ticket.type}>
               <Col xs={3} sm={3}>
@@ -92,13 +113,13 @@ export default function Event({ event, setUser }) {
 
             <Col style={{ marginBottom: "10px" }} xs={12} sm={4}>
               <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
-            <br></br>
+              <br></br>
               {/* </Col>
             <Col style={{marginBottom: "10px"}} xs={12} sm={4}> */}
               <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
               {/* </Col>
             <Col style={{marginBottom: "10px"}} xs={12} sm={4}> */}
-            <br></br>
+              <br></br>
               <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
             </Col>
           </Row>
