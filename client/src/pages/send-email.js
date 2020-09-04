@@ -188,10 +188,11 @@ export default function Send({ event, setUser }) {
       const reqBody = {
         sheetId: sheetId
       };
-      const tickets = await getEmails(reqBody);
+      var tickets = await getEmails(reqBody);
       if (tickets.error) {
         toast.error(`Error with getting emails: ${tickets.error}`);
       } else {
+        tickets = tickets.filter(t => t.reservationStatus === 'reserved' || t.reservationStatus === 'waitlist')
         tickets.forEach(ticket => {
           ticket.name = getCapitalizedType(ticket.ticketType) + ' ' + getCapitalized(ticket.reservationStatus);
           ticket.subject = `${getCapitalizedType(ticket.ticketType)} Ticket ${getCapitalized(ticket.reservationStatus)} for ${name}`;
@@ -226,7 +227,7 @@ export default function Send({ event, setUser }) {
       <div>
         <Header title={`${event.name} Email`} setUser={setUser} />
         <div className="emailFormMain">
-          <h1>No ticket holder information</h1>
+          <h1>Tickets have not been allocated</h1>
         </div>
       </div>
     );

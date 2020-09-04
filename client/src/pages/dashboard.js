@@ -7,7 +7,6 @@ import SearchBar from 'material-ui-search-bar';
 import EventTable from '../components/event-table'
 import { useHistory } from "react-router-dom";
 import Calendar from 'react-calendar'
-import 'react-calendar/dist/Calendar.css';
 
 export default function Dashboard({ setUser, events, fetchEvents, renderEvents}) {
   const history = useHistory();
@@ -27,7 +26,7 @@ export default function Dashboard({ setUser, events, fetchEvents, renderEvents})
           <Container fluid>
             <Row>
               <Col style={{marginBottom:"10px"}} xs={12} sm={8}>
-                <Calendar tileClassName={({view, date}) => view === 'month' && (events.some(e => new Date(e.eventDate).getFullYear() === date.getFullYear() && new Date(e.eventDate).getMonth() === date.getMonth() && new Date(e.eventDate).getDate() === date.getDate())) ? "selectedDate":null}/>
+                <Calendar defaultValue={new Date()} defaultActiveStartDate={new Date()} tileClassName={({view, date}) => view === 'month' && (events.some(e => new Date(e.eventDate).getFullYear() === date.getFullYear() && new Date(e.eventDate).getMonth() === date.getMonth() && new Date(e.eventDate).getDate() === date.getDate())) ? "selectedDate":null}/>
               </Col>
               <Col style={{marginBottom:"10px"}} xs={12} sm={4}>
                 <div style={{height:"100%"}}>
