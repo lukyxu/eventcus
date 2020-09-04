@@ -252,6 +252,12 @@ h2 {
   padding: 8px 16px;
 }
 
+.eventName {
+  font: inherit;
+  color: #2e2e2e;
+  font-weight: bold;
+  font-size: 72px;
+}
 .react-calendar {
   width: 100%;
   max-width: 1000px;
