@@ -1,4 +1,5 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { response } = require('express');
 
 
 class GoogleSheetsReader {
@@ -21,6 +22,11 @@ class GoogleSheetsReader {
       await this.doc.loadInfo();
       this.responseSheet = this.doc.sheetsByIndex[0]; // or use doc.sheetsById[id]
       this.ticketTypeSheet = this.doc.sheetsByIndex[1];
+      if (this.doc.sheetCount < 3) {
+        this.memberSheet = await this.doc.addSheet({ title: "Members List" });
+      } else {
+        this.memberSheet = this.doc.sheetsByIndex[2];
+      }
       console.log("Initiating");
       console.log(this.responseSheet.title);
       // await this.sheet.getRows()
@@ -72,6 +78,22 @@ class GoogleSheetsReader {
     totalRow["allocated"] = `=SUM(D2:D${ticketTypes.length + 1})`
     totalRow["paid"] = `=SUM(E2:E${ticketTypes.length + 1})`
     await totalRow.save();
+
+    try {
+      // Create Members sheet
+      await this.memberSheet.loadCells('A1:A1');
+      const cell = this.memberSheet.getCell(0, 0);
+      cell.formula = '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1xnPmklouiafFZkaih4eI5qX3pHsHdViRN4w8SjsE8jo", "A:N")';
+      await cell.save();
+
+      // Add Member/Non-Member/Fresher column if shortcode column exists
+      if (this.responseSheet.headerValues.indexOf("Imperial Shortcode") >= 0) {
+        await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Member Status"]));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 
   async isTicketAvaliable(ticketType, ticketTypeRows) {
@@ -108,15 +130,16 @@ class GoogleSheetsReader {
     await person.save();
   }
 
-  async changeReservationStatus(timestamp, fullName) {
+  async changeReservationStatus(timestamp, fullName, ticketType, reservationStatus) {
+    console.log("HEREEE")
     const person = await this.findPerson(timestamp, fullName);
-
-    person.ReservationStatus = (person.ReservationStatus == "reserved" ? "waitlist" : "reserved");
+    person["Ticket Type"] = ticketType;
+    person["Reservation Status"] = reservationStatus;
     await person.save();
   }
 
   async allocate() {
-    const responseRows = await this.responseSheet.getRows();
+    var responseRows = await this.responseSheet.getRows();
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
 
     await responseRows.map(async (row) => {
@@ -133,6 +156,19 @@ class GoogleSheetsReader {
       }
     });
 
+    await this.responseSheet.loadHeaderRow();
+    // Fill the Member Status column if it exists
+    if (this.responseSheet.headerValues.indexOf("Member Status") >= 0) {
+      const shortcodeColumnAddress = String.fromCharCode(64 + 1 + this.responseSheet.headerValues.indexOf("Imperial Shortcode"));
+      responseRows.map(async (row, index) => {
+        row["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${shortcodeColumnAddress}${index + 2}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
+        try {
+          await row.save();
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }
 
     console.log('allocated');
   }
@@ -209,8 +245,10 @@ class GoogleSheetsReader {
       } else {
         map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }])}
       }
+      if (row['Member Status']) {
+        map[key].reservations[map[key].reservations.length - 1].memberStatus = row['Member Status'];
+      }
     })
-
 
     const data = Object.values(map)
 

@@ -37,7 +37,7 @@ export default function EventHookForm({fetchEvents}) {
   }
 
   const onSubmit = async (data) => {
-    setLoadingSubmission(true)
+    // setLoadingSubmission(true)
     var temp = {
       fullName: false,
       shortcode: false,
@@ -63,6 +63,7 @@ export default function EventHookForm({fetchEvents}) {
     }
     await fetchEvents()
     history.push('/')
+    toast.success("Event created")
   }; // your form submit function which will invoke after successful validation
 
   // console.log(watch("eventName")); // you can watch individual input by pass the name of the input

@@ -2,6 +2,7 @@ let CheckboxItem = require("./GoogleFormCheckboxItem")
 let ListItem = require("./GoogleFormListItem")
 let MultipleChoiceItem = require("./GoogleFormMultipleChoiceItem")
 let TextItem = require("./GoogleFormTextItem")
+let jsesc = require('jsesc') 
 
 function closeFormStr() {
   return "form.setAcceptingResponses(false);form.setCustomClosedFormMessage('Ticket Reservations are currently closed.');"
@@ -25,10 +26,10 @@ class GoogleFormBuilder {
   toString() {
     let content = `var form = FormApp.create('${this.formName}');`;
     if (this.title.length){
-      content += `form.setTitle("${this.title}");`
+      content += `form.setTitle('${jsesc(this.title)}');`
     }
     if (this.description.length){
-      content += `form.setDescription("${this.description}");`
+      content += `form.setDescription('${jsesc(this.description)}');`
     }
     for (let i = 0; i < this.items.length; i++) {
       content += this.items[i].toString()

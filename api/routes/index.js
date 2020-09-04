@@ -9,6 +9,7 @@ var GoogleSheetsReader = require('../helpers/googleSheets')
 var GoogleFormOpener = require('../helpers/google_form_builder/GoogleFormOpener')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
 var Agenda = require('agenda')
+var jsesc = require('jsesc')
 
 /* Read sa-credentials. */
 const fs = require('fs');
@@ -121,7 +122,6 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
   }
   googleAppLinker.createForm(form.toFunctionString(), formRes => {
     const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
-    console.log("hello")
     console.log(sheetUrl)
     const newEvent = new Event({ name: body.eventName, description: body.eventDetails, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate, paymentInfo: body.paymentInfo })
     newEvent.save(err => {
@@ -201,8 +201,20 @@ router.post('/changePaymentStatus', function (req, res, next) {
 router.post('/changeReservationStatus', function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
+  console.log(req.body.ticketType)
+  console.log(req.body.reservationStatus)
   let reader = new GoogleSheetsReader(sheetId);
-  reader.init(() => reader.changePaymentStatus(req.body.timestamp, req.body.fullName));
+  reader.init(() => reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus));
 });
+
+
+// const test = `🍚🍜HANCHI KID TAIWANESE FOOD DELIVERY🍚🍜
+// Hanchi Kid expanded their menu! Visit their website to order now: http://hanchikid.co.uk/ 👀
+// Hey guys! Now's your chance to try out Hanchi Kid's authentic Taiwanese food! For this Thursday (21st May) they will be delivering exclusively to the following postcodes:
+// W1, WC1, W2, W6, W8, W14;
+// SW3, SW5, SW6, SW7.
+// If you missed our last post, Hanchi Kid showcases home-cooked Taiwanese dishes cooked by a mother and son duo! Everything is made fresh and ingredients are sourced from Taiwan where possible. Check out the post below for more details! ❤`
+
+// console.log(jsesc(test))
 
 module.exports = router;
