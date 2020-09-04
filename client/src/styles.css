@@ -258,6 +258,14 @@ h2 {
   font-weight: bold;
   font-size: 72px;
 }
+
+.eventDate {
+  font: inherit;
+  color: #2e2e2e;
+  font-weight: medium;
+  font-size: 36px;
+}
+
 .react-calendar {
   width: 100%;
   max-width: 1000px;

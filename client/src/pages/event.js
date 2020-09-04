@@ -61,22 +61,47 @@ export default function Event({ event, setUser }) {
         <Container fluid style={{ minHeight: "100vh" }}>
 
           <Row>
-            <Col xs={3} sm={3} xl={9}>
-              <div className='eventName'>{event.name}</div>
+            <Col xs={3} sm={9} xl={9}>
+              <div>
+                <div className='eventName'>{event.name}</div>
+                <div className='eventDate'>{dayjs(event.eventDate).format('LLLL')}</div>
+
+              </div>
             </Col>
-            <Col xs={3} sm={3} xl={1}>
-              <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
+            <Col xs={12} sm={3} xl={3}>
+              <Row>
+                <Col xs={4} sm={4} xl={4}>
+                  {/* <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button> */}
+                  <Button onClick={() => window.open(event.formResUrl, "_blank")}><img src='./../../assets/google-forms-icon.png' style={{width : '64px', height : '64px'}}></img></Button>
+                </Col>
+                <Col xs={4} sm={4} xl={4}>
+                  {/* <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button> */}
+                  <Button onClick={() => window.open(event.formResUrl, "_blank")}><img src='./../../assets/google-sheets-icon.png' style={{width : '64px', height : '64px'}}></img></Button>
+                </Col>
+                <Col xs={4} sm={4} xl={4}>
+                  <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
+                </Col>
+              </Row>
+
             </Col>
-            <Col xs={3} sm={3} xl={1}>
-              <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
-            </Col>
-            <Col xs={3} sm={3} xl={1}>
-              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
-            </Col>
+
           </Row>
+          <br></br>
+
           <Row>
             <Col>
-              {dayjs(event.eventDate).format('LLLL')}
+              <b>Event Details</b> <br />
+              <div>{nl2br(event.description)}</div>
+              <br></br>
+              <b>Payment Information</b><br />
+              {nl2br(event.paymentInfo)}<br />
+            </Col>
+          </Row>
+          <hr></hr>
+          <Row>
+            <Col>
+              <b>Ticket Information</b> <br />
+
             </Col>
           </Row>
           <br></br>
@@ -101,30 +126,6 @@ export default function Event({ event, setUser }) {
           })}
           <hr></hr>
           <Row>
-            <Col>
-              <b>Event Details</b> <br />
-              <div>{nl2br(event.description)}</div>
-              <br /><br />
-              <b>Event Date</b><br />
-              {dayjs(event.eventDate).format('LLLL')} <br /><br />
-              <b>Payment Info</b><br />
-              {nl2br(event.paymentInfo)}<br />
-            </Col>
-
-            <Col style={{ marginBottom: "10px" }} xs={12} sm={4}>
-              <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button>
-              <br></br>
-              {/* </Col>
-            <Col style={{marginBottom: "10px"}} xs={12} sm={4}> */}
-              <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button>
-              {/* </Col>
-            <Col style={{marginBottom: "10px"}} xs={12} sm={4}> */}
-              <br></br>
-              <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
-            </Col>
-          </Row>
-          <hr></hr>
-          <Row>
             <Col style={{ marginBottom: "10px" }} xs={12} sm={6}>
               <Button className="blueButton" onClick={pressAllocate}> Allocate </Button>
             </Col>
@@ -135,7 +136,7 @@ export default function Event({ event, setUser }) {
 
           <br></br>
           <Row style={{ paddingTop: "10px" }}>
-            <Col sm={12}>
+            <Col xs={12} sm={12} xl={12}>
               <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} />
             </Col>
           </Row>
