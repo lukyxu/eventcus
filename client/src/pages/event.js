@@ -86,7 +86,7 @@ export default function Event({ event, setUser }) {
                   <Button onClick={() => window.open(event.sheetUrl, "_blank")}><img src='./../../assets/google-sheets-icon.png' style={{width : '64px', height : '64px'}}></img></Button>
                 </Col>
                 <Col xs={4} sm={4} xl={4}>
-                  <Button className="blueButton" onClick={() => window.open(event.formEditUrl, "_blank")}> Edit Form </Button>
+                <Button onClick={() => window.open(event.formEditUrl, "_blank")}><img src='./../../assets/google-form-edit-icon.png' style={{ height : '72px'}}></img></Button>
                 </Col>
               </Row>
 
