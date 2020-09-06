@@ -68,7 +68,7 @@ export default function Event({ event, setUser }) {
         <Container fluid style={{ minHeight: "100vh" }}>
 
           <Row>
-            <Col xs={3} sm={9} xl={9}>
+            <Col xs={12} sm={9} xl={9}>
               <div>
                 <div className='eventName'>{event.name}</div>
                 <div className='eventDate'>{dayjs(event.eventDate).format('LLLL')}</div>

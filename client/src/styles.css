@@ -256,14 +256,14 @@ h2 {
   font: inherit;
   color: #2e2e2e;
   font-weight: bold;
-  font-size: 72px;
+  font-size: 9vh;
 }
 
 .eventDate {
   font: inherit;
   color: #2e2e2e;
   font-weight: medium;
-  font-size: 36px;
+  font-size: 4vh;
 }
 
 .react-calendar {
