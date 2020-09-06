@@ -119,7 +119,8 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
   const getListStyle = isDraggingOver => ({
     background: isDraggingOver ? "#D4F9F9" : "#E8E8E8",
     padding: grid,
-    width: (ticketTypes.length >= 2) ? 1200 / ticketTypes.length : 500
+    // width: (ticketTypes.length >= 2) ? 1200 / ticketTypes.length : 500
+    width : '100%',
   });
 
   const refresh = async () => {
@@ -283,71 +284,91 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
             onRequestSearch={() => null} />
           </Col>
           <Col>
-            <LoadingButton style={{width: "120px"}} title="Save" loadingTitle="Saving" onClick={save} />
+            <LoadingButton style={{ width: "120px" }} title="Save" loadingTitle="Saving" onClick={save} />
           </Col>
 
 
         </Row>
-        <div style={{ display: "flex" }}>
+        {/* <div style={{ display: "flex" }}> */}
+        <Row style={{ paddingTop: "10px" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
-              <Droppable key={ind} droppableId={`${ind}`}>
-                {(provided, snapshot) => (
-                  <div style={{ padding: '20px 25px 0 0' }}>
-                    <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
-                    <div
-                      ref={provided.innerRef}
-                      style={getListStyle(snapshot.isDraggingOver)}
-                      {...provided.droppableProps}
-                    >
-                      {/* <div>{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div> */}
+              <Col xs={12} sm={6} xl={6}>
+                <Droppable key={ind} droppableId={`${ind}`}>
+                  {(provided, snapshot) => (
+                    // <div >
+                      <div style={{ padding: '20px 15px 0' }}>
+                        <Row>
+                        <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
 
-
-
-                      {state[ind].map((item, index) => (
-                        <Draggable
-                          key={`item-${item.timestamp}-${item.name}`}
-                          draggableId={`item-${item.timestamp}-${item.name}`}
-                          index={index}
+                        </Row>
+                        <Row>
+                          <div
+                          ref={provided.innerRef}
+                          style={getListStyle(snapshot.isDraggingOver)}
+                          {...provided.droppableProps}
                         >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={getItemStyle(
-                                snapshot.isDragging,
-                                provided.draggableProps.style
-                              )}
+                          {/* <div>{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div> */}
+
+
+
+                          {state[ind].map((item, index) => (
+                            <Draggable
+                              key={`item-${item.timestamp}-${item.name}`}
+                              draggableId={`item-${item.timestamp}-${item.name}`}
+                              index={index}
                             >
-                              <div
-                                style={{
-                                  display: "flex",
-                                }}
-                              >
-                                <div style={{ alignSelf: "center", flex: 1 }}>
-                                  {item.name}
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  style={getItemStyle(
+                                    snapshot.isDragging,
+                                    provided.draggableProps.style
+                                  )}
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                    }}
+                                  >
+                                    <div style={{ alignSelf: "center", flex: 1 }}>
+                                      {item.name}
+                                    </div>
+                                    <div>
+                                      {renderPaidButton(item)}
+                                    </div>
+
+
+                                  </div>
                                 </div>
-                                <div>
-                                  {renderPaidButton(item)}
-                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                        </div>
+
+                        </Row>
+
+                        
+                        
+
+                      </div>
+                    // </div>
 
 
-                              </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  </div>
+                  )}
+                </Droppable>
 
+              </Col>
 
-                )}
-              </Droppable>
             ))}
           </DragDropContext>
-        </div>
+
+        </Row>
+
+        {/* </div> */}
       </div>
     );
   }
