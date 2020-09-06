@@ -69,6 +69,8 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
   const [reservations, setReservations] = useState({});
   const [searchValue, setSearchValue] = useState('');
 
+  // const filteredPeople = events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
+
   const fetchTicketReservations = async () => {
     const reqBody = {
       sheetId: event.sheetId
@@ -281,7 +283,8 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
           <Col xs={12} sm={5}><SearchBar
             value={searchValue}
             onChange={(newValue) => setSearchValue(newValue)}
-            onRequestSearch={() => null} />
+            onRequestSearch={() => null} 
+            onCancelSearch={(() => setSearchValue(''))}/>
           </Col>
           <Col>
             <LoadingButton style={{ width: "120px" }} title="Save" loadingTitle="Saving" onClick={save} />
@@ -312,7 +315,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
 
 
 
-                          {state[ind].map((item, index) => (
+                          {state[ind].filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase())).map((item, index) => (
                             <Draggable
                               key={`item-${item.timestamp}-${item.name}`}
                               draggableId={`item-${item.timestamp}-${item.name}`}
