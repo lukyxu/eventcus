@@ -65,18 +65,26 @@ class GoogleSheetsReader {
 
     // Create Ticket Type sheet
     await this.ticketTypeSheet.updateProperties({ title: "Ticket Types" })
-    await this.ticketTypeSheet.setHeaderRow(["type", "price", "quantity", "allocated", "paid"])
-    const rows = await this.ticketTypeSheet.addRows(ticketTypes)
-    rows.map(async (row) => {
-      row["allocated"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["type"]}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
-      row["paid"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["type"]}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
-
+    await this.ticketTypeSheet.setHeaderRow(["Type", "Price", "Quantity", "Allocated", "Paid", " ", "Expected Revenue", " ", "Collected Revenue"])
+    const rows = await this.ticketTypeSheet.addRows(ticketTypes.map(ticket => {
+      ticket.Type = ticket.type;
+      ticket.Price = ticket.price;
+      ticket.Quantity = ticket.quantity;
+      return ticket;
+    }))
+    rows.map(async (row, index) => {
+      row["Allocated"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["Type"]}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
+      row["Paid"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["Type"]}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
+      row["Expected Revenue"] = `=SUM(B${index + 2}*D${index + 2})`
+      row["Collected Revenue"] = `=SUM(B${index + 2}*E${index + 2})`
       await row.save();
     })
-    const totalRow = await this.ticketTypeSheet.addRow({ type: "Total" })
-    totalRow["quantity"] = `=SUM(C2:C${ticketTypes.length + 1})`
-    totalRow["allocated"] = `=SUM(D2:D${ticketTypes.length + 1})`
-    totalRow["paid"] = `=SUM(E2:E${ticketTypes.length + 1})`
+    const totalRow = await this.ticketTypeSheet.addRow({ Type: "Total" })
+    totalRow["Quantity"] = `=SUM(C2:C${ticketTypes.length + 1})`
+    totalRow["Allocated"] = `=SUM(D2:D${ticketTypes.length + 1})`
+    totalRow["Paid"] = `=SUM(E2:E${ticketTypes.length + 1})`
+    totalRow["Expected Revenue"] = `=SUM(G2:G${ticketTypes.length + 1})`
+    totalRow["Collected Revenue"] = `=SUM(I2:I${ticketTypes.length + 1})`
     await totalRow.save();
 
     try {
@@ -100,9 +108,9 @@ class GoogleSheetsReader {
     var res = false;
     await ticketTypeRows.forEach(async (row) => {
 
-      if (row["type"] != "Total") {
-        if (row["type"] === ticketType && row["allocated"] < row["quantity"]) {
-          row["allocated"] = parseInt(row["allocated"]) + 1;
+      if (row["Type"] != "Total") {
+        if (row["Type"] === ticketType && row["Allocated"] < row["Quantity"]) {
+          row["Allocated"] = parseInt(row["Allocated"]) + 1;
           res = true;
         }
       }
@@ -159,7 +167,8 @@ class GoogleSheetsReader {
     }
 
     responseRows.map(async (row) => {
-      if (row["Reservation Status"] === "") {
+      console.log(row["Reservation Status"])
+      if (row["Reservation Status"] != "reserved" && row["Reservation Status"] != "waitlist") {
         const bool = await this.isTicketAvaliable(row["Ticket Type"], ticketTypeRows);
         // console.log(bool)
         if (bool) {
@@ -200,9 +209,9 @@ class GoogleSheetsReader {
     const ticketTypeRows = await this.ticketTypeSheet.getRows();
     const data = []
     ticketTypeRows.forEach((row) => {
-      const unreserved = parseInt(row["quantity"]) - parseInt(row["allocated"])
-      const reserved = row["allocated"] - row["paid"]
-      data.push({ "type": row["type"], "paid": parseInt(row["paid"]), "reserved": reserved, "unreserved": unreserved, "quantity": parseInt(row["quantity"]) });
+      const unreserved = parseInt(row["Quantity"]) - parseInt(row["Allocated"])
+      const reserved = row["Allocated"] - row["Paid"]
+      data.push({ "type": row["Type"], "paid": parseInt(row["Paid"]), "reserved": reserved, "unreserved": unreserved, "quantity": parseInt(row["Quantity"]) });
     })
 
     callback(data);
