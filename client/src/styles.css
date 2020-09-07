@@ -226,6 +226,10 @@ h2 {
   font-size: 36px;
 }
 
+.reservationTimestamp {
+  font-size: 15px;
+}
+
 @media (min-width: 1600px) {
   .centralDashboardContainer {
     max-width: 1280px;
@@ -259,6 +263,10 @@ h2 {
     color: #2e2e2e;
     font-weight: medium;
     font-size: 24px;
+  }
+
+  .reservationTimestamp {
+    font-size: 13px;
   }
 }
 

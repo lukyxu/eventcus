@@ -7,6 +7,7 @@ import { Button, Container, Row, Col } from 'react-bootstrap'
 import SearchBar from 'material-ui-search-bar';
 import LoadingButton from "./loading-button.js";
 import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
 
 // fake data generator
 // const getItems = (count, offset = 0) =>
@@ -164,13 +165,13 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
     try {
       await updatePayments();
       await updateReservations();
-    
+
       await fetchTicketReservations()
       await fetchTicketInfo()
       setPayments({})
       setReservations({})
       toast.success("Payment and reservation saved");
-    } catch(err) {
+    } catch (err) {
       toast.error(`Error with saving payments/reservation: ${err}`)
     }
   }
@@ -298,14 +299,30 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
 
 
                                   </div> */}
-                                  <Row style={{ alignItems: 'center', paddingLeft:'10px', paddingRight:'10px' }}>
+                                  <Row style={{ alignItems: 'center', paddingLeft: '10px', paddingRight: '10px' }}>
                                     <Col xs={9} sm={10} xl={10} >
-                                      <Row>
-                                        {item.name}
+                                      <Row style={{ alignItems: 'center' }}>
+                                        <Col xs={6}>
+                                          <Row className='reservationTimestamp'>
+                                            {dayjs(item.timestamp).format('DD/MM HH:mm')}
+                                          </Row>
+                                          <Row style={{ paddingTop: '5px' }}>
+                                            {renderIcons(item)}
+                                          </Row>
+                                        </Col>
+                                        <Col xs={6}>
+                                          <Row>
+                                            {item.name}
+                                          </Row>
+                                        </Col>
+
                                       </Row>
-                                      <Row style={{paddingTop:'5px'}}>
-                                        {renderIcons(item)}
-                                      </Row>
+
+
+
+
+
+
                                     </Col>
                                     <Col xs={3} sm={2} xl={2}>
                                       {renderPaidButton(item)}
