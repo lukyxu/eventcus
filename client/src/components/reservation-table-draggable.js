@@ -176,6 +176,11 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
   }
 
   const refresh = async() => {
+    if (Object.entries(payments).length > 0 || Object.entries(reservations).length > 0) {
+      if (!window.confirm("Unsaved reservation/payment changes. Are you sure you want to refresh payments?")) {
+        return
+      }
+    }
     try {
       await fetchTicketReservations()
       await fetchTicketInfo()

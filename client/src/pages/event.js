@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import nl2br from 'react-nl2br';
 import { toast } from 'react-toastify';
 import LoadingButton from '../components/loading-button.js';
+import {Prompt} from 'react-router'
 
 async function getTicketReservations(reqBody) {
   const res = await TicketAllocations(reqBody);
@@ -27,6 +28,7 @@ export default function Event({ event, events, setUser, setEvents }) {
   const [loading, setLoading] = useState(true);
   const [payments, setPayments] = useState({});
   const [reservations, setReservations] = useState({});
+  console.log(Object.entries(payments).length > 0 || Object.entries(reservations).length > 0)
 
   let tickets = [...event.tickets]
   tickets.push(event.total)
@@ -126,6 +128,8 @@ export default function Event({ event, events, setUser, setEvents }) {
   return (
     <div>
       <Header title={event.name} setUser={setUser} />
+      <Prompt when={Object.entries(payments).length > 0 || Object.entries(reservations).length > 0}
+       message="Unsaved reservation/payment changes. Are you sure you want to leave?"></Prompt>
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
 
