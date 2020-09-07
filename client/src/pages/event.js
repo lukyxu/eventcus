@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap'
 import Header from '../components/header.js'
 import Button from '@material-ui/core/Button';
 import ReservationTable from '../components/reservation-table-draggable.js'
 import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
+import TicketAllocations from './../services/ticketAllocations.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
 import dayjs from 'dayjs';
@@ -12,8 +13,20 @@ import nl2br from 'react-nl2br';
 import { toast } from 'react-toastify';
 import LoadingButton from '../components/loading-button.js';
 
+async function getTicketReservations(reqBody) {
+  const res = await TicketAllocations(reqBody);
+  console.log(res)
+  return res
+}
+
 export default function Event({ event, events, setUser, setEvents }) {
   const history = useHistory();
+
+  const [state, setState] = useState([]);
+  const [ticketTypes, setTicketTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useState({});
+  const [reservations, setReservations] = useState({});
 
   let tickets = [...event.tickets]
   tickets.push(event.total)
@@ -21,6 +34,38 @@ export default function Event({ event, events, setUser, setEvents }) {
   const [ticketInfo, setTicketInfo] = useState(tickets)
 
   console.log(events)
+
+  const fetchTicketReservations = async () => {
+    const reqBody = {
+      sheetId: event.sheetId
+    };
+    const tickets = await getTicketReservations(reqBody);
+    console.log(tickets)
+
+    // if (tickets.error) {
+    //   alert(JSON.stringify(tickets.error));
+    // }
+    const reservations = []
+    tickets.sort(function (a, b) {
+      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
+      if (a.ticketType < b.ticketType) { return -1 }
+      return 1;
+    })
+
+    tickets.map((ticket, index) => {
+      reservations.push(ticket.reservations.map(item => {
+        item["src"] = index;
+        return item
+      }))
+    })
+    setState(reservations);
+    setTicketTypes(tickets);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTicketReservations();
+  }, []);
 
   const pressAllocate = async () => {
     const reqBody = {
@@ -35,6 +80,7 @@ export default function Event({ event, events, setUser, setEvents }) {
     }
     try {
       await fetchTicketReservationInfo()
+      await fetchTicketReservations()
       toast.success(`Tickets allocated`);
     } catch(err) {
       toast.warn(`Tickets allocated but error with fetching ticket reservation status: ${err}`);
@@ -50,7 +96,9 @@ export default function Event({ event, events, setUser, setEvents }) {
     event.total = res.find(t => t.type === "Total")
     res = res.filter(t => t.type !== "Total")
     event.tickets = res
+    events[events.findIndex(e => e === event)] = {...event}
     setEvents([...events])
+    console.log("OK")
   }
 
   const pressEmailingList = () => {
@@ -154,7 +202,7 @@ export default function Event({ event, events, setUser, setEvents }) {
           <br></br>
           <Row style={{ paddingTop: "10px" }}>
             <Col xs={12} sm={12} xl={12}>
-              <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} />
+              <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} state={state} setState={setState} ticketTypes={ticketTypes} setTicketTypes={setTicketTypes} loading={loading} setLoading={setLoading} payments={payments} setPayments={setPayments} reservations={reservations} setReservations={setReservations} fetchTicketReservations={fetchTicketReservations}/>
             </Col>
           </Row>
         </Container>

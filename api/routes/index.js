@@ -195,7 +195,7 @@ router.post('/changePaymentStatus', function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
   let reader = new GoogleSheetsReader(sheetId);
-  reader.init(() => reader.changePaymentStatus(req.body.timestamp, req.body.fullName));
+  reader.init(async () => {await reader.changePaymentStatus(req.body.timestamp, req.body.fullName); res.status(200).json({success:true})});
 });
 
 router.post('/changeReservationStatus', function (req, res, next) {
@@ -204,7 +204,7 @@ router.post('/changeReservationStatus', function (req, res, next) {
   console.log(req.body.ticketType)
   console.log(req.body.reservationStatus)
   let reader = new GoogleSheetsReader(sheetId);
-  reader.init(() => reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus));
+  reader.init(async () => {await reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus); res.status(200).json({success: true})});
 });
 
 

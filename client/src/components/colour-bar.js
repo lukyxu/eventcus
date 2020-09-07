@@ -7,6 +7,11 @@ export default function ColourBar({data}) {
   //   {name: "VIP", value: 50, colour:"#ffb800"},
   //   {name: "Committee", value: 50, colour:"#de5959"}
   // ]
+  data.forEach(d => {
+    if (d.value < 0) {
+      d.value = 0
+    }
+  })
   let totalValue = data.map(d => d.value).reduce((a,b) => a+b)
   console.log(totalValue)
 
