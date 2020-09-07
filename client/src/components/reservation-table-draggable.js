@@ -176,6 +176,23 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
     }
   }
 
+  const refresh = async() => {
+    if (Object.entries(payments).length > 0 || Object.entries(reservations).length > 0) {
+      if (!window.confirm("Unsaved reservation/payment changes. Are you sure you want to refresh payments?")) {
+        return
+      }
+    }
+    try {
+      await fetchTicketReservations()
+      await fetchTicketInfo()
+      setPayments({})
+      setReservations({})
+      toast.success("Updated ticket information")
+    } catch(err) {
+      toast.error(`Failed to update ticket information: ${err}`)
+    }
+  }
+
   function onDragEnd(result) {
     const { source, destination } = result;
     console.log(source)
@@ -233,14 +250,18 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         Add new item
       </button> */}
         <Row style={{ paddingTop: "10px" }}>
-          <Col xs={12} sm={5}><SearchBar
+          <Col xs={12} sm={6}><SearchBar
+          style={{marginBottom:"10px"}}
             value={searchValue}
             onChange={(newValue) => setSearchValue(newValue)}
             onRequestSearch={() => null}
             onCancelSearch={(() => setSearchValue(''))} />
           </Col>
-          <Col>
-            <LoadingButton style={{ width: "120px" }} title="Save" loadingTitle="Saving" onClick={save} />
+          <Col xs={6} sm={3}>
+            <LoadingButton title="Save" loadingTitle="Saving" onClick={save} />
+          </Col>
+          <Col xs={6} sm={3}>
+            <LoadingButton title="Refresh" loadingTitle="Refreshing" onClick={refresh} />
           </Col>
 
 
