@@ -10,26 +10,17 @@ import LoadingButton from "./loading-button.js";
 import { toast } from 'react-toastify';
 
 async function getTicketReservations(reqBody) {
-  // try {
-  //   const res =  await TicketAllocations(reqBody);
-  //   return await res.json
-  // } catch (error) {
-  //   return ({
-  //     error
-  //   });
-  // }
-
   const res = await TicketAllocations(reqBody);
   console.log(res)
   return res
 }
 
 // fake data generator
-const getItems = (count, offset = 0) =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
-    id: `item-${k + offset}-${new Date().getTime()}`,
-    content: `item ${k + offset}`
-  }));
+// const getItems = (count, offset = 0) =>
+//   Array.from({ length: count }, (v, k) => k).map(k => ({
+//     id: `item-${k + offset}-${new Date().getTime()}`,
+//     content: `item ${k + offset}`
+//   }));
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);

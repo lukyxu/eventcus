@@ -50,7 +50,9 @@ export default function Event({ event, events, setUser, setEvents }) {
     event.total = res.find(t => t.type === "Total")
     res = res.filter(t => t.type !== "Total")
     event.tickets = res
+    events[events.findIndex(e => e === event)] = {...event}
     setEvents([...events])
+    console.log("OK")
   }
 
   const pressEmailingList = () => {
