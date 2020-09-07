@@ -144,7 +144,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       delete newPayments[key];
     }
 
-    item.paymentStatus = (item.paymentStatus != null) ? undefined : "Paid"
+    item.paymentStatus = (item.paymentStatus === "paid") ? undefined : "paid"
 
     setPayments(newPayments);
   }
