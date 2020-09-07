@@ -154,7 +154,7 @@ function App() {
             <PrivateRoute exact user={user} path='/create-event' render={(props) => <Create setUser={setUser} fetchEvents={fetchEvents}></Create>} />
             {/* <PrivateRoute exact user={user} path='/event' render={(props) => <Event setUser={setUser}></Event>} />
             <PrivateRoute exact user={user} path='/send-email' render={(props) => <Send setUser={setUser}></Send>} /> */}
-            {events.map(e => <PrivateRoute exact key={e._id} user={user} path={`/event/${e._id}`} render={(props) => <Event setUser={setUser} event={e} />} />)}
+            {events.map(e => <PrivateRoute exact key={e._id} user={user} path={`/event/${e._id}`} render={(props) => <Event setUser={setUser} event={e} events={events} setEvents={setEvents} />} />)}
             {events.map(e => <PrivateRoute exact key={e._id} user={user} path={`/event/${e._id}/email`} render={(props) => <Send setUser={setUser} event={e} />} />)}
             <Route exact path='/login' render={(props) => <Login setUser={setUser} setLoaded={setLoaded}/>}/>
             <Route render={() => <h1>404: page not found</h1>}></Route>

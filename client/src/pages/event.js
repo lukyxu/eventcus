@@ -12,7 +12,7 @@ import nl2br from 'react-nl2br';
 import { toast } from 'react-toastify';
 import LoadingButton from '../components/loading-button.js';
 
-export default function Event({ event, setUser }) {
+export default function Event({ event, events, setUser, setEvents }) {
   const history = useHistory();
 
   let tickets = [...event.tickets]
@@ -20,7 +20,7 @@ export default function Event({ event, setUser }) {
 
   const [ticketInfo, setTicketInfo] = useState(tickets)
 
-  console.log(event)
+  console.log(events)
 
   const pressAllocate = async () => {
     const reqBody = {
@@ -29,9 +29,15 @@ export default function Event({ event, setUser }) {
     try {
       const res = await AllocateTickets(reqBody);
       console.log(res);
+    } catch (err) {
+      toast.error(`Error with allocating tickets: ${err}`);
+      return
+    }
+    try {
+      await fetchTicketReservationInfo()
       toast.success(`Tickets allocated`);
-    } catch (error) {
-      toast.error(`Error with allocating tickets: ${error}`);
+    } catch(err) {
+      toast.warn(`Tickets allocated but error with fetching ticket reservation status: ${err}`);
     }
   }
 
@@ -39,8 +45,12 @@ export default function Event({ event, setUser }) {
     const reqBody = {
       sheetId: event.sheetId,
     }
-    const res = await TicketReservationInfo(reqBody);
+    var res = await TicketReservationInfo(reqBody);
     setTicketInfo(res)
+    event.total = res.find(t => t.type === "Total")
+    res = res.filter(t => t.type !== "Total")
+    event.tickets = res
+    setEvents([...events])
   }
 
   const pressEmailingList = () => {
