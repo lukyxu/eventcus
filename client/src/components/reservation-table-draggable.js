@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import TicketAllocations from './../services/ticketAllocations.js';
 import UpdatePaymentStatus from "../services/changePaymentStatus.js";
 import UpdateReservationStatus from "../services/changeReservationStatus.js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
@@ -8,28 +7,14 @@ import { Button, Container, Row, Col } from 'react-bootstrap'
 import SearchBar from 'material-ui-search-bar';
 import LoadingButton from "./loading-button.js";
 import { toast } from 'react-toastify';
-
-async function getTicketReservations(reqBody) {
-  // try {
-  //   const res =  await TicketAllocations(reqBody);
-  //   return await res.json
-  // } catch (error) {
-  //   return ({
-  //     error
-  //   });
-  // }
-
-  const res = await TicketAllocations(reqBody);
-  console.log(res)
-  return res
-}
+import dayjs from 'dayjs';
 
 // fake data generator
-const getItems = (count, offset = 0) =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
-    id: `item-${k + offset}-${new Date().getTime()}`,
-    content: `item ${k + offset}`
-  }));
+// const getItems = (count, offset = 0) =>
+//   Array.from({ length: count }, (v, k) => k).map(k => ({
+//     id: `item-${k + offset}-${new Date().getTime()}`,
+//     content: `item ${k + offset}`
+//   }));
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -59,51 +44,10 @@ const grid = 8;
 
 
 
-
-export default function ReservationTable({ event, fetchTicketInfo }) {
-  const [state, setState] = useState([]);
-  const [ticketTypes, setTicketTypes] = useState([]);
-  const [payments, setPayments] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [reservations, setReservations] = useState({});
+export default function ReservationTable({ event, fetchTicketInfo, fetchTicketReservations, state, setState, ticketTypes, setTicketTypes, loading, setLoading, payments, setPayments, reservations, setReservations }) {
   const [searchValue, setSearchValue] = useState('');
 
   // const filteredPeople = events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
-
-  const fetchTicketReservations = async () => {
-    const reqBody = {
-      sheetId: event.sheetId
-    };
-    const tickets = await getTicketReservations(reqBody);
-    console.log(tickets)
-
-    // if (tickets.error) {
-    //   alert(JSON.stringify(tickets.error));
-    // }
-    const reservations = []
-    tickets.sort(function (a, b) {
-      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
-      if (a.ticketType < b.ticketType) { return -1 }
-      return 1;
-    })
-
-    tickets.map((ticket, index) => {
-      reservations.push(ticket.reservations.map(item => {
-        item["src"] = index;
-        return item
-      }))
-    })
-    setState(reservations);
-
-    setTicketTypes(tickets);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchTicketReservations();
-
-  }, [event]);
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     // some basic styles to make the items look a bit nicer
@@ -122,15 +66,15 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     background: isDraggingOver ? "#D4F9F9" : "#E8E8E8",
     padding: grid,
     // width: (ticketTypes.length >= 2) ? 1200 / ticketTypes.length : 500
-    width : '100%',
+    width: '100%',
   });
 
-  const refresh = async () => {
-    console.log("refresh")
-    setRefreshing(true)
-    await fetchTicketReservations()
-    setRefreshing(false)
-  }
+  // const refresh = async () => {
+  //   console.log("refresh")
+  //   setRefreshing(true)
+  //   await fetchTicketReservations()
+  //   setRefreshing(false)
+  // }
 
   console.log(state)
   console.log(ticketTypes)
@@ -144,7 +88,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
       delete newPayments[key];
     }
 
-    item.paymentStatus = (item.paymentStatus != null) ? undefined : "Paid"
+    item.paymentStatus = (item.paymentStatus === "paid") ? undefined : "paid"
 
     setPayments(newPayments);
   }
@@ -176,9 +120,8 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         ticketType: newTicket.ticketType,
         reservationStatus: newTicket.reservationStatus,
       }
-      const res = UpdateReservationStatus(reqBody);
+      const res = await UpdateReservationStatus(reqBody);
     }
-
   }
 
   const updatePayments = async () => {
@@ -189,19 +132,27 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         timestamp: strings[0],
         fullName: strings[1],
       }
-      const res = UpdatePaymentStatus(reqBody);
+      const res = await UpdatePaymentStatus(reqBody);
     }
 
+  }
+
+  const renderIcons = (item) => {
+    if (item.memberStatus === "Non-Member") {
+      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}></img>)
+    } else {
+      return (<img src='./../../assets/member-icon.png' style={{ width: '18px', height: '18px' }}></img>)
+    }
   }
 
   const renderPaidButton = (item) => {
     return (
       <BootstrapSwitchButton
+        size='sm'
         onlabel="Paid"
         offlabel=" "
         onstyle="success"
         offstyle="outline-secondary"
-        size="sm"
         checked={item.paymentStatus === "paid"}
         onChange={() => {
           changePaymentStatus(item)
@@ -211,16 +162,35 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
   }
 
   const save = async () => {
-    await updatePayments();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    await updateReservations();
-    await new Promise(resolve => setTimeout(resolve, 4000));
+    try {
+      await updatePayments();
+      await updateReservations();
 
-    await fetchTicketReservations()
-    await fetchTicketInfo()
-    setPayments({})
-    setReservations({})
-    toast.success("Payment and reservation saved");
+      await fetchTicketReservations()
+      await fetchTicketInfo()
+      setPayments({})
+      setReservations({})
+      toast.success("Payment and reservation saved");
+    } catch (err) {
+      toast.error(`Error with saving payments/reservation: ${err}`)
+    }
+  }
+
+  const refresh = async() => {
+    if (Object.entries(payments).length > 0 || Object.entries(reservations).length > 0) {
+      if (!window.confirm("Unsaved reservation/payment changes. Are you sure you want to refresh payments?")) {
+        return
+      }
+    }
+    try {
+      await fetchTicketReservations()
+      await fetchTicketInfo()
+      setPayments({})
+      setReservations({})
+      toast.success("Updated ticket information")
+    } catch(err) {
+      toast.error(`Failed to update ticket information: ${err}`)
+    }
   }
 
   function onDragEnd(result) {
@@ -280,14 +250,18 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         Add new item
       </button> */}
         <Row style={{ paddingTop: "10px" }}>
-          <Col xs={12} sm={5}><SearchBar
+          <Col xs={12} sm={6}><SearchBar
+          style={{marginBottom:"10px"}}
             value={searchValue}
             onChange={(newValue) => setSearchValue(newValue)}
-            onRequestSearch={() => null} 
-            onCancelSearch={(() => setSearchValue(''))}/>
+            onRequestSearch={() => null}
+            onCancelSearch={(() => setSearchValue(''))} />
           </Col>
-          <Col>
-            <LoadingButton style={{ width: "120px" }} title="Save" loadingTitle="Saving" onClick={save} />
+          <Col xs={6} sm={3}>
+            <LoadingButton title="Save" loadingTitle="Saving" onClick={save} />
+          </Col>
+          <Col xs={6} sm={3}>
+            <LoadingButton title="Refresh" loadingTitle="Refreshing" onClick={refresh} />
           </Col>
 
 
@@ -296,17 +270,17 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         <Row style={{ paddingTop: "10px" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
-              <Col xs={12} sm={6} xl={6}>
+              <Col xs={12} sm={12} xl={6}>
                 <Droppable key={ind} droppableId={`${ind}`}>
                   {(provided, snapshot) => (
                     // <div >
-                      <div style={{ padding: '20px 15px 0' }}>
-                        <Row>
+                    <div style={{ padding: '20px 15px 0' }}>
+                      <Row>
                         <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
 
-                        </Row>
-                        <Row>
-                          <div
+                      </Row>
+                      <Row>
+                        <div
                           ref={provided.innerRef}
                           style={getListStyle(snapshot.isDraggingOver)}
                           {...provided.droppableProps}
@@ -331,20 +305,52 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
                                     provided.draggableProps.style
                                   )}
                                 >
-                                  <div
+                                  {/* <div
                                     style={{
                                       display: "flex",
                                     }}
                                   >
                                     <div style={{ alignSelf: "center", flex: 1 }}>
                                       {item.name}
+                                      {renderIcons(item)}
                                     </div>
                                     <div>
                                       {renderPaidButton(item)}
                                     </div>
 
 
-                                  </div>
+                                  </div> */}
+                                  <Row style={{ alignItems: 'center', paddingLeft: '10px', paddingRight: '10px' }}>
+                                    <Col xs={9} sm={10} xl={10} >
+                                      <Row style={{ alignItems: 'center' }}>
+                                        <Col xs={6}>
+                                          <Row className='reservationTimestamp'>
+                                            {dayjs(item.timestamp).format('DD/MM HH:mm')}
+                                          </Row>
+                                          <Row style={{ paddingTop: '5px' }}>
+                                            {renderIcons(item)}
+                                          </Row>
+                                        </Col>
+                                        <Col xs={6}>
+                                          <Row>
+                                            {item.name}
+                                          </Row>
+                                        </Col>
+
+                                      </Row>
+
+
+
+
+
+
+                                    </Col>
+                                    <Col xs={3} sm={2} xl={2}>
+                                      {renderPaidButton(item)}
+                                    </Col>
+
+
+                                  </Row>
                                 </div>
                               )}
                             </Draggable>
@@ -352,12 +358,12 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
                           {provided.placeholder}
                         </div>
 
-                        </Row>
+                      </Row>
 
-                        
-                        
 
-                      </div>
+
+
+                    </div>
                     // </div>
 
 

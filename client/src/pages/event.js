@@ -1,26 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap'
 import Header from '../components/header.js'
 import Button from '@material-ui/core/Button';
 import ReservationTable from '../components/reservation-table-draggable.js'
 import AllocateTickets from '../services/allocate.js';
 import TicketReservationInfo from './../services/ticketReservationInfo.js';
+import TicketAllocations from './../services/ticketAllocations.js';
 import ColourBar from '../components/colour-bar';
 import { useHistory } from "react-router-dom";
 import dayjs from 'dayjs';
 import nl2br from 'react-nl2br';
 import { toast } from 'react-toastify';
 import LoadingButton from '../components/loading-button.js';
+import {Prompt} from 'react-router'
 
-export default function Event({ event, setUser }) {
+async function getTicketReservations(reqBody) {
+  const res = await TicketAllocations(reqBody);
+  console.log(res)
+  return res
+}
+
+export default function Event({ event, events, setUser, setEvents }) {
   const history = useHistory();
+
+  const [state, setState] = useState([]);
+  const [ticketTypes, setTicketTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useState({});
+  const [reservations, setReservations] = useState({});
+  console.log(Object.entries(payments).length > 0 || Object.entries(reservations).length > 0)
 
   let tickets = [...event.tickets]
   tickets.push(event.total)
 
   const [ticketInfo, setTicketInfo] = useState(tickets)
 
-  console.log(event)
+  console.log(events)
+
+  const fetchTicketReservations = async () => {
+    const reqBody = {
+      sheetId: event.sheetId
+    };
+    const tickets = await getTicketReservations(reqBody);
+    console.log(tickets)
+
+    // if (tickets.error) {
+    //   alert(JSON.stringify(tickets.error));
+    // }
+    const reservations = []
+    tickets.sort(function (a, b) {
+      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
+      if (a.ticketType < b.ticketType) { return -1 }
+      return 1;
+    })
+
+    tickets.map((ticket, index) => {
+      reservations.push(ticket.reservations.map(item => {
+        item["src"] = index;
+        return item
+      }))
+    })
+    setState(reservations);
+    setTicketTypes(tickets);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTicketReservations();
+  }, []);
+
+  const refresh = async() => {
+    await fetchTicketReservationInfo()
+    await fetchTicketReservations()
+  }
 
   const pressAllocate = async () => {
     const reqBody = {
@@ -29,9 +81,15 @@ export default function Event({ event, setUser }) {
     try {
       const res = await AllocateTickets(reqBody);
       console.log(res);
+    } catch (err) {
+      toast.error(`Error with allocating tickets: ${err}`);
+      return
+    }
+    try {
+      await refresh()
       toast.success(`Tickets allocated`);
-    } catch (error) {
-      toast.error(`Error with allocating tickets: ${error}`);
+    } catch(err) {
+      toast.warn(`Tickets allocated but error with fetching ticket reservation status: ${err}`);
     }
   }
 
@@ -39,8 +97,14 @@ export default function Event({ event, setUser }) {
     const reqBody = {
       sheetId: event.sheetId,
     }
-    const res = await TicketReservationInfo(reqBody);
+    var res = await TicketReservationInfo(reqBody);
     setTicketInfo(res)
+    event.total = res.find(t => t.type === "Total")
+    res = res.filter(t => t.type !== "Total")
+    event.tickets = res
+    events[events.findIndex(e => e === event)] = {...event}
+    setEvents([...events])
+    console.log("OK")
   }
 
   const pressEmailingList = () => {
@@ -64,6 +128,8 @@ export default function Event({ event, setUser }) {
   return (
     <div>
       <Header title={event.name} setUser={setUser} />
+      <Prompt when={Object.entries(payments).length > 0 || Object.entries(reservations).length > 0}
+       message="Unsaved reservation/payment changes. Are you sure you want to leave?"></Prompt>
       <div className='centralDashboardContainer'>
         <Container fluid style={{ minHeight: "100vh" }}>
 
@@ -140,11 +206,10 @@ export default function Event({ event, setUser }) {
               <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
             </Col>
           </Row>
-
-          <br></br>
-          <Row style={{ paddingTop: "10px" }}>
+          <hr></hr>
+          <Row>
             <Col xs={12} sm={12} xl={12}>
-              <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} />
+              <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} state={state} setState={setState} ticketTypes={ticketTypes} setTicketTypes={setTicketTypes} loading={loading} setLoading={setLoading} payments={payments} setPayments={setPayments} reservations={reservations} setReservations={setReservations} fetchTicketReservations={fetchTicketReservations}/>
             </Col>
           </Row>
         </Container>

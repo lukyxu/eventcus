@@ -73,7 +73,7 @@ html *
 button[type="submit"].blueButton, input[type="submit"].blueButton {
   background: #5E99F1;
   color: white;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   border: none;
   width: 100%;
   margin-bottom: 10px;
@@ -212,6 +212,24 @@ h2 {
   margin-top: 7px;
 }
 
+.eventName {
+  font: inherit;
+  color: #2e2e2e;
+  font-weight: bold;
+  font-size: 72px;
+}
+
+.eventDate {
+  font: inherit;
+  color: #2e2e2e;
+  font-weight: medium;
+  font-size: 36px;
+}
+
+.reservationTimestamp {
+  font-size: 15px;
+}
+
 @media (min-width: 1600px) {
   .centralDashboardContainer {
     max-width: 1280px;
@@ -232,6 +250,24 @@ h2 {
     padding-left: 15px;
     margin-top: 7px;
   }
+
+  .eventName{
+    font: inherit;
+    color: #2e2e2e;
+    font-weight: bold;
+    font-size: 64px;
+  }
+
+  .eventDate {
+    font: inherit;
+    color: #2e2e2e;
+    font-weight: medium;
+    font-size: 24px;
+  }
+
+  .reservationTimestamp {
+    font-size: 13px;
+  }
 }
 
 .eventTableColouredText span {
@@ -250,20 +286,6 @@ h2 {
 
 .ticketSelect {
   padding: 8px 16px;
-}
-
-.eventName {
-  font: inherit;
-  color: #2e2e2e;
-  font-weight: bold;
-  font-size: 9vh;
-}
-
-.eventDate {
-  font: inherit;
-  color: #2e2e2e;
-  font-weight: medium;
-  font-size: 4vh;
 }
 
 .react-calendar {
