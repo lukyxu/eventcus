@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import TicketAllocations from './../services/ticketAllocations.js';
 import UpdatePaymentStatus from "../services/changePaymentStatus.js";
 import UpdateReservationStatus from "../services/changeReservationStatus.js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
@@ -8,12 +7,6 @@ import { Button, Container, Row, Col } from 'react-bootstrap'
 import SearchBar from 'material-ui-search-bar';
 import LoadingButton from "./loading-button.js";
 import { toast } from 'react-toastify';
-
-async function getTicketReservations(reqBody) {
-  const res = await TicketAllocations(reqBody);
-  console.log(res)
-  return res
-}
 
 // fake data generator
 // const getItems = (count, offset = 0) =>
@@ -50,51 +43,10 @@ const grid = 8;
 
 
 
-
-export default function ReservationTable({ event, fetchTicketInfo }) {
-  const [state, setState] = useState([]);
-  const [ticketTypes, setTicketTypes] = useState([]);
-  const [payments, setPayments] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [reservations, setReservations] = useState({});
+export default function ReservationTable({ event, fetchTicketInfo, fetchTicketReservations, state, setState, ticketTypes, setTicketTypes, loading, setLoading, payments, setPayments, reservations, setReservations }) {
   const [searchValue, setSearchValue] = useState('');
 
   // const filteredPeople = events.filter(e => e.name.toUpperCase().startsWith(searchValue.toUpperCase()))
-
-  const fetchTicketReservations = async () => {
-    const reqBody = {
-      sheetId: event.sheetId
-    };
-    const tickets = await getTicketReservations(reqBody);
-    console.log(tickets)
-
-    // if (tickets.error) {
-    //   alert(JSON.stringify(tickets.error));
-    // }
-    const reservations = []
-    tickets.sort(function (a, b) {
-      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
-      if (a.ticketType < b.ticketType) { return -1 }
-      return 1;
-    })
-
-    tickets.map((ticket, index) => {
-      reservations.push(ticket.reservations.map(item => {
-        item["src"] = index;
-        return item
-      }))
-    })
-    setState(reservations);
-
-    setTicketTypes(tickets);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchTicketReservations();
-
-  }, [event]);
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     // some basic styles to make the items look a bit nicer
@@ -116,12 +68,12 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
     width : '100%',
   });
 
-  const refresh = async () => {
-    console.log("refresh")
-    setRefreshing(true)
-    await fetchTicketReservations()
-    setRefreshing(false)
-  }
+  // const refresh = async () => {
+  //   console.log("refresh")
+  //   setRefreshing(true)
+  //   await fetchTicketReservations()
+  //   setRefreshing(false)
+  // }
 
   console.log(state)
   console.log(ticketTypes)
@@ -167,9 +119,8 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         ticketType: newTicket.ticketType,
         reservationStatus: newTicket.reservationStatus,
       }
-      const res = UpdateReservationStatus(reqBody);
+      const res = await UpdateReservationStatus(reqBody);
     }
-
   }
 
   const updatePayments = async () => {
@@ -180,7 +131,7 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
         timestamp: strings[0],
         fullName: strings[1],
       }
-      const res = UpdatePaymentStatus(reqBody);
+      const res = await UpdatePaymentStatus(reqBody);
     }
 
   }
@@ -202,16 +153,18 @@ export default function ReservationTable({ event, fetchTicketInfo }) {
   }
 
   const save = async () => {
-    await updatePayments();
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    await updateReservations();
-    await new Promise(resolve => setTimeout(resolve, 4000));
-
-    await fetchTicketReservations()
-    await fetchTicketInfo()
-    setPayments({})
-    setReservations({})
-    toast.success("Payment and reservation saved");
+    try {
+      await updatePayments();
+      await updateReservations();
+    
+      await fetchTicketReservations()
+      await fetchTicketInfo()
+      setPayments({})
+      setReservations({})
+      toast.success("Payment and reservation saved");
+    } catch(err) {
+      toast.error(`Error with saving payments/reservation: ${err}`)
+    }
   }
 
   function onDragEnd(result) {

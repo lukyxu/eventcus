@@ -141,9 +141,11 @@ class GoogleSheetsReader {
   async changeReservationStatus(timestamp, fullName, ticketType, reservationStatus) {
     console.log("HEREEE")
     const person = await this.findPerson(timestamp, fullName);
+    console.log(person)
     person["Ticket Type"] = ticketType;
     person["Reservation Status"] = reservationStatus;
     await person.save();
+    console.log("HERE3")
   }
 
   async allocate() {
