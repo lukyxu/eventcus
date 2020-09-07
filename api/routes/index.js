@@ -207,6 +207,13 @@ router.post('/changeReservationStatus', function (req, res, next) {
   reader.init(() => reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus));
 });
 
+router.post('/updateEmailStatus', function (req, res, next) {
+  const sheetId = req.body.sheetId;
+  console.log(sheetId);
+  let reader = new GoogleSheetsReader(sheetId);
+  reader.init(async () => { await reader.updateEmailStatus(req.body.email); res.status(200); res.json({ success: true }) });
+});
+
 
 // const test = `🍚🍜HANCHI KID TAIWANESE FOOD DELIVERY🍚🍜
 // Hanchi Kid expanded their menu! Visit their website to order now: http://hanchikid.co.uk/ 👀

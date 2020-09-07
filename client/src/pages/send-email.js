@@ -10,6 +10,7 @@ import { UserAgentApplication } from 'msal';
 import Select from 'react-select'
 import { Container, Row } from "react-bootstrap";
 import { sendNewEmail } from '../services/graphService';
+import updateEmailStatus from '../services/updateEmailStatus.js';
 
 const getCapitalized = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -112,6 +113,17 @@ export default function Send({ event, setUser }) {
     );
   }
 
+  const updateStatus = async (emails) => {
+    emails.forEach(async (email) => {
+      const reqBody = {
+        sheetId: sheetId,
+        email: email
+      }
+      let res = await updateEmailStatus(reqBody);
+      console.log(res);
+    });
+  }
+
   const sendOne = async (ticket) => {
     try {
       if (!isAuthenticated) {
@@ -119,13 +131,14 @@ export default function Send({ event, setUser }) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
       var accessToken = await getAccessToken(config.scopes);
+      const recipients = ticket.emailEveryone ? ticket.reservations : ticket.unemailed;
       const email = {
         "subject": ticket.subject,
         "body": {
           "contentType": "Text",
           "content": ticket.message
         },
-        "bccRecipients": ticket.reservations.map(email => {
+        "bccRecipients": recipients.map(email => {
           return ({
             "emailAddress": {
               "address": email
@@ -134,8 +147,11 @@ export default function Send({ event, setUser }) {
         })
       }
       console.log(email);
-      let res = await sendNewEmail(accessToken, email);
-      console.log(res);
+      if (recipients.length > 0) {
+        // let res = await sendNewEmail(accessToken, email);
+        // console.log(res);
+        await updateStatus(recipients);
+      }
       toast.success(`Email sent`)
     } catch (err) {
       toast.error(`Error in sending email: ${err}`)
@@ -154,14 +170,14 @@ export default function Send({ event, setUser }) {
             return
           }
           var accessToken = await getAccessToken(config.scopes);
-          console.log("OK33")
+          const recipients = ticket.emailEveryone ? ticket.reservations : ticket.unemailed;
           const email = {
           "subject": ticket.subject,
           "body": {
             "contentType": "Text",
             "content": ticket.message
           },
-          "bccRecipients": ticket.reservations.map(email => {
+          "bccRecipients": recipients.map(email => {
             return ({
               "emailAddress": {
                 "address": email
@@ -169,10 +185,12 @@ export default function Send({ event, setUser }) {
               })
             })
           }
-          console.log(accessToken)
           console.log(email);
-          let res = await sendNewEmail(accessToken, email);
-          console.log(res);
+          if (recipients.length > 0) {
+            // let res = await sendNewEmail(accessToken, email);
+            // console.log(res);
+            await updateStatus(recipients);
+          }
           await new Promise(resolve => setTimeout(resolve, 200));
           }) (ticketTypes[i])
       }
@@ -198,6 +216,7 @@ export default function Send({ event, setUser }) {
           ticket.message = ticket.reservationStatus === 'reserved' ?
             `Hi,\nYou have secured a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.\n\nPayment Details:\n${event.paymentInfo}`
             : `Hi,\nYou have been waitlisted for a ${ticket.ticketType} ticket for ${name} on ${dayjs(eventDate).format('LLLL')}.`;
+          ticket.emailEveryone = false;
         });
         console.log(tickets);
         setTicketTypes(tickets);
@@ -232,20 +251,6 @@ export default function Send({ event, setUser }) {
     );
   }
 
-
-  const customStyles = {
-    option: (provided, state) => ({
-      ...provided,
-      borderBottom: '2px dotted green',
-      color: state.isSelected ? 'yellow' : 'black',
-      backgroundColor: state.isSelected ? 'green' : 'white'
-    }),
-    control: (provided) => ({
-      ...provided,
-      marginTop: "5%",
-    })
-  }
-
   return (
     <div>
       <Header title={`${event.name} Email`} setUser = {setUser}/>
@@ -262,7 +267,7 @@ export default function Send({ event, setUser }) {
           ticket={ticketTypes[ticketIndex]}
           updateTickets={updateTickets}
           sendEmail={sendOne}
-          sendAll={sendAll}/>
+          sendAll={sendAll} />
         </div>
       </Container>
     </div>

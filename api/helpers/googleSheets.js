@@ -98,6 +98,9 @@ class GoogleSheetsReader {
       if (this.responseSheet.headerValues.indexOf("Imperial Shortcode") >= 0) {
         await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Member Status"]));
       }
+
+      // Add Emailed column
+      await this.responseSheet.setHeaderRow(this.responseSheet.headerValues.concat(["Email Status"]));
     } catch (error) {
       console.log(error);
     }
@@ -143,6 +146,23 @@ class GoogleSheetsReader {
     const person = await this.findPerson(timestamp, fullName);
     person["Ticket Type"] = ticketType;
     person["Reservation Status"] = reservationStatus;
+    await person.save();
+  }
+
+  async findPersonByEmail(email) {
+    const responseRows = await this.responseSheet.getRows();
+    var res;
+    responseRows.forEach((row) => {
+      if (row["Email Address"] == email) {
+        res = row
+      }
+    });
+    return res;
+  }
+
+  async updateEmailStatus(email) {
+    const person = await this.findPersonByEmail(email);
+    person["Email Status"] = "Emailed";
     await person.save();
   }
 
@@ -230,9 +250,17 @@ class GoogleSheetsReader {
       let reservationStatus = row["Reservation Status"] || "Pending"
       console.log(reservationStatus)
       if (map[key] == null) {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : [ row["Email Address"] ] }
+        if (row["Email Status"]) {
+          map[key] = { ticketType: row["Ticket Type"], reservationStatus, reservations: [row["Email Address"]], unemailed: [] };
+        } else {
+          map[key] = { ticketType: row["Ticket Type"], reservationStatus, reservations: [row["Email Address"]], unemailed: [row["Email Address"]] };
+        }
       } else {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : map[key].reservations.concat( [row["Email Address"]])}
+        if (row["Email Status"]) {
+          map[key] = { ticketType: row["Ticket Type"], reservationStatus, reservations: map[key].reservations.concat([row["Email Address"]]), unemailed: map[key].unemailed };
+        } else {
+          map[key] = { ticketType: row["Ticket Type"], reservationStatus, reservations: map[key].reservations.concat([row["Email Address"]]), unemailed: map[key].unemailed.concat([row["Email Address"]]) };
+        }
       }
     })
 

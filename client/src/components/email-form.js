@@ -48,6 +48,19 @@ export default function EmailForm({ ticket, updateTickets, sendEmail, sendAll })
             }}
           />
         </Row>
+        <Row className="formSection">
+          <div>
+            <input
+              className="checkboxInput"
+              type="checkbox"
+              checked={ticket.emailEveryone}
+              onChange={(e) => {
+                ticket.emailEveryone = e.target.checked;
+                updateTickets();
+              }} />
+            <label>Email everyone in the current category (default unchecked means only email people who haven't been emailed yet)</label>
+          </div>
+        </Row>
         <hr></hr>
         <Row className="formSection">
           <LoadingButton title="Send" loadingTitle="Sending" onClick={async () => {await sendEmail(ticket);}}/>
