@@ -281,9 +281,9 @@ class GoogleSheetsReader {
       let key = row["Ticket Type"] + '#' + row["Reservation Status"]
       let reservationStatus = row["Reservation Status"] || "Pending"
       if (map[key] == null) {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }]}
+        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"], emailStatus : row["Email Status"] }]}
       } else {
-        map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : map[key].reservations.concat([{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"] }])}
+        map[key] = { ticketType: row["Ticket Type"], reservationStatus, reservations: map[key].reservations.concat([{ timestamp: row["Timestamp"], name: row["Full Name"], paymentStatus: row["Payment Status"], emailStatus: row["Email Status"] }])}
       }
       if (row['Member Status']) {
         map[key].reservations[map[key].reservations.length - 1].memberStatus = row['Member Status'];
