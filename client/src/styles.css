@@ -73,7 +73,7 @@ html *
 button[type="submit"].blueButton, input[type="submit"].blueButton {
   background: #5E99F1;
   color: white;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   border: none;
   width: 100%;
   margin-bottom: 10px;

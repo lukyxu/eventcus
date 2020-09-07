@@ -67,6 +67,11 @@ export default function Event({ event, events, setUser, setEvents }) {
     fetchTicketReservations();
   }, []);
 
+  const refresh = async() => {
+    await fetchTicketReservationInfo()
+    await fetchTicketReservations()
+  }
+
   const pressAllocate = async () => {
     const reqBody = {
       sheetId: event.sheetId,
@@ -79,8 +84,7 @@ export default function Event({ event, events, setUser, setEvents }) {
       return
     }
     try {
-      await fetchTicketReservationInfo()
-      await fetchTicketReservations()
+      await refresh()
       toast.success(`Tickets allocated`);
     } catch(err) {
       toast.warn(`Tickets allocated but error with fetching ticket reservation status: ${err}`);
@@ -198,9 +202,8 @@ export default function Event({ event, events, setUser, setEvents }) {
               <Button className="blueButton" onClick={pressEmailingList}> Email </Button>
             </Col>
           </Row>
-
-          <br></br>
-          <Row style={{ paddingTop: "10px" }}>
+          <hr></hr>
+          <Row>
             <Col xs={12} sm={12} xl={12}>
               <ReservationTable event={event} fetchTicketInfo={fetchTicketReservationInfo} state={state} setState={setState} ticketTypes={ticketTypes} setTicketTypes={setTicketTypes} loading={loading} setLoading={setLoading} payments={payments} setPayments={setPayments} reservations={reservations} setReservations={setReservations} fetchTicketReservations={fetchTicketReservations}/>
             </Col>
