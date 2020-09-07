@@ -65,7 +65,7 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
     background: isDraggingOver ? "#D4F9F9" : "#E8E8E8",
     padding: grid,
     // width: (ticketTypes.length >= 2) ? 1200 / ticketTypes.length : 500
-    width : '100%',
+    width: '100%',
   });
 
   // const refresh = async () => {
@@ -136,14 +136,22 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
 
   }
 
+  const renderIcons = (item) => {
+    if (item.memberStatus === "Non-Member") {
+      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}></img>)
+    } else {
+      return (<img src='./../../assets/member-icon.png' style={{ width: '18px', height: '18px' }}></img>)
+    }
+  }
+
   const renderPaidButton = (item) => {
     return (
       <BootstrapSwitchButton
+        size='sm'
         onlabel="Paid"
         offlabel=" "
         onstyle="success"
         offstyle="outline-secondary"
-        size="sm"
         checked={item.paymentStatus === "paid"}
         onChange={() => {
           changePaymentStatus(item)
@@ -240,8 +248,8 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
           style={{marginBottom:"10px"}}
             value={searchValue}
             onChange={(newValue) => setSearchValue(newValue)}
-            onRequestSearch={() => null} 
-            onCancelSearch={(() => setSearchValue(''))}/>
+            onRequestSearch={() => null}
+            onCancelSearch={(() => setSearchValue(''))} />
           </Col>
           <Col xs={6} sm={3}>
             <LoadingButton title="Save" loadingTitle="Saving" onClick={save} />
@@ -256,17 +264,17 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         <Row style={{ paddingTop: "10px" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
-              <Col xs={12} sm={6} xl={6}>
+              <Col xs={12} sm={12} xl={6}>
                 <Droppable key={ind} droppableId={`${ind}`}>
                   {(provided, snapshot) => (
                     // <div >
-                      <div style={{ padding: '20px 15px 0' }}>
-                        <Row>
+                    <div style={{ padding: '20px 15px 0' }}>
+                      <Row>
                         <div className="reservationColumnHeader">{`${ticketTypes[ind].ticketType} ${ticketTypes[ind].reservationStatus}`}</div>
 
-                        </Row>
-                        <Row>
-                          <div
+                      </Row>
+                      <Row>
+                        <div
                           ref={provided.innerRef}
                           style={getListStyle(snapshot.isDraggingOver)}
                           {...provided.droppableProps}
@@ -291,20 +299,36 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
                                     provided.draggableProps.style
                                   )}
                                 >
-                                  <div
+                                  {/* <div
                                     style={{
                                       display: "flex",
                                     }}
                                   >
                                     <div style={{ alignSelf: "center", flex: 1 }}>
                                       {item.name}
+                                      {renderIcons(item)}
                                     </div>
                                     <div>
                                       {renderPaidButton(item)}
                                     </div>
 
 
-                                  </div>
+                                  </div> */}
+                                  <Row style={{ alignItems: 'center', paddingLeft:'10px', paddingRight:'10px' }}>
+                                    <Col xs={9} sm={10} xl={10} >
+                                      <Row>
+                                        {item.name}
+                                      </Row>
+                                      <Row style={{paddingTop:'5px'}}>
+                                        {renderIcons(item)}
+                                      </Row>
+                                    </Col>
+                                    <Col xs={3} sm={2} xl={2}>
+                                      {renderPaidButton(item)}
+                                    </Col>
+
+
+                                  </Row>
                                 </div>
                               )}
                             </Draggable>
@@ -312,12 +336,12 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
                           {provided.placeholder}
                         </div>
 
-                        </Row>
+                      </Row>
 
-                        
-                        
 
-                      </div>
+
+
+                    </div>
                     // </div>
 
 
