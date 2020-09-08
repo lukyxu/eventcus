@@ -50,7 +50,7 @@ class GoogleSheetsReader {
     })
   }
 
-  async configSheet(ticketTypes) {
+  async configSheet(user, ticketTypes) {
     // Add payment and reservation status headers 
     await this.responseSheet.loadHeaderRow();
 
@@ -91,7 +91,8 @@ class GoogleSheetsReader {
       // Create Members sheet
       await this.memberSheet.loadCells('A1:A1');
       const cell = this.memberSheet.getCell(0, 0);
-      cell.formula = '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1xnPmklouiafFZkaih4eI5qX3pHsHdViRN4w8SjsE8jo", "A:N")';
+      cell.formula = `=IMPORTRANGE("${user.memberListUrl}", "A:N")`;
+      console.log(cell.formula)
       await cell.save();
 
       // Add Member/Non-Member/Fresher column if shortcode column exists

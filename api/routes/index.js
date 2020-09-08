@@ -10,15 +10,6 @@ var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
 var Agenda = require('agenda')
 var jsesc = require('jsesc')
 
-/* Read sa-credentials. */
-const fs = require('fs');
-const readline = require('readline');
-var serviceAccountEmail = '';
-fs.readFile('sa-credentials.json', (err, content) => {
-  if (err) return console.log('Error loading sa-credentials file:', err);
-  serviceAccountEmail = JSON.parse(content).client_email;
-});
-
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
@@ -91,7 +82,8 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation"); 
   form.setDescription(body.eventDetails);
-  form.setServiceAccount(serviceAccountEmail);
+  form.setServiceAccount(req.user.saCredentials.client_email);
+  console.log(req.user.saCredentials.client_email)
   if (body.fieldsChecked.fullName) {
     form.addTextItem().setTitle("Full Name").setRequired();
   }
@@ -138,7 +130,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
 
     console.log(sheetId);
     let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
-    reader.init(async () => { await reader.configSheet(body.ticketTypes); res.json({ success: true }) });
+    reader.init(async () => { await reader.configSheet(req.user, body.ticketTypes); res.json({ success: true }) });
   });
 });
 
