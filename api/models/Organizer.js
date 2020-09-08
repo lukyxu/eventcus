@@ -24,6 +24,8 @@ const OrganizerSchema = mongoose.Schema({
     type: [mongoose.Schema.Types.ObjectId],
     default: []
   },
+  token:Object,
+
   credentials: Object
 });
 

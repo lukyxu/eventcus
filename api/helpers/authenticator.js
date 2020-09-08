@@ -68,7 +68,7 @@ class Authenticator {
             return done(err,false);
           }
           if(user) {
-            user.linker = new GoogleAppLinker(null, user.credentials)
+            user.linker = new GoogleAppLinker(user.credentials)
             return done(err, user);
           }
           return done(null, false)

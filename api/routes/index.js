@@ -79,7 +79,7 @@ agenda.start()
 agenda.define('openForm', { concurrency: 1 }, (job, done) => {
   console.log(job.attrs)
   console.log((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString())
-  job.attrs.data.user.linker.createForm((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
+  job.attrs.data.user.linker.createForm(job.attrs.data.user, (new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
     console.log(formRes)
       done()
     })
@@ -111,7 +111,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     form.addTextItem().setTitle("If yes, please specify")
   }
 
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
+  // form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
 
   form.linkWithSheets()
 
@@ -126,7 +126,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     console.log(req.user.events)
     console.log(req.user.credentials)
   console.log(req.user.linker)
-  req.user.linker.createForm(form.toFunctionString(), formRes => {
+  req.user.linker.createForm(req.user, form.toFunctionString(), formRes => {
     const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
     console.log(sheetUrl)
     const newEvent = new Event({ name: body.eventName, description: body.eventDetails, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate, paymentInfo: body.paymentInfo })
