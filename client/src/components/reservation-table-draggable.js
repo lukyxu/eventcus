@@ -137,11 +137,17 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
 
   }
 
-  const renderIcons = (item) => {
+  const renderMemberIcon = (item) => {
     if (item.memberStatus === "Non-Member") {
-      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}></img>)
+      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}/>)
     } else {
-      return (<img src='./../../assets/member-icon.png' style={{ width: '18px', height: '18px' }}></img>)
+      return (<img src='./../../assets/member-icon.png' style={{ width: '18px', height: '18px' }}/>)
+    }
+  }
+
+  const renderEmailedIcon = (item) => {
+    if (item.emailStatus === "Emailed") {
+      return (<img src='./../../assets/emailed-icon.png' style={{ width: '18px', height: '18px' }}/>)
     }
   }
 
@@ -328,7 +334,8 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
                                             {dayjs(item.timestamp).format('DD/MM HH:mm')}
                                           </Row>
                                           <Row style={{ paddingTop: '5px' }}>
-                                            {renderIcons(item)}
+                                            {renderMemberIcon(item)}
+                                            {renderEmailedIcon(item)}
                                           </Row>
                                         </Col>
                                         <Col xs={6}>
