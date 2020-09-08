@@ -75,8 +75,8 @@ class GoogleSheetsReader {
     rows.map(async (row, index) => {
       row["Allocated"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["Type"]}", 'Form responses 1'!${reservationStatusColumnAddress}$1:${reservationStatusColumnAddress} = "reserved")), 0))`;
       row["Paid"] = `=ARRAYFORMULA(IFNA(ROWS(FILTER('${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress}, '${this.responseSheet.title}'!${ticketTypeColumnAddress}$1:${ticketTypeColumnAddress} = "${row["Type"]}", 'Form responses 1'!${paymentStatusColumnAddress}$1:${paymentStatusColumnAddress} = "paid")), 0))`;
-      row["Expected Revenue"] = `=SUM(B${index + 2}*D${index + 2})`
-      row["Collected Revenue"] = `=SUM(B${index + 2}*E${index + 2})`
+      row["Expected Revenue"] = `=SUM(B${row["_rowNumber"]}*D${row["_rowNumber"]})`
+      row["Collected Revenue"] = `=SUM(B${row["_rowNumber"]}*E${row["_rowNumber"]})`
       await row.save();
     })
     const totalRow = await this.ticketTypeSheet.addRow({ Type: "Total" })
@@ -130,6 +130,8 @@ class GoogleSheetsReader {
         res = row
       }
     });
+    // console.log(res)
+    console.log(res._sheet.headerValues)
     return res;
 
   }
@@ -138,6 +140,11 @@ class GoogleSheetsReader {
     const person = await this.findPerson(timestamp, fullName);
 
     person["Payment Status"] = (person["Payment Status"] == "paid" ? "" : "paid");
+
+    if (person._sheet.headerValues.indexOf("Member Status") >= 0) {
+      person["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${String.fromCharCode(64 + 1 + person._sheet.headerValues.indexOf("Imperial Shortcode"))}${person["_rowNumber"]}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
+    }
+
     await person.save();
   }
 
@@ -147,6 +154,11 @@ class GoogleSheetsReader {
     console.log(person)
     person["Ticket Type"] = ticketType;
     person["Reservation Status"] = reservationStatus;
+
+    if (person._sheet.headerValues.indexOf("Member Status") >= 0) {
+      person["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${String.fromCharCode(64 + 1 + person._sheet.headerValues.indexOf("Imperial Shortcode"))}${person["_rowNumber"]}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
+    }
+
     await person.save();
     console.log("HERE3")
   }
@@ -165,6 +177,11 @@ class GoogleSheetsReader {
   async updateEmailStatus(email) {
     const person = await this.findPersonByEmail(email);
     person["Email Status"] = "Emailed";
+
+    if (person._sheet.headerValues.indexOf("Member Status") >= 0) {
+      person["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${String.fromCharCode(64 + 1 + person._sheet.headerValues.indexOf("Imperial Shortcode"))}${person["_rowNumber"]}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
+    }
+
     await person.save();
   }
 
@@ -179,7 +196,7 @@ class GoogleSheetsReader {
     if (this.responseSheet.headerValues.indexOf("Member Status") >= 0) {
       const shortcodeColumnAddress = String.fromCharCode(64 + 1 + this.responseSheet.headerValues.indexOf("Imperial Shortcode"));
       responseRows.map(async (row, index) => {
-        row["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${shortcodeColumnAddress}${index + 2}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
+        row["Member Status"] = `=ARRAYFORMULA(IFERROR(IF(VLOOKUP(${shortcodeColumnAddress}${row["_rowNumber"]}, 'Members List'!$D:$N,11, FALSE) = 1, "Fresher", "Member"),"Non-Member"))`;
         // try {
         //   await row.save();
         // } catch (error) {
@@ -278,8 +295,9 @@ class GoogleSheetsReader {
     const map = {};
 
     responseRows.forEach((row) => {
-      let key = row["Ticket Type"] + '#' + row["Reservation Status"]
       let reservationStatus = row["Reservation Status"] || "Pending"
+      console.log(reservationStatus)
+      let key = row["Ticket Type"] + '#' + reservationStatus
       if (map[key] == null) {
         map[key] = {ticketType : row["Ticket Type"], reservationStatus, reservations : [{timestamp : row["Timestamp"], name : row["Full Name"], paymentStatus : row["Payment Status"], emailStatus : row["Email Status"] }]}
       } else {
@@ -288,6 +306,29 @@ class GoogleSheetsReader {
       if (row['Member Status']) {
         map[key].reservations[map[key].reservations.length - 1].memberStatus = row['Member Status'];
       }
+    })
+
+    const ticketTypeRows = await this.ticketTypeSheet.getRows();
+
+    ticketTypeRows.forEach((ticket) => {
+      if (ticket["Type"] !== "Total") {
+        let keyReserved = ticket["Type"] + '#' + 'reserved'
+        let keyWaitlist = ticket["Type"] + '#' + 'waitlist'
+        let keyPending = ticket["Type"] + '#' + 'Pending'
+
+        if (map[keyReserved] == null) {
+          map[keyReserved] = {ticketType : ticket["Type"], reservationStatus : 'reserved', reservations : []}
+        }
+  
+        if (map[keyWaitlist] == null) {
+          map[keyWaitlist] = {ticketType : ticket["Type"], reservationStatus : 'waitlist', reservations : []}
+        }
+
+        if (map[keyPending] == null) {
+          map[keyPending] = {ticketType : ticket["Type"], reservationStatus : 'Pending', reservations : []}
+        }
+      }
+      
     })
 
     const data = Object.values(map)

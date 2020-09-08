@@ -138,10 +138,10 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
   }
 
   const renderMemberIcon = (item) => {
-    if (item.memberStatus === "Non-Member") {
-      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}/>)
-    } else {
+    if (item.memberStatus === "Member" || item.memberStatus === "Fresher" ) {
       return (<img src='./../../assets/member-icon.png' style={{ width: '18px', height: '18px' }}/>)
+    } else {
+      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}/>)
     }
   }
 
@@ -171,11 +171,13 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
     try {
       await updatePayments();
       await updateReservations();
+      setPayments({})
+      setReservations({})
+      // setState([])
+      // setTicketTypes([])
 
       await fetchTicketReservations()
       await fetchTicketInfo()
-      setPayments({})
-      setReservations({})
       toast.success("Payment and reservation saved");
     } catch (err) {
       toast.error(`Error with saving payments/reservation: ${err}`)
@@ -276,7 +278,7 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         <Row style={{ paddingTop: "10px" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
-              <Col xs={12} sm={12} xl={6}>
+              <Col xs={12} sm={6} xl={4}>
                 <Droppable key={ind} droppableId={`${ind}`}>
                   {(provided, snapshot) => (
                     // <div >
