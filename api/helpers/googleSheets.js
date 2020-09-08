@@ -3,8 +3,8 @@ const { response } = require('express');
 
 
 class GoogleSheetsReader {
-  constructor(spreadsheetId, credentials_path) {
-    this.credentials_path = credentials_path || 'sa-credentials.json'
+  constructor(spreadsheetId, credentials) {
+    this.credentials = credentials
     this.spreadsheetId = spreadsheetId
 
     // spreadsheet key is the long id in the sheets URL
@@ -14,9 +14,9 @@ class GoogleSheetsReader {
 
   async init(callback) {
     try {
-
+      this.credentials.private_key = JSON.parse("\""+this.credentials.private_key+"\"")
       // OR load directly from json file if not in secure environment
-      await this.doc.useServiceAccountAuth(require('./../sa-credentials.json'));
+      await this.doc.useServiceAccountAuth(this.credentials);
       // OR use API key -- only for read-only access to public sheets
       // doc.useApiKey('YOUR-API-KEY');
       await this.doc.loadInfo();

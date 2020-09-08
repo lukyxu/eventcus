@@ -137,7 +137,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     agenda.schedule(new Date(body.ticketRelease), 'openForm', { formId, user:req.user })
 
     console.log(sheetId);
-    let reader = new GoogleSheetsReader(sheetId);
+    let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
     reader.init(async () => { await reader.configSheet(body.ticketTypes); res.json({ success: true }) });
   });
 });
@@ -152,17 +152,17 @@ router.get('/events', passport.authenticate('jwt', { session: false }), function
   })
 });
 
-router.post('/allocate', function (req, res, next) {
+router.post('/allocate', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => { await reader.allocate(); res.json({ success: true }) });
 });
 
-router.post('/ticketReservationInfo', function (req, res, next) {
+router.post('/ticketReservationInfo', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(() => {
     reader.ticketReservationInfo((data) => {
       console.log(data);
@@ -171,10 +171,10 @@ router.post('/ticketReservationInfo', function (req, res, next) {
   });
 });
 
-router.post('/getEmailsAndTicketTypes', function (req, res, next) {
+router.post('/getEmailsAndTicketTypes', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(() => {
     reader.getEmailsAndTicketTypes((data) => {
       console.log(data);
@@ -184,10 +184,10 @@ router.post('/getEmailsAndTicketTypes', function (req, res, next) {
 
 });
 
-router.post('/getTicketAllocations', function (req, res, next) {
+router.post('/getTicketAllocations', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(() => {
     reader.getTicketAllocations((data) => {
       res.json(data);
@@ -197,26 +197,26 @@ router.post('/getTicketAllocations', function (req, res, next) {
 
 });
 
-router.post('/changePaymentStatus', function (req, res, next) {
+router.post('/changePaymentStatus', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => {await reader.changePaymentStatus(req.body.timestamp, req.body.fullName); res.status(200).json({success:true})});
 });
 
-router.post('/changeReservationStatus', function (req, res, next) {
+router.post('/changeReservationStatus', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
   console.log(req.body.ticketType)
   console.log(req.body.reservationStatus)
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => {await reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus); res.status(200).json({success: true})});
 });
 
-router.post('/updateEmailStatus', function (req, res, next) {
+router.post('/updateEmailStatus', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => { await reader.updateEmailStatus(req.body.email); res.status(200); res.json({ success: true }) });
 });
 

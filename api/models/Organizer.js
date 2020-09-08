@@ -25,8 +25,8 @@ const OrganizerSchema = mongoose.Schema({
     default: []
   },
   token:Object,
-
-  credentials: Object
+  credentials: Object,
+  saCredentials: Object,
 });
 
 OrganizerSchema.pre('save', function (next) {
