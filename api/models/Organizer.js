@@ -23,7 +23,8 @@ const OrganizerSchema = mongoose.Schema({
   events: {
     type: [mongoose.Schema.Types.ObjectId],
     default: []
-  }
+  },
+  credentials: Object
 });
 
 OrganizerSchema.pre('save', function (next) {

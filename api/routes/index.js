@@ -4,7 +4,6 @@ var authenticator = require('../helpers/authenticator')
 var passport = require('passport')
 var Organizer = require('../models/Organizer');
 var Event = require('../models/Event');
-var googleAppLinker = require('../helpers/googleAppLinker')
 var GoogleSheetsReader = require('../helpers/googleSheets')
 var GoogleFormOpener = require('../helpers/google_form_builder/GoogleFormOpener')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
@@ -80,13 +79,14 @@ agenda.start()
 agenda.define('openForm', { concurrency: 1 }, (job, done) => {
   console.log(job.attrs)
   console.log((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString())
-  googleAppLinker.createForm((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
+  job.attrs.data.user.linker.createForm((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
     console.log(formRes)
       done()
     })
 })
 
 router.post('/createForm', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  console.log("hi")
   const body = req.body;
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation"); 
@@ -116,11 +116,17 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
   form.linkWithSheets()
 
   form.setFormOpenTime(new Date(body.ticketRelease))
-  console.log(form.toFunctionString())
-  if (form.formClosed()) {
-    console.log("CLOSED")
-  }
-  googleAppLinker.createForm(form.toFunctionString(), formRes => {
+  // console.log(form.toFunctionString())
+  // if (form.formClosed()) {
+  //   console.log("CLOSED")
+  // }
+    console.log(req.user)
+    console.log(req.user.name)
+    console.log(req.user.password)
+    console.log(req.user.events)
+    console.log(req.user.credentials)
+  console.log(req.user.linker)
+  req.user.linker.createForm(form.toFunctionString(), formRes => {
     const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
     console.log(sheetUrl)
     const newEvent = new Event({ name: body.eventName, description: body.eventDetails, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate, paymentInfo: body.paymentInfo })
@@ -128,7 +134,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
       console.error(err)
     })
 
-    agenda.schedule(new Date(body.ticketRelease), 'openForm', { formId })
+    agenda.schedule(new Date(body.ticketRelease), 'openForm', { formId, user:req.user })
 
     console.log(sheetId);
     let reader = new GoogleSheetsReader(sheetId);
