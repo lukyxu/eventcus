@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col } from 'react-bootstrap'
 import Header from '../components/header.js'
 import Button from '@material-ui/core/Button';
@@ -37,37 +37,40 @@ export default function Event({ event, events, setUser, setEvents }) {
 
   console.log(events)
 
-  const fetchTicketReservations = async () => {
-    const reqBody = {
-      sheetId: event.sheetId
-    };
-    const tickets = await getTicketReservations(reqBody);
-    console.log(tickets)
+  const fetchTicketReservations = useCallback(
+    async () => {
+      const reqBody = {
+        sheetId: event.sheetId
+      };
+      const tickets = await getTicketReservations(reqBody);
+      console.log(tickets)
 
-    // if (tickets.error) {
-    //   alert(JSON.stringify(tickets.error));
-    // }
-    const reservations = []
-    tickets.sort(function (a, b) {
-      if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
-      if (a.ticketType < b.ticketType) { return -1 }
-      return 1;
-    })
+      // if (tickets.error) {
+      //   alert(JSON.stringify(tickets.error));
+      // }
+      const reservations = []
+      tickets.sort(function (a, b) {
+        if (a.ticketType === b.ticketType) { return (a.reservationStatus < b.reservationStatus) ? -1 : 1 }
+        if (a.ticketType < b.ticketType) { return -1 }
+        return 1;
+      })
 
-    tickets.map((ticket, index) => {
-      reservations.push(ticket.reservations.map(item => {
-        item["src"] = index;
-        return item
-      }))
-    })
-    setState(reservations);
-    setTicketTypes(tickets);
-    setLoading(false);
-  };
+      tickets.forEach((ticket, index) => {
+        reservations.push(ticket.reservations.map(item => {
+          item["src"] = index;
+          return item
+        }))
+      })
+      setState(reservations);
+      setTicketTypes(tickets);
+      setLoading(false);
+    },
+    [event.sheetId],
+  )
 
   useEffect(() => {
     fetchTicketReservations();
-  }, []);
+  }, [fetchTicketReservations]);
 
   const refresh = async() => {
     await fetchTicketReservationInfo()
@@ -145,14 +148,14 @@ export default function Event({ event, events, setUser, setEvents }) {
               <Row>
                 <Col xs={4} sm={4} xl={4}>
                   {/* <Button className="blueButton" onClick={() => window.open(event.formResUrl, "_blank")}> Google Form </Button> */}
-                  <Button onClick={() => window.open(event.formResUrl, "_blank")}><img src='./../../assets/google-forms-icon.png' style={{width : '64px', height : '64px'}}></img></Button>
+                  <Button onClick={() => window.open(event.formResUrl, "_blank")}><img src='./../../assets/google-forms-icon.png' alt="google forms icon" style={{width : '64px', height : '64px'}}></img></Button>
                 </Col>
                 <Col xs={4} sm={4} xl={4}>
                   {/* <Button className="blueButton" onClick={() => window.open(event.sheetUrl, "_blank")}> Google Sheet </Button> */}
-                  <Button onClick={() => window.open(event.sheetUrl, "_blank")}><img src='./../../assets/google-sheets-icon.png' style={{width : '64px', height : '64px'}}></img></Button>
+                  <Button onClick={() => window.open(event.sheetUrl, "_blank")}><img src='./../../assets/google-sheets-icon.png' alt="google sheets icon" style={{width : '64px', height : '64px'}}></img></Button>
                 </Col>
                 <Col xs={4} sm={4} xl={4}>
-                <Button onClick={() => window.open(event.formEditUrl, "_blank")}><img src='./../../assets/google-form-edit-icon.png' style={{ height : '72px'}}></img></Button>
+                  <Button onClick={() => window.open(event.formEditUrl, "_blank")}><img src='./../../assets/google-form-edit-icon.png' alt="edit google forms icon" style={{ height : '72px'}}></img></Button>
                 </Col>
               </Row>
 

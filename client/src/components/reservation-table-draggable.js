@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import UpdatePaymentStatus from "../services/changePaymentStatus.js";
 import UpdateReservationStatus from "../services/changeReservationStatus.js";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
-import { Button, Container, Row, Col } from 'react-bootstrap'
+import { Row, Col } from 'react-bootstrap'
 import SearchBar from 'material-ui-search-bar';
 import LoadingButton from "./loading-button.js";
 import { toast } from 'react-toastify';
@@ -120,7 +120,7 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         ticketType: newTicket.ticketType,
         reservationStatus: newTicket.reservationStatus,
       }
-      const res = await UpdateReservationStatus(reqBody);
+      await UpdateReservationStatus(reqBody);
     }
   }
 
@@ -132,22 +132,22 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         timestamp: strings[0],
         fullName: strings[1],
       }
-      const res = await UpdatePaymentStatus(reqBody);
+      await UpdatePaymentStatus(reqBody);
     }
 
   }
 
   const renderMemberIcon = (item) => {
-    if (item.memberStatus === "Non-Member") {
-      return (<img src='./../../assets/non-member-icon.png' style={{ width: '18px', height: '18px' }}/>)
+    if (item.memberStatus === "Member" || item.memberStatus === "Fresher" ) {
+      return (<img src='./../../assets/member-icon.png' alt="member icon" style={{ width: '18px', height: '18px' }}/>)
     } else {
-      return (<img src='./../../assets/member-icon.png' style={{ width: '18px', height: '18px' }}/>)
+      return (<img src='./../../assets/non-member-icon.png' alt="non-member icon" style={{ width: '18px', height: '18px' }}/>)
     }
   }
 
   const renderEmailedIcon = (item) => {
     if (item.emailStatus === "Emailed") {
-      return (<img src='./../../assets/emailed-icon.png' style={{ width: '18px', height: '18px' }}/>)
+      return (<img src='./../../assets/emailed-icon.png' alt="emailed icon" style={{ width: '18px', height: '18px' }}/>)
     }
   }
 
@@ -171,11 +171,13 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
     try {
       await updatePayments();
       await updateReservations();
+      setPayments({})
+      setReservations({})
+      // setState([])
+      // setTicketTypes([])
 
       await fetchTicketReservations()
       await fetchTicketInfo()
-      setPayments({})
-      setReservations({})
       toast.success("Payment and reservation saved");
     } catch (err) {
       toast.error(`Error with saving payments/reservation: ${err}`)
@@ -276,7 +278,7 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         <Row style={{ paddingTop: "10px" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
-              <Col xs={12} sm={12} xl={6}>
+              <Col key={ind} xs={12} sm={12} xl={6}>
                 <Droppable key={ind} droppableId={`${ind}`}>
                   {(provided, snapshot) => (
                     // <div >

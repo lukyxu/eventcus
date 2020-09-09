@@ -57,13 +57,13 @@ export default function EventHookForm({fetchEvents}) {
         toast.error(`Event creation unsuccessful: ${res.error}`)
       } else {
         await fetchEvents()
+        setLoadingSubmission(false)
         history.push('/')
         toast.success("Event created")
       }
     } catch (err) {
       toast.error(`Event creation unsuccessful: ${err}`)
     }
-    setLoadingSubmission(false)
   }; // your form submit function which will invoke after successful validation
 
   // console.log(watch("eventName")); // you can watch individual input by pass the name of the input
