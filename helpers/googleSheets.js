@@ -3,8 +3,8 @@ const { response } = require('express');
 
 
 class GoogleSheetsReader {
-  constructor(spreadsheetId, credentials_path) {
-    this.credentials_path = credentials_path || 'sa-credentials.json'
+  constructor(spreadsheetId, credentials) {
+    this.credentials = credentials
     this.spreadsheetId = spreadsheetId
 
     // spreadsheet key is the long id in the sheets URL
@@ -14,9 +14,9 @@ class GoogleSheetsReader {
 
   async init(callback) {
     try {
-
+      this.credentials.private_key = JSON.parse("\""+this.credentials.private_key+"\"")
       // OR load directly from json file if not in secure environment
-      await this.doc.useServiceAccountAuth(require('./../sa-credentials.json'));
+      await this.doc.useServiceAccountAuth(this.credentials);
       // OR use API key -- only for read-only access to public sheets
       // doc.useApiKey('YOUR-API-KEY');
       await this.doc.loadInfo();
@@ -50,7 +50,7 @@ class GoogleSheetsReader {
     })
   }
 
-  async configSheet(ticketTypes) {
+  async configSheet(user, ticketTypes) {
     // Add payment and reservation status headers 
     await this.responseSheet.loadHeaderRow();
 
@@ -91,7 +91,8 @@ class GoogleSheetsReader {
       // Create Members sheet
       await this.memberSheet.loadCells('A1:A1');
       const cell = this.memberSheet.getCell(0, 0);
-      cell.formula = '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1xnPmklouiafFZkaih4eI5qX3pHsHdViRN4w8SjsE8jo", "A:N")';
+      cell.formula = `=IMPORTRANGE("${user.memberListUrl}", "A:N")`;
+      console.log(cell.formula)
       await cell.save();
 
       // Add Member/Non-Member/Fresher column if shortcode column exists

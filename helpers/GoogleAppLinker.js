@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
+const Organizer = require('../models/Organizer')
 require('dotenv').config();
 
 const SCOPES = ['https://www.googleapis.com/auth/script.projects',
@@ -12,27 +13,25 @@ const SCOPES = ['https://www.googleapis.com/auth/script.projects',
   'https://www.googleapis.com/auth/script.scriptapp'];
   
 class GoogleAppLinker {
-  constructor(token_path, credentials_path) {
-    this.token_path = token_path || 'token.json'
-    this.credentials_path = credentials_path || 'credentials.json'
-    try {
-      this.credentials = JSON.parse(fs.readFileSync(this.credentials_path))
-    } catch(err) {
-      console.log(err)
-    }
+  constructor(credentials) {
+    this.credentials = credentials
   }
 
-  authorize(callback) {
+  setCredentials(credentials) {
+    this.credentials = credentials
+  }
+
+  authorize(user, callback) {
     const { client_secret, client_id, redirect_uris } = this.credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
   
+    if (!user.token) {
+      return this.getAccessToken(user, oAuth2Client, callback);
+    }
     // Check if we have previously stored a token.
-    fs.readFile(this.token_path, (err, token) => {
-      if (err) return this.getAccessToken(oAuth2Client, callback);
-      oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client);
-    });
+    oAuth2Client.setCredentials(user.token);
+    callback(oAuth2Client);
   }
 
 
@@ -42,7 +41,7 @@ class GoogleAppLinker {
    * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
    * @param {getEventsCallback} callback The callback for the authorized client.
    */
-  getAccessToken(oAuth2Client, callback) {
+  getAccessToken(user, oAuth2Client, callback) {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: SCOPES,
@@ -57,23 +56,29 @@ class GoogleAppLinker {
       oAuth2Client.getToken(code, (err, token) => {
         if (err) return console.error('Error retrieving access token', err);
         oAuth2Client.setCredentials(token);
+        Organizer.findByIdAndUpdate(user._id,{token}, (err => {
+          if (err) {
+            console.error(err)
+          }
+          callback(oAuth2Client);
+        }))
         // Store the token to disk for later program executions
-        fs.writeFile(this.token_path, JSON.stringify(token), (err) => {
-          if (err) return console.error(err);
-          console.log('Token stored to', this.token_path);
-        });
-        callback(oAuth2Client);
+        // fs.writeFile(this.token_path, JSON.stringify(token), (err) => {
+        //   if (err) return console.error(err);
+        //   console.log('Token stored to', this.token_path);
+        // });
       });
     });
   }
 
-  createForm(code, callback) {
+  createForm(user, code, callback) {
     // For testing purposes
     code = code || 'function myFunction() {\n var form = FormApp.create(\'New Form\');\n var item = form.addTextItem();\n item.setTitle(\'Shortcode\');\n  var sheet = SpreadsheetApp.create("Responses", 50, 5); \n sheet.addEditor("sa-eventmanager@event-manager-cl-1597328691488.iam.gserviceaccount.com");\n form.setDestination(FormApp.DestinationType.SPREADSHEET, sheet.getId()); \n Logger.log(\'Published URL: \' + form.getPublishedUrl());\n Logger.log(\'Editor URL: \' + form.getEditUrl());\n   var res = {\'formResUrl\' : form.getPublishedUrl(), \'formEditUrl\' : form .getEditUrl(), \'sheetId\' : sheet.getId(), \'sheetUrl\':sheet.getUrl() }; \n return res;\n }';
-    this.authorize((auth) => {
+    console.log(code)
+    this.authorize(user, (auth) => {
     const script = google.script({ version: 'v1', auth });
-    const scriptId = process.env.SCRIPT_ID;
-    const deploymentId = process.env.DEPLOYMENT_ID;
+    const scriptId = user.scriptId;
+    const deploymentId = user.deploymentId;
 
     script.projects.updateContent({
       scriptId: scriptId,
@@ -155,6 +160,7 @@ class GoogleAppLinker {
               // The API encountered a problem before the script started executing.
               return console.log('The API scripts run returned an error: ' + err);
             }
+            console.log(JSON.stringify(res.data))
             console.log(res.data.response.result);
             // saveItemInFolder(res.data.response.result.SHEET_ID)
             console.log('success');
@@ -168,4 +174,4 @@ class GoogleAppLinker {
   }
 }
 
-module.exports = new GoogleAppLinker();
+module.exports = GoogleAppLinker;

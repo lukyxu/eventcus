@@ -4,21 +4,11 @@ var authenticator = require('../helpers/authenticator')
 var passport = require('passport')
 var Organizer = require('../models/Organizer');
 var Event = require('../models/Event');
-var googleAppLinker = require('../helpers/googleAppLinker')
 var GoogleSheetsReader = require('../helpers/googleSheets')
 var GoogleFormOpener = require('../helpers/google_form_builder/GoogleFormOpener')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
 var Agenda = require('agenda')
 var jsesc = require('jsesc')
-
-/* Read sa-credentials. */
-const fs = require('fs');
-const readline = require('readline');
-var serviceAccountEmail = '';
-fs.readFile('sa-credentials.json', (err, content) => {
-  if (err) return console.log('Error loading sa-credentials file:', err);
-  serviceAccountEmail = JSON.parse(content).client_email;
-});
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -80,18 +70,20 @@ agenda.start()
 agenda.define('openForm', { concurrency: 1 }, (job, done) => {
   console.log(job.attrs)
   console.log((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString())
-  googleAppLinker.createForm((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
+  job.attrs.data.user.linker.createForm(job.attrs.data.user, (new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
     console.log(formRes)
       done()
     })
 })
 
 router.post('/createForm', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  console.log("hi")
   const body = req.body;
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation"); 
   form.setDescription(body.eventDetails);
-  form.setServiceAccount(serviceAccountEmail);
+  form.setServiceAccount(req.user.saCredentials.client_email);
+  console.log(req.user.saCredentials.client_email)
   if (body.fieldsChecked.fullName) {
     form.addTextItem().setTitle("Full Name").setRequired();
   }
@@ -111,16 +103,22 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     form.addTextItem().setTitle("If yes, please specify")
   }
 
-  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
+  // form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
 
   form.linkWithSheets()
 
   form.setFormOpenTime(new Date(body.ticketRelease))
-  console.log(form.toFunctionString())
-  if (form.formClosed()) {
-    console.log("CLOSED")
-  }
-  googleAppLinker.createForm(form.toFunctionString(), formRes => {
+  // console.log(form.toFunctionString())
+  // if (form.formClosed()) {
+  //   console.log("CLOSED")
+  // }
+    console.log(req.user)
+    console.log(req.user.name)
+    console.log(req.user.password)
+    console.log(req.user.events)
+    console.log(req.user.credentials)
+  console.log(req.user.linker)
+  req.user.linker.createForm(req.user, form.toFunctionString(), formRes => {
     const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
     console.log(sheetUrl)
     const newEvent = new Event({ name: body.eventName, description: body.eventDetails, dropTime: new Date(body.ticketRelease), hosts: [req.user._id], sheetId, formId, sheetUrl, formEditUrl, formResUrl, eventDate: body.eventDate, paymentInfo: body.paymentInfo })
@@ -128,11 +126,11 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
       console.error(err)
     })
 
-    agenda.schedule(new Date(body.ticketRelease), 'openForm', { formId })
+    agenda.schedule(new Date(body.ticketRelease), 'openForm', { formId, user:req.user })
 
     console.log(sheetId);
-    let reader = new GoogleSheetsReader(sheetId);
-    reader.init(async () => { await reader.configSheet(body.ticketTypes); res.json({ success: true }) });
+    let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
+    reader.init(async () => { await reader.configSheet(req.user, body.ticketTypes); res.json({ success: true }) });
   });
 });
 
@@ -146,17 +144,17 @@ router.get('/events', passport.authenticate('jwt', { session: false }), function
   })
 });
 
-router.post('/allocate', function (req, res, next) {
+router.post('/allocate', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => { await reader.allocate(); res.json({ success: true }) });
 });
 
-router.post('/ticketReservationInfo', function (req, res, next) {
+router.post('/ticketReservationInfo', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(() => {
     reader.ticketReservationInfo((data) => {
       console.log(data);
@@ -165,10 +163,10 @@ router.post('/ticketReservationInfo', function (req, res, next) {
   });
 });
 
-router.post('/getEmailsAndTicketTypes', function (req, res, next) {
+router.post('/getEmailsAndTicketTypes', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(() => {
     reader.getEmailsAndTicketTypes((data) => {
       console.log(data);
@@ -178,10 +176,10 @@ router.post('/getEmailsAndTicketTypes', function (req, res, next) {
 
 });
 
-router.post('/getTicketAllocations', function (req, res, next) {
+router.post('/getTicketAllocations', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(() => {
     reader.getTicketAllocations((data) => {
       res.json(data);
@@ -191,26 +189,26 @@ router.post('/getTicketAllocations', function (req, res, next) {
 
 });
 
-router.post('/changePaymentStatus', function (req, res, next) {
+router.post('/changePaymentStatus', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => {await reader.changePaymentStatus(req.body.timestamp, req.body.fullName); res.status(200).json({success:true})});
 });
 
-router.post('/changeReservationStatus', function (req, res, next) {
+router.post('/changeReservationStatus', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
   console.log(req.body.ticketType)
   console.log(req.body.reservationStatus)
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => {await reader.changeReservationStatus(req.body.timestamp, req.body.fullName, req.body.ticketType, req.body.reservationStatus); res.status(200).json({success: true})});
 });
 
-router.post('/updateEmailStatus', function (req, res, next) {
+router.post('/updateEmailStatus', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   const sheetId = req.body.sheetId;
   console.log(sheetId);
-  let reader = new GoogleSheetsReader(sheetId);
+  let reader = new GoogleSheetsReader(sheetId, req.user.saCredentials);
   reader.init(async () => { await reader.updateEmailStatus(req.body.email); res.status(200); res.json({ success: true }) });
 });
 

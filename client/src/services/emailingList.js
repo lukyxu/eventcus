@@ -1,6 +1,6 @@
 export default async function getEmails(reqBody) {
     try {
-        let res = await fetch('/getEmailsAndTicketTypes', {
+        let res = await fetch('/api/getEmailsAndTicketTypes', {
             method: "post",
             body: JSON.stringify(reqBody),
             headers: {

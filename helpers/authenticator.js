@@ -4,6 +4,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const JwtStrategy = require('passport-jwt').Strategy
 const Organizer = require('../models/Organizer')
+const GoogleAppLinker = require('../helpers/GoogleAppLinker')
 require('dotenv').config()
 
 class Authenticator {
@@ -67,6 +68,7 @@ class Authenticator {
             return done(err,false);
           }
           if(user) {
+            user.linker = new GoogleAppLinker(user.credentials)
             return done(err, user);
           }
           return done(null, false)

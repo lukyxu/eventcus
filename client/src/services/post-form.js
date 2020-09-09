@@ -1,6 +1,6 @@
 export default async function PostForm(formData) {
   console.log(formData)
-    let res = await fetch('/createForm',{
+    let res = await fetch('/api/createForm',{
         method : "post",
         body : JSON.stringify(formData),
         headers : {

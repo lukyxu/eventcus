@@ -1,5 +1,5 @@
 export default async function AllocateTickets(data) {
-  const res = await fetch('/allocate', {
+  const res = await fetch('/api/allocate', {
     method: "post",
     body: JSON.stringify(data),
     headers: {
