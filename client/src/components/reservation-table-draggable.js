@@ -138,10 +138,10 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
   }
 
   const renderMemberIcon = (item) => {
-    if (item.memberStatus === "Non-Member") {
-      return (<img src='./../../assets/non-member-icon.png' alt="non-member icon" style={{ width: '18px', height: '18px' }}/>)
-    } else {
+    if (item.memberStatus === "Member" || item.memberStatus === "Fresher" ) {
       return (<img src='./../../assets/member-icon.png' alt="member icon" style={{ width: '18px', height: '18px' }}/>)
+    } else {
+      return (<img src='./../../assets/non-member-icon.png' alt="non-member icon" style={{ width: '18px', height: '18px' }}/>)
     }
   }
 
@@ -171,11 +171,13 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
     try {
       await updatePayments();
       await updateReservations();
+      setPayments({})
+      setReservations({})
+      // setState([])
+      // setTicketTypes([])
 
       await fetchTicketReservations()
       await fetchTicketInfo()
-      setPayments({})
-      setReservations({})
       toast.success("Payment and reservation saved");
     } catch (err) {
       toast.error(`Error with saving payments/reservation: ${err}`)

@@ -1,6 +1,6 @@
 export default function ChangeReservationStatus(data) {
     console.log(data)
-    return fetch('/changeReservationStatus', {
+    return fetch('/api/changeReservationStatus', {
         method: "post",
         body: JSON.stringify(data),
         headers: {

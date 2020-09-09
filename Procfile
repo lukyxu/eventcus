@@ -1,0 +1,1 @@
+web: npm run aws-build && npm start

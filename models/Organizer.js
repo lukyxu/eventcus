@@ -27,6 +27,9 @@ const OrganizerSchema = mongoose.Schema({
   token:Object,
   credentials: Object,
   saCredentials: Object,
+  memberListUrl: String,
+  scriptId: String,
+  deploymentId: String
 });
 
 OrganizerSchema.pre('save', function (next) {

@@ -1,5 +1,5 @@
 export default async function updateEmailStatus(data) {
-  const res = await fetch('/updateEmailStatus', {
+  const res = await fetch('/api/updateEmailStatus', {
     method: "post",
     body: JSON.stringify(data),
     headers: {

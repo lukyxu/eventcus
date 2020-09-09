@@ -10,6 +10,8 @@ require('dotenv').config()
 var indexRouter = require('./routes/index');
 var organizerRouter = require('./routes/organizer');
 
+var port = process.env.PORT || '9000';
+
 var app = express();
 
 // view engine setup
@@ -28,12 +30,19 @@ mongoose.connect(uri,
   .then(() => {  console.log('MongoDB Connected')})
   .catch(err => console.log(err))
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
+app.use('/api', indexRouter);
 app.use('/organizer', organizerRouter);
 
 app.get('/hey', (req, res) => res.send('ho!'))
+
+// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'client/build')));
+if(process.env.NODE_ENV === 'production') {  
+  app.use(express.static(path.join(__dirname, 'client/build'))); 
+  app.get('*', (req, res) => {    res.sendfile(path.join(__dirname = 'client/build/index.html'));  
+})}
+app.get('*', (req, res) => {  res.sendFile(path.join(__dirname+'/client/public/index.html'));})
+// app.listen(port, (req, res) => {  console.log( `server listening on port: ${port}`);})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
