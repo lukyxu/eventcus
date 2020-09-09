@@ -278,7 +278,7 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         <Row style={{ paddingTop: "10px" }}>
           <DragDropContext onDragEnd={onDragEnd}>
             {ticketTypes.map((el, ind) => (
-              <Col key={ind} xs={12} sm={12} xl={6}>
+              <Col key={ind} xs={12} sm={6} xl={4}>
                 <Droppable key={ind} droppableId={`${ind}`}>
                   {(provided, snapshot) => (
                     // <div >
@@ -345,16 +345,9 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
                                             {item.name}
                                           </Row>
                                         </Col>
-
                                       </Row>
-
-
-
-
-
-
                                     </Col>
-                                    <Col xs={3} sm={2} xl={2}>
+                                    <Col xs={3} sm={2} xl={2} style={{padding: "0px"}}>
                                       {renderPaidButton(item)}
                                     </Col>
 
