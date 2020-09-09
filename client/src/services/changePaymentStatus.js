@@ -1,6 +1,6 @@
 export default function ChangePaymentStatus(data) {
     console.log(data)
-    return fetch('/changePaymentStatus', {
+    return fetch('/api/changePaymentStatus', {
         method: "post",
         body: JSON.stringify(data),
         headers: {

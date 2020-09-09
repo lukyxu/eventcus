@@ -1,5 +1,5 @@
 export var login = (user, cb) =>{
-    return fetch('/login',{
+    return fetch('/api/login',{
         method : "post",
         body : JSON.stringify(user),
         headers : {
@@ -15,7 +15,7 @@ export var login = (user, cb) =>{
 }
 export var register = (user, cb) =>{
     console.log(user);
-    return fetch('/register',{
+    return fetch('/api/register',{
         method : "post",
         body : JSON.stringify(user),
         headers : {
@@ -26,13 +26,13 @@ export var register = (user, cb) =>{
       .then(data => cb(data)).catch(error => cb({error}));
 }
 export var logout = (cb)=>{
-    return fetch('/logout',
+    return fetch('/api/logout',
     {method : "post", credentials: "include"})
             .then(res => res.json())
             .then(data => cb(data)).catch(error => cb({error}));
 }
 export var isAuthenticated = (cb) =>{
-    return fetch('/authenticate',
+    return fetch('/api/authenticate',
     {method: "post", credentials: "include"})
     .then(res=>{
         if(res.status !== 401){

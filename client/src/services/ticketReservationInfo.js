@@ -1,5 +1,5 @@
 export default function TicketReservationInfo(data) {
-    return fetch('/ticketReservationInfo', {
+    return fetch('/api/ticketReservationInfo', {
         method: "post",
         body: JSON.stringify(data),
         headers: {

@@ -1,5 +1,5 @@
 export default function TicketAllocations(data) {
-    return fetch('/getTicketAllocations', {
+    return fetch('/api/getTicketAllocations', {
         method: "post",
         body: JSON.stringify(data),
         headers: {

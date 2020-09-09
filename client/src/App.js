@@ -55,7 +55,7 @@ function App() {
   async function fetchEvents() {
     let r = []
     try {
-      let res = await fetch("/events", {credentials: "include"})
+      let res = await fetch("/api/events", {credentials: "include"})
       let e = await res.json()
 
       await Promise.all(e.map(async (event) => {

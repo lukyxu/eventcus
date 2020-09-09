@@ -77,8 +77,8 @@ class GoogleAppLinker {
     console.log(code)
     this.authorize(user, (auth) => {
     const script = google.script({ version: 'v1', auth });
-    const scriptId = process.env.SCRIPT_ID;
-    const deploymentId = process.env.DEPLOYMENT_ID;
+    const scriptId = user.scriptId;
+    const deploymentId = user.deploymentId;
 
     script.projects.updateContent({
       scriptId: scriptId,
