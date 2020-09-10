@@ -152,7 +152,8 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
         <source media="(min-width: 1024px)" srcset="./../../assets/large-member-icon.png"/>
         <img src="./../../assets/member-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
     </picture>)
-    } else {
+    }
+    if (item.memberStatus === "Non-Member") {
       return(<picture>
         <source media="(max-width: 1024px)" srcset="./../../assets/non-member-icon.png"/>
         <source media="(min-width: 1024px)" srcset="./../../assets/large-non-member-icon.png"/>
