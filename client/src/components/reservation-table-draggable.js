@@ -138,16 +138,36 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
   }
 
   const renderMemberIcon = (item) => {
-    if (item.memberStatus === "Member" || item.memberStatus === "Fresher" ) {
-      return (<img src='./../../assets/member-icon.png' alt="member icon" style={{ width: '18px', height: '18px' }}/>)
+    if (item.memberStatus === "Fresher") {
+      return(<picture>
+        <source media="(max-width: 1024px)" srcset="./../../assets/blue-fresher-icon.png"/>
+        <source media="(min-width: 1024px)" srcset="./../../assets/large-blue-fresher-icon.png"/>
+        <img src="./../../assets/blue-fresher-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
+    </picture>)
+    }
+
+    if (item.memberStatus === "Member") {
+      return(<picture>
+        <source media="(max-width: 1024px)" srcset="./../../assets/member-icon.png"/>
+        <source media="(min-width: 1024px)" srcset="./../../assets/large-member-icon.png"/>
+        <img src="./../../assets/member-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
+    </picture>)
     } else {
-      return (<img src='./../../assets/non-member-icon.png' alt="non-member icon" style={{ width: '18px', height: '18px' }}/>)
+      return(<picture>
+        <source media="(max-width: 1024px)" srcset="./../../assets/non-member-icon.png"/>
+        <source media="(min-width: 1024px)" srcset="./../../assets/large-non-member-icon.png"/>
+        <img src="./../../assets/non-member-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
+    </picture>)
     }
   }
 
   const renderEmailedIcon = (item) => {
     if (item.emailStatus === "Emailed") {
-      return (<img src='./../../assets/emailed-icon.png' alt="emailed icon" style={{ width: '18px', height: '18px' }}/>)
+      return(<picture>
+        <source media="(max-width: 1024px)" srcset="./../../assets/emailed-icon.png"/>
+        <source media="(min-width: 1024px)" srcset="./../../assets/large-emailed-icon.png"/>
+        <img src="./../../assets/emailed-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
+    </picture>)
     }
   }
 
