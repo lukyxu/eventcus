@@ -8,6 +8,9 @@ import SearchBar from 'material-ui-search-bar';
 import LoadingButton from "./loading-button.js";
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
+const customParseFormat = require('dayjs/plugin/customParseFormat')
+dayjs.extend(customParseFormat)
+
 
 // fake data generator
 // const getItems = (count, offset = 0) =>
@@ -140,23 +143,23 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
   const renderMemberIcon = (item) => {
     if (item.memberStatus === "Fresher") {
       return(<picture>
-        <source media="(max-width: 1024px)" srcset="./../../assets/blue-fresher-icon.png"/>
-        <source media="(min-width: 1024px)" srcset="./../../assets/large-blue-fresher-icon.png"/>
+        <source media="(max-width: 1024px)" srcSet="./../../assets/blue-fresher-icon.png"/>
+        <source media="(min-width: 1024px)" srcSet="./../../assets/large-blue-fresher-icon.png"/>
         <img src="./../../assets/blue-fresher-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
     </picture>)
     }
 
     if (item.memberStatus === "Member") {
       return(<picture>
-        <source media="(max-width: 1024px)" srcset="./../../assets/member-icon.png"/>
-        <source media="(min-width: 1024px)" srcset="./../../assets/large-member-icon.png"/>
+        <source media="(max-width: 1024px)" srcSet="./../../assets/member-icon.png"/>
+        <source media="(min-width: 1024px)" srcSet="./../../assets/large-member-icon.png"/>
         <img src="./../../assets/member-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
     </picture>)
     }
     if (item.memberStatus === "Non-Member") {
       return(<picture>
-        <source media="(max-width: 1024px)" srcset="./../../assets/non-member-icon.png"/>
-        <source media="(min-width: 1024px)" srcset="./../../assets/large-non-member-icon.png"/>
+        <source media="(max-width: 1024px)" srcSet="./../../assets/non-member-icon.png"/>
+        <source media="(min-width: 1024px)" srcSet="./../../assets/large-non-member-icon.png"/>
         <img src="./../../assets/non-member-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
     </picture>)
     }
@@ -165,8 +168,8 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
   const renderEmailedIcon = (item) => {
     if (item.emailStatus === "Emailed") {
       return(<picture>
-        <source media="(max-width: 1024px)" srcset="./../../assets/emailed-icon.png"/>
-        <source media="(min-width: 1024px)" srcset="./../../assets/large-emailed-icon.png"/>
+        <source media="(max-width: 1024px)" srcSet="./../../assets/emailed-icon.png"/>
+        <source media="(min-width: 1024px)" srcSet="./../../assets/large-emailed-icon.png"/>
         <img src="./../../assets/emailed-icon.png" alt="IfItDoesntMatchAnyMedia" style={{ height: '18px' }}/>
     </picture>)
     }
@@ -354,7 +357,7 @@ export default function ReservationTable({ event, fetchTicketInfo, fetchTicketRe
                                       <Row style={{ alignItems: 'center' }}>
                                         <Col xs={6}>
                                           <Row className='reservationTimestamp'>
-                                            {dayjs(item.timestamp).format('DD/MM HH:mm')}
+                                            {dayjs(item.timestamp, "DD/MM/YYYY HH:mm:ss").format('DD/MM HH:mm')}
                                           </Row>
                                           <Row style={{ paddingTop: '5px' }}>
                                             {renderMemberIcon(item)}

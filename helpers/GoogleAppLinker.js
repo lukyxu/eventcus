@@ -11,7 +11,7 @@ const SCOPES = ['https://www.googleapis.com/auth/script.projects',
   'https://www.googleapis.com/auth/forms',
   'https://www.googleapis.com/auth/forms.currentonly',
   'https://www.googleapis.com/auth/script.scriptapp'];
-  
+
 class GoogleAppLinker {
   constructor(credentials) {
     this.credentials = credentials
@@ -25,7 +25,7 @@ class GoogleAppLinker {
     const { client_secret, client_id, redirect_uris } = this.credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
-  
+    
     if (!user.token) {
       return this.getAccessToken(user, oAuth2Client, callback);
     }
@@ -91,7 +91,7 @@ class GoogleAppLinker {
         }, {
           name: 'appsscript',
           type: 'JSON',
-          source: '{\"timeZone\":\"America/New_York\","executionApi": {"access": "ANYONE"},\"exceptionLogging\":' +
+          source: '{\"timeZone\":\"Europe/London\","executionApi": {"access": "ANYONE"},\"exceptionLogging\":' +
             '\"CLOUD\"}',
         }],
       },
@@ -123,7 +123,7 @@ class GoogleAppLinker {
         //     versionNumber: res.data.versionNumber,
         //   }
         // }, {}, (err, res) => {
-  
+        console.log()
         script.projects.deployments.update({
           scriptId: scriptId,
           deploymentId: deploymentId,

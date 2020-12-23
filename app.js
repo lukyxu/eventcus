@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 //     res.sendfile(path.join(__dirname = 'client/build/index.html'));  
 // })}
 
-app.get('*', (req, res) => {  
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 })
 // app.listen(port, (req, res) => {  console.log( `server listening on port: ${port}`);})

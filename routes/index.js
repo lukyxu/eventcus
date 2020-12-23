@@ -8,7 +8,8 @@ var GoogleSheetsReader = require('../helpers/googleSheets')
 var GoogleFormOpener = require('../helpers/google_form_builder/GoogleFormOpener')
 var Form = require('../helpers/google_form_builder/GoogleFormBuilder')
 var Agenda = require('agenda')
-var jsesc = require('jsesc')
+var jsesc = require('jsesc');
+const GoogleAppLinker = require('../helpers/GoogleAppLinker');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -69,15 +70,16 @@ agenda.start()
 
 agenda.define('openForm', { concurrency: 1 }, (job, done) => {
   console.log(job.attrs)
+  const user = job.attrs.data.user
   console.log((new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString())
-  job.attrs.data.user.linker.createForm(job.attrs.data.user, (new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
+  const linker = new GoogleAppLinker(user.credentials)
+  linker.createForm(job.attrs.data.user, (new GoogleFormOpener(job.attrs.data.formId)).openForm().toFunctionString(), formRes => {
     console.log(formRes)
       done()
     })
 })
 
 router.post('/createForm', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  console.log("hi")
   const body = req.body;
   let form = new Form(body.eventName)
   form.setTitle(body.eventName + " Ticket Reservation"); 
@@ -103,7 +105,7 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
     form.addTextItem().setTitle("If yes, please specify")
   }
 
-  // form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
+  form.addMultipleChoiceItem().setTitle("Ticket Type").setChoices(body.ticketTypes.map(x => {x.type = x.type + " " + (x.price > 0 ? "(£" + x.price + ")" : "(Free)"); return x.type})).setRequired()
 
   form.linkWithSheets()
 
@@ -112,11 +114,11 @@ router.post('/createForm', passport.authenticate('jwt', { session: false }), fun
   // if (form.formClosed()) {
   //   console.log("CLOSED")
   // }
-    console.log(req.user)
-    console.log(req.user.name)
-    console.log(req.user.password)
-    console.log(req.user.events)
-    console.log(req.user.credentials)
+  console.log(req.user)
+  console.log(req.user.name)
+  console.log(req.user.password)
+  console.log(req.user.events)
+  console.log(req.user.credentials)
   console.log(req.user.linker)
   req.user.linker.createForm(req.user, form.toFunctionString(), formRes => {
     const { sheetId, formId, sheetUrl, formEditUrl, formResUrl } = formRes;
